@@ -1,0 +1,33 @@
+---
+description: Auto-generated dev-library rule for api-design-principles
+globs: *.*
+---
+# Rule: API Design Principles
+
+> **Purpose:** API design engineering rules for REST, GraphQL, and OpenAPI specifications. Attach this rule to enforce strict API standards and consistent service contracts.
+
+## 1. REST API Design
+- **Resource-Noun URLs:** Use plural nouns for resource endpoints (`/users`, `/orders`). Avoid verbs in URLs; use HTTP methods (`GET`, `POST`, `PUT`, `DELETE`) to indicate actions.
+- **HTTP Status Codes:** `200` for successful GET/PUT, `201` for created resources (POST), `204` for deleted resources, `400` for client errors, `401`/`403` for auth, `404` for not found, `500` for server errors.
+- **Filtering and Pagination:** Use query parameters for filtering (`?status=active`), sorting (`?sort=created_at`), and pagination (`?page=2&limit=10`). 
+- **HTTP Methods Semantics:**
+  - `GET`: Retrieve resource. Must be idempotent and safe.
+  - `POST`: Create a new resource. Not idempotent.
+  - `PUT`: Replace a resource entirely. Must be idempotent.
+  - `PATCH`: Partially update a resource.
+  - `DELETE`: Remove a resource. Must be idempotent.
+
+## 2. API Versioning
+- **URL Versioning (Preferred for Breaking Changes):** `/v1/users`, `/v2/users`. Use when the change is not backward-compatible.
+- **Header Versioning:** `Accept: application/vnd.api+v1+json`. Good for minor versioning.
+- **Deprecation, Not Removal:** Deprecate old versions with `Deprecation` header and timeline. 
+
+## 3. OpenAPI/Swagger Specification
+- **Versioned Specs:** Store OpenAPI YAML/JSON files versioned in the repository (`openapi/v1.yaml`). Never generate specs solely at runtime without source control.
+- **Security Schemes:** Define `securitySchemes` for OAuth2, API keys, or Bearer tokens. Reference them in individual operation `security` blocks.
+- **Request/Response Models:** Define inline or referenced models for every request body and response type. Use `examples` fields to illustrate typical payloads.
+
+## 4. Authentication and Authorization
+- **Bearer Tokens:** Use `Authorization: Bearer <jwt>` for stateless authentication. JWTs should be short-lived (15-30 minutes) with refresh token flow.
+- **Scope-Based Authorization:** Attach scopes to tokens (`scope: read:users`). Check scopes on the server side for every protected resource.
+- **Rate Limiting:** Implement per-IP or per-token rate limiting. Return `429 Too Many Requests`.

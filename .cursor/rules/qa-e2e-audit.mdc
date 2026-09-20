@@ -1,0 +1,30 @@
+---
+globs: *.*
+name: qa-e2e-audit
+description: >-
+  Run a Quality Assurance (QA) and End-to-End (E2E) testing audit using Playwright or Cypress to prevent regression bugs.
+  Use when the user asks for "/qa-audit", "/e2e-audit", or "test the user flow".
+trigger: explicit
+---
+
+# QA & End-to-End (E2E) Testing Audit
+
+AI coding tools frequently introduce regression bugs—breaking an existing feature while building a new one. This skill enforces strict End-to-End browser testing to act as a safety net.
+
+## Workflow
+
+### Phase 1: Test Infrastructure Check
+1. Verify if Playwright or Cypress is installed. If not, pause and ask the user for permission to install Playwright (`npm init playwright@latest`).
+
+### Phase 2: Critical Path Analysis
+1. Read the application structure to identify the most critical user flows (e.g., Login/Signup, Checkout, Content Creation).
+2. Look for existing `.spec.ts` or `.cy.ts` files. 
+
+### Phase 3: Test Generation & Execution
+1. If critical paths lack tests, generate robust E2E tests for them.
+   - Tests MUST mock external third-party APIs (like Stripe) to avoid dirtying production data.
+   - Tests MUST use resilient locators (e.g., `getByRole`, `getByTestId`) rather than brittle CSS classes.
+2. Run the test suite headlessly (`npx playwright test`).
+
+### Phase 4: Generate Verdict
+Generate a `QA_VERDICT.md` detailing the tests created, the pass/fail rate, and any regression bugs caught.

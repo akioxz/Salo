@@ -1,0 +1,32 @@
+---
+globs: *.*
+name: architecture-refactor-audit
+description: >-
+  Run a structural audit to find and fix monolithic files (1000+ lines), spaghetti code, and architectural violations.
+  Use when the user asks for "/refactor-audit", "/architecture-audit", or "clean up my code".
+trigger: explicit
+---
+
+# The Architecture & Refactoring Audit
+
+AI coding tools often degrade project architecture over time by appending code to the same files, creating unmaintainable monoliths. This skill reverses that entropy.
+
+## Workflow
+
+### Phase 1: The Monolith Hunt
+1. Scan the codebase (specifically `app/`, `components/`, or `src/`) for any file exceeding 300 lines of code.
+2. Identify files that violate the Single Responsibility Principle (e.g., a file handling database queries, UI rendering, and state management simultaneously).
+
+### Phase 2: Feature-Sliced Breakdown
+For every monolithic file found, execute a strict refactoring plan:
+1. **Extract UI Components:** Move large sub-trees of JSX into their own isolated components.
+2. **Extract Logic (Custom Hooks):** Move complex `useState` and `useEffect` chains into standalone custom hooks (e.g., `useUserDashboard.ts`).
+3. **Extract Utilities:** Move pure data-formatting functions into a `utils/` or `lib/` directory.
+
+### Phase 3: Folder Structure Enforcement
+Ensure the project follows a scalable standard:
+- UI Components belong in `components/ui/` (if reusable) or `components/features/` (if domain-specific).
+- Database calls and API interactions must be separated from UI components.
+
+### Phase 4: Generate Verdict
+Generate a `REFACTOR_VERDICT.md` detailing which files were broken down and the new component hierarchy.

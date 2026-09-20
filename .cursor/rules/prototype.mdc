@@ -1,0 +1,21 @@
+---
+globs: *.*
+name: prototype
+description: Generate a live, interactive HTML/Tailwind mockup inline in the chat before committing to Next.js code.
+trigger: explicit
+---
+
+# The Prototype Engine
+
+Use this skill to rapidly validate a UI/UX "vibe" or layout using the `generative_ui` capability before writing complex Next.js/React code. This saves iteration time and prevents spaghetti code.
+
+## Workflow
+
+1. Parse the user's request, wireframe, or reference link.
+2. **Do NOT write Next.js or React code.**
+3. Create a raw HTML artifact. Use the `write_to_file` tool to save an `.html` file. 
+4. The HTML file MUST use Tailwind CSS via the allowed CDN (`<script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>`).
+5. Include vanilla JavaScript inside the HTML file if basic interactions (like hover states or simple GSAP equivalents) are needed to demonstrate the vibe.
+6. Enforce the **Design Spells Doctrine** and **Motionsite 3D Standard** (use mock CSS elements for 3D backgrounds if necessary).
+7. Render the HTML file inline in the chat using the `<agent-embed src="file:///<artifact_path>"></agent-embed>` tag.
+8. Wait for the user's feedback. If approved, instruct the user to trigger `/build` to implement the design into the actual Next.js project.

@@ -1,0 +1,25 @@
+---
+globs: *.*
+name: State Management Boundaries
+description: Strict rules to prevent React state spaghetti, infinite re-renders, and prop drilling.
+---
+
+# State Management Constraints
+
+AI agents frequently mix server state and client state, leading to performance degradation and spaghetti code. Enforce these boundaries strictly:
+
+## 1. Server State vs. Client State
+- **Server State:** Any data fetched from an API or database.
+  - MUST use caching libraries like TanStack Query (React Query) or SWR.
+  - DO NOT sync server state into local `useState` or global stores. Rely on the cache.
+- **Client State:** UI state (e.g., modals open/closed, dark mode, selected tabs).
+  - Use `useState` for strictly local component state.
+  - Use `Zustand` for global client state.
+
+## 2. React Context Anti-Pattern
+- DO NOT use React Context for global state that changes frequently (this causes whole-tree re-renders).
+- React Context is ONLY permitted for Dependency Injection (e.g., passing a theme object or an auth provider) that rarely changes.
+
+## 3. Prop Drilling
+- If you are passing a prop down more than 2 levels, STOP.
+- Refactor using Component Composition (passing `children`) or lift the state into a Zustand store.

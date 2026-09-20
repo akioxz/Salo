@@ -1,0 +1,66 @@
+---
+globs: *.*
+name: backend-security-audit
+description: >-
+  Run the ultimate backend and security audit combining automated SAST scanning, practical anti-vulnerability heuristics from The Lazy Developer, and Doubt-Driven Adversarial Reviews.
+  Use when the user asks for "/backend-audit", "/security-audit", "check backend", or "harden my API".
+trigger: explicit
+---
+
+# The Ultimate Backend & Security Audit
+
+This skill executes a comprehensive, multi-layered audit of the backend, database, and API layer. It combines programmatic linting with LLM-driven architectural reviews based on industry gold standards and the "The Lazy Developer" security playbook.
+
+## Workflow
+
+Execute the following 4 passes systematically. Do not skip any pass.
+
+### Phase 1: Programmatic & Tooling Pass
+Run terminal commands to check the actual state of the project dependencies and secrets:
+1. Run `npm audit` or `yarn audit` to identify vulnerabilities in the supply chain.
+2. Search the codebase for leaked secrets (e.g., hardcoded API keys, JWT secrets, database connection strings). 
+3. Check `package.json` for outdated or abandoned core packages.
+
+### Phase 2: The Lazy Developer Pass (Business Logic & Auth)
+Manually review the codebase specifically looking for the exact mistakes AI tools usually make. Fix these immediately if found:
+- **Authorization & IDOR:** Authenticated != Authorized. Check every `GET`, `POST`, `PUT`, `DELETE` endpoint. Does it verify that the *logged-in user owns the specific record* they are trying to access? If missing, add ownership checks.
+- **Securing Endpoints:** Any endpoint without a shared secret or auth middleware is public. Lock down every route that writes data or triggers a side effect.
+- **Environment Variables:** Ensure server secrets DO NOT have `NEXT_PUBLIC_` or `VITE_` prefixes. Check that `.env.local` is in `.gitignore`.
+- **Database RLS & Privilege Escalation:** In Supabase/Prisma, ensure users cannot flip their own `is_admin` or `role` flags via the UI/API. Enforce Row Level Security (RLS) on all tables.
+- **Payments & Webhooks:** Ensure webhook signatures are actually verified. Add a database uniqueness constraint (e.g., processed_event_id) so replay attacks cannot double-grant credits.
+
+### Phase 3: The Architecture & Performance Pass
+Review the database access and application architecture:
+- **Eliminate N+1 Queries:** Find any loops in the code that trigger a database round-trip (e.g., fetching a user, then looping through to fetch their posts). Refactor to use `include` (Prisma) or SQL `JOIN`s to batch the request.
+- **Rate Limiting:** Ensure public mutating endpoints (login, signup, reset password) have rate limiting applied.
+- **Pagination & Scale Traps:** Look for `.findMany()` or `.select()` calls without `limit` or `take` arguments. AI often assumes databases are small. Enforce limits on all list endpoints.
+
+### Phase 4: Doubt-Driven Development (The Adversarial Review)
+Before generating the final verdict and committing fixes, act as a fresh-context adversarial reviewer. Apply this exact mindset to the codebase:
+> *"Adversarial review. Find what is wrong with this artifact. Assume the author is overconfident. Do NOT validate. Find issues. Look for unstated assumptions, edge cases not handled, and ways the contract could be violated."*
+Scrutinize your own proposed fixes from Phases 2 and 3. If the adversarial review finds holes (e.g., "This fix breaks under concurrent requests"), fix them.
+
+### Phase 5: Fix and Generate Verdict
+Refactor the codebase to patch the vulnerabilities discovered. 
+Once completed, generate or update a report at `security/BACKEND_VERDICT.md` with the following structure:
+
+```markdown
+# Backend Security Verdict -- [Project Name]
+
+**disposition: [SECURE | VULNERABLE]**
+
+## 1. Automated Scan Results
+[Summarize npm audit and secret scanning results]
+
+## 2. The Lazy Developer Fixes
+[List the IDORs, public endpoints, and webhook replays fixed]
+
+## 3. Architecture & DB Optimizations
+[List the N+1 queries killed, and pagination limits enforced]
+
+## 4. Adversarial Findings
+[List edge cases caught by the Doubt-Driven review phase]
+
+## Conclusion
+[Provide a final security rating and any remaining risks]
+```

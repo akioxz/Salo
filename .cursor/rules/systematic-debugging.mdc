@@ -1,0 +1,44 @@
+---
+globs: *.*
+name: systematic-debugging
+description: "4-phase root cause investigation protocol requiring reproduction, bisection, hypothesis testing, and regression proof. Use when fixing bugs, test failures, or regressions to avoid speculative, trial-and-error code edits."
+---
+
+# Systematic Debugging
+
+Use when a bug is reported, a test fails unexpectedly, or a regression occurs. This skill enforces a structured investigation protocol rather than guessing or applying random patches to see what sticks.
+
+## Workflow: The 4 Phases
+
+### Phase 1: Minimal Reproduction
+Before touching any production code, write a minimal automated test or script that reproduces the bug deterministically.
+- **Goal:** Isolate the failure from the rest of the application.
+- **Validation:** The script must fail consistently with the exact target error.
+
+### Phase 2: Isolation & Bisection
+Trace the execution path backwards from the failure point.
+- **Goal:** Pinpoint the exact line of code or state variable where the program diverges from expected behavior.
+- **Validation:** You can point to the specific file, line, and variable causing the divergence.
+
+### Phase 3: Formulate & Test Hypothesis
+State an explicit hypothesis for *why* the failure occurs. Test this hypothesis using a minimal diagnostic edit or logging.
+- **Goal:** Prove you understand the mechanism before writing the final fix.
+- **Validation:** The diagnostic output confirms your hypothesis. If it disproves it, reformulate before proceeding.
+
+### Phase 4: Targeted Fix & Regression Proof
+Apply the targeted fix to the production code.
+- **Goal:** Resolve the root cause without breaking external modules.
+- **Validation:** The reproduction test from Phase 1 now passes, AND the full test suite remains 100% green.
+
+## Hard Rules
+- **No Speculative Edits:** Never edit production logic until you have a failing reproduction test.
+- **State Your Hypothesis:** Always explicitly write out your hypothesis before attempting a fix.
+- **Verify Globally:** A fix is not complete until the entire test suite passes, proving no regressions were introduced.
+
+## Constraints
+Do not use this skill for simple syntax errors caught by the compiler, or for feature implementations where the code is known to be working. Use it specifically for logic bugs, runtime crashes, and flaky tests.
+
+## Related (dev-library cross-links)
+- Rules: error-handling.md
+- Prompts: invoked via an "investigate bug" goal in project-continuation-prompt.md
+- Workflows: ai-development-workflow-map.md

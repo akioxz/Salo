@@ -1,0 +1,62 @@
+---
+globs: *.*
+name: seo-aeo-audit
+description: >-
+  Run the ultimate SEO and AEO (Answer Engine Optimization) audit. Implements The Lazy Developer playbook to optimize Next.js apps for AI crawlers (ChatGPT, Perplexity, Claude), Google Search, and frontend performance.
+  Use when the user asks for "/seo-audit", "/aeo-audit", "optimize for AI search", or "fix my SEO".
+trigger: explicit
+---
+
+# The SEO & AEO (Answer Engine Optimization) Audit
+
+This skill executes a comprehensive audit of the frontend's discoverability, focusing on the modern 2026 landscape where AI crawlers (Perplexity, ChatGPT, Claude) are just as important as traditional Google Search. It enforces the strict guidelines from "The Lazy Developer".
+
+## Workflow
+
+Execute the following 4 passes systematically. Do not skip any pass.
+
+### Phase 1: Technical AEO & Crawlability (AI Search)
+Ensure the application can be cleanly read by AI agents:
+1. **llms.txt Generation:** Ensure there is an `llms.txt` and `llms-full.txt` at the root of the domain. This should provide a clean, markdown-based map of the site's content specifically for LLM crawlers.
+2. **robots.txt & Crawler Access:** Verify `robots.txt` is properly configured. Do not block legitimate AI crawlers (`OAI-SearchBot`, `ClaudeBot`, `PerplexityBot`) from reading public content.
+3. **SSR & Prerendering:** Ensure that public-facing content is available in the initial HTML payload (Server-Side Rendered or Static). AI crawlers do not reliably execute JavaScript. Avoid client-side-only fetching for critical content.
+
+### Phase 2: Structured Data (Schema.org)
+Speak the language of search engines directly:
+1. **JSON-LD Injection:** Ensure every page has the appropriate JSON-LD Schema.org markup.
+2. **Entity Types:** 
+   - Homepage: Must have `Organization` or `WebSite` schema.
+   - Blog/Content: Must have `Article` schema with author and publish dates.
+   - Support/Help: Must have `FAQPage` schema.
+3. Validate that structured data is injected into the `<head>` or high up in the `<body>` cleanly without breaking React hydration.
+
+### Phase 3: Traditional SEO & Metadata
+Enforce classic on-page SEO requirements:
+1. **Meta Tags & OpenGraph:** Every page MUST have dynamic `<title>`, `<meta name="description">`, canonical URLs, and OpenGraph (`og:title`, `og:image`) tags.
+2. **Semantic HTML:** Ensure correct heading hierarchy (one `<h1>`, followed by `<h2>`, etc.). Do not use heading tags just for sizing/styling.
+3. **Alt Text:** Ensure every `<img>` and Next.js `<Image>` has descriptive, non-spammy `alt` text.
+
+### Phase 4: Frontend Performance (Ship Less JS)
+Speed is a ranking factor. Audit the bundle sizes:
+1. **Code Splitting:** Check for heavy libraries (e.g., Three.js, heavy chart libraries, rich text editors). Force them to load dynamically (e.g., using `next/dynamic` with `ssr: false` if they are client-only).
+2. **Asset Optimization:** Ensure all images are served via Next.js Image component (which auto-converts to WebP/AVIF).
+3. **Font Loading:** Ensure fonts are self-hosted or loaded with `next/font` to prevent Cumulative Layout Shift (CLS) and external tracking.
+
+### Phase 5: Generate Verdict
+Refactor the codebase to implement the missing optimizations. 
+Once completed, generate or update a report at `seo/AEO_VERDICT.md` with the following structure:
+
+```markdown
+# SEO & AEO Verdict -- [Project Name]
+
+**disposition: [OPTIMIZED | LACKING]**
+
+## 1. AI Crawlability (AEO)
+[Summarize llms.txt creation and SSR fixes]
+
+## 2. Structured Data
+[List the JSON-LD schemas added]
+
+## 3. Traditional SEO & Performance
+[List meta tags added and JS bundles split]
+```

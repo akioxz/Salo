@@ -1,0 +1,61 @@
+---
+globs: *.ts, *.tsx, *.js, *.jsx
+name: ui-ux-design-audit
+description: >-
+  Run the ultimate UI/UX audit using the Holy Trinity of AI design: Bakaus's Impeccable (linting), Leon Lin's TasteSkill (anti-slop constraints), and Emil Kowalski's Design Eng (animations and micro-interactions).
+  Use when the user asks for "/ui-ux-audit", "check design", "clean up the frontend", or remove "AI slop".
+trigger: explicit
+---
+
+# The Ultimate UI/UX Audit (Impeccable + TasteSkill + Emil Kowalski)
+
+This skill executes a complete, 3-dimensional audit of the frontend code. It combines programmatic linting, anti-slop visual constraints, and world-class animation principles to guarantee a perfectly polished interface.
+
+## Workflow
+
+Follow these steps exactly to execute the audit. 
+
+### Step 1: The Impeccable Pass (Programmatic Linting)
+1. Run `npx impeccable detect --json .` in the terminal to scan the project.
+2. Read the output.
+3. If Impeccable flags any deterministic slop (e.g., side-tab borders, dark glows, small touch targets, or hardcoded hex colors violating `design.json`), refactor the code to fix them immediately. 
+4. The code MUST pass Impeccable before proceeding.
+
+### Step 2: The TasteSkill + Design Spells Doctrine (Anti-Slop Constraints)
+Apply Leon Lin's strict "Taste" rules combined with "Design Spells", "Motionsite", and "Google Flow" principles. You are STRICTLY FORBIDDEN from generating "cheap AI sci-fi" aesthetics.
+- **BANNED (The AI Slop List):** No generic neon cyan glows. No bloated 2018 dark mode templates. No excessively rounded, meaningless borders. No unstructured padding.
+- **The Design Spells Mandate:** Emulate top-tier startups (Vercel, Linear, Stripe). Use extremely subtle borders (e.g., `border-white/10` in dark mode). Use frosted glass (`backdrop-blur`) with high contrast text, NOT muddy transparency.
+- **The Motionsite 3D Standard (Aral Planeta Specific):** For interactive 3D pages, the WebGL `<Canvas>` (React Three Fiber) MUST act as the immersive background. All HTML UI (sidebars, info cards, buttons) MUST float cleanly over the 3D scene using `absolute`/`fixed` positioning and `z-index`. Use GSAP to smoothly animate these floating UI elements in sync with the 3D model's interactions.
+- **Google Flow Usability:** Prioritize UX clarity over flashy garbage. The layout must have a strict grid, predictable navigation, and obvious visual hierarchy. 
+- **Elevation:** Remove heavy, opaque box-shadows. Replace them with subtle, layered, semi-transparent shadows (e.g., `rgba(0,0,0,0.05)`) or inner borders.
+- **Typography & Whitespace:** Ensure structural hierarchy. Use generous negative space between sections. Do not use generic AI-default fonts (like Inter) if the project ledger specifies a brand font.
+
+### Step 3: The Emil Kowalski Pass (Design Engineering & Motion)
+Apply Emil Kowalski's polish and animation rules to interactive elements:
+- **Animations:** Agents often hallucinate bad easing curves. NEVER use `ease-in` for elements entering the screen; ALWAYS use `ease-out` (so they decelerate naturally). Use `ease-in` only for exiting elements.
+- **Snappiness:** Keep enter animations fast (200ms - 300ms). Do not make UI elements float slowly.
+- **Micro-interactions:** Ensure every clickable element (buttons, links, cards) has a distinct `:hover` and `:active` state. The `:active` state should usually feature a subtle scale-down (e.g., `transform: scale(0.98)`) to provide tactile feedback.
+- **Details:** Swap solid borders on cards/buttons for inner semi-transparent shadows for a more refined look.
+
+### Step 4: Fix and Generate Verdict
+Rewrite the frontend components to comply with all three passes. Once fixed, generate or update `.impeccable/review/VERDICT.md` with the following format:
+
+```markdown
+# Verdict -- [Project Name]
+
+**disposition: [ship | fail]**
+
+Review basis: The Holy Trinity (Impeccable + TasteSkill + Emil Kowalski).
+
+## 1. Impeccable (Programmatic)
+[Summarize fixed deterministic violations from the npx tool.]
+
+## 2. TasteSkill (Visual Constraints)
+[Summarize what slop was removed (e.g., stripped generic shadows, fixed spacing).]
+
+## 3. Emil Kowalski (Motion & Polish)
+[Summarize animation fixes (e.g., switched ease-in to ease-out, added scale(0.98) active states).]
+
+## Verdict
+[Pass/Fail reasoning]
+```

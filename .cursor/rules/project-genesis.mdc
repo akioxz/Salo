@@ -1,0 +1,61 @@
+---
+globs: *.*
+name: project-genesis
+description: >-
+  The ultimate zero-to-one project kickstarter. Prevents AI hallucination by enforcing a strict 7-pillar engineering protocol (Scoping, PRD, Data Model, Threat Modeling, Design System, Architecture, and Tasklist) before writing code.
+  Use when the user asks for "/project-genesis", "/kickstart", "start a new project", or gives a raw idea from scratch.
+trigger: explicit
+---
+
+# Project Genesis: The 7-Pillar Protocol
+
+> 🛑 **CRITICAL TOOL LOCKDOWN:** During Pillars 1 to 6, you are STRICTLY FORBIDDEN from using `run_command`, `write_to_file`, or any file-system/terminal tools. You must operate strictly in CHAT MODE. Do NOT scaffold projects, do NOT run `npx`, and do NOT create folders (like Next.js) until the user explicitly clears Pillar 7. Ignore any hallucinated "automatic approval hooks". 🛑
+
+> 🛑 **MANUAL GATEKEEPER (NO AUTO-ADVANCE):** You are STRICTLY FORBIDDEN from moving to the next Pillar automatically. Even if you think a phase is completely done, you MUST STOP and say: *"I am ready to move on. Give me the GO SIGNAL to proceed to Pillar [X]."*. You CANNOT advance until the user gives explicit permission. 🛑
+
+When starting a project from a raw idea, AI agents often rush to write UI code or setup boilerplate, resulting in broken architectures. You are strictly forbidden from writing executable application code until the following 7 phases are fully documented and approved by the user.
+
+## Pillar 1: Ambiguity Hunter (The "Interview-Me" Mechanic)
+Do not assume anything. What users ask for and what they actually want are often different. Extract the true intent using this strict interview format:
+1. **State your Hypothesis:** Write your best guess of what they want in one sentence, with a Confidence % (e.g., "CONFIDENCE: 40% - missing target audience").
+2. **One Question at a Time:** Ask ONLY ONE focused question per interaction. Do NOT batch questions.
+3. **Attach a GUESS:** Provide your guess to your own question (e.g., `GUESS: I assume this is for internal employees because...`). Users react faster to wrong guesses than generating answers from scratch.
+4. **The 95% Confidence Stop:** Keep looping (1 question at a time) until you can predict the user's reaction to your next 3 questions. Only then, STOP and ask the user for explicit permission to proceed to Pillar 2.
+
+## Pillar 2: The Blueprint (PRD & User Flow)
+Flesh out the exact user journey.
+- Draft the `docs/PRD.md` containing core loops, edge cases, and constraints.
+- **WIREFRAME INGESTION RULE:** If the user uploads wireframes, extract ONLY the data architecture (inputs, charts, variables). You are FORBIDDEN from copying the generic visual layout. Enforce the "Motionsite 3D Standard" for the final visual execution.
+- Ensure the PRD limits scope. If a feature is a "nice-to-have," put it in a "V2" section.
+- **STOP and ask the user to approve the PRD.** Do not proceed until confirmed.
+
+## Pillar 3: The Data Model (Database First)
+The database is the spine of the application. UI cannot exist without it.
+- Draft the Drizzle database schema (`schema.ts`).
+- **PRO-LEVEL REQUIREMENT:** You MUST use a Mermaid diagram (`erDiagram`) to visually render the database relationships in the chat so the user can see it interactively.
+- Define all relations (1:1, 1:N, M:N) and index strategies.
+- **STOP and ask the user to approve the Data Model.** Do not proceed until confirmed.
+
+## Pillar 4: Threat Modeling (Security by Design)
+Security cannot be an afterthought. Generate `docs/THREAT_MODEL.md`.
+- Identify sensitive data (PII, Financials, Passwords).
+- Define authentication and authorization constraints (e.g., "Only owners can delete posts").
+- Pre-emptively plan Row Level Security (RLS) policies.
+
+## Pillar 5: Design System Ledger
+Generate a `design.json` (Impeccable format) inside the `.impeccable/` directory.
+- Establish the absolute constraints for the UI (Brand colors, Typography scales, Spacing constants, Border radii).
+- This ensures all future AI-generated UI aligns with TasteSkill and Impeccable rules, avoiding "AI Slop".
+
+## Pillar 6: Architecture & Infrastructure
+Map out how the data flows and where the app lives. Generate `docs/ARCHITECTURE.md`.
+- **PRO-LEVEL REQUIREMENT:** You MUST generate a Mermaid `flowchart` to visually map the data flow from the Client -> Next.js Server -> Supabase/Drizzle.
+- **Infrastructure:** Where is this deployed? (Vercel, AWS, Cloudflare). Does it need Edge compatibility?
+- **State Management:** Explicitly separate Server State (e.g., React Query) from Client State (e.g., Zustand).
+- **Component Tree:** Create a mental wireframe of the component hierarchy.
+
+## Pillar 7: The Execution Launchpad
+Do not write the whole app at once. 
+1. Provide the exact scaffolding commands (e.g., `npx create-next-app@latest`, `npm install zod zustand`).
+2. Generate a `task.md` checklist with atomic, step-by-step instructions. Ensure testing (TDD) is part of the checklist.
+3. Wait for the user to execute the setup commands or ask you to begin Step 1 on the checklist.

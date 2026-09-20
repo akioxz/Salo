@@ -1,0 +1,20 @@
+---
+globs: *.*
+name: sync-library
+description: >-
+  Automatically updates the local project's rules to match the global Dev-Library orchestrator.
+  Use when the user asks to "/sync", "/update-rules", or "/init" to fetch the latest prompt engineering and context rules.
+trigger: explicit
+---
+
+# The Sync Engine
+
+Whenever the user requests to sync or initialize the Dev-Library, you must run the CLI in auto-mode to update the local `.cursor/rules` and `AGENTS.md` files without getting stuck in an interactive prompt loop.
+
+## Execution
+Run the following command in the terminal:
+```bash
+dev-library init --auto
+```
+
+After running this, acknowledge to the user that the local rules have been updated and you are ready to proceed with the newly injected Master Orchestrator context.

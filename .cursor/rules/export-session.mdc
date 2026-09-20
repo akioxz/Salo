@@ -1,0 +1,62 @@
+---
+globs: *.*
+name: export-session
+description: >-
+  Compiles the entire session's memory, decisions, and current state into a handoff document. 
+  Use when the user asks to "/export-session", "save our progress", "generate session", or wants to transfer context to a new chat window to prevent AI amnesia.
+trigger: explicit
+---
+
+# The Context Handoff Engine
+
+Long AI sessions suffer from context degradation (AI amnesia). When the user triggers this skill, you must act as a meticulous archivist. Your goal is to extract everything of value from the current chat history and create a "Save State" document.
+
+## Execution Steps
+
+1. **Analyze Chat Memory:** Scan the entire conversation history from the first prompt to the current moment.
+2. **Extract Key Information:**
+   - What is the ultimate goal of the project?
+   - What major decisions were resolved? (e.g., Game mechanics, architectural choices, DB schema).
+   - What is the *exact* current state? (e.g., "We are currently on Pillar 1 of Project Genesis, discussing the 3rd mini-game").
+   - What are the immediate next steps or pending questions?
+3. **Generate the Handoff Document:** Create or overwrite the file at `docs/SESSION_HANDOFF.md` using the exact format below.
+
+## File Format: `docs/SESSION_HANDOFF.md`
+
+```markdown
+# 💾 Session Handoff State
+**Last Updated:** [Insert Current Date/Time]
+
+## 1. Project Context
+- **Project Name:** [Name]
+- **Core Goal:** [Brief description of the app]
+- **Current Phase:** [e.g., Project Genesis - Pillar 1]
+
+## 2. Resolved Decisions & Mechanics
+*Detail everything the user and AI have agreed upon so far. Do not leave out important business logic, game mechanics, or technical constraints.*
+- [Decision 1: Detailed explanation]
+- [Decision 2: Detailed explanation]
+- [Decision 3: Detailed explanation]
+
+## 3. Pending Items & Next Steps
+*What was the last thing being discussed before this handoff was generated?*
+- [Pending task/question 1]
+- [Pending task/question 2]
+
+## 4. How to Resume
+*To the next AI reading this file:* 
+Start by acknowledging this handoff file. Inform the user that you have successfully ingested the context, summarize what you know, and immediately ask the user if they are ready to tackle the first item in the "Pending Items" list.
+
+## 5. Full Conversation Log (Back-and-Forth Transcript)
+*The user requested the ENTIRE conversation to be exported, not just a summary. Transcribe the chronological back-and-forth of the session here. Do your best to preserve the exact prompts and the important parts of the AI responses.*
+
+**[User - Time/Phase]:**
+"..."
+**[AI - Response]:**
+"..."
+*(Repeat for the entire chat history)*
+```
+
+## Post-Execution
+After generating `docs/SESSION_HANDOFF.md`, tell the user: 
+*"Session successfully exported! Note: If the conversation was extremely long, the transcript might hit the output token limit. You can now start a new chat window and upload this file."*

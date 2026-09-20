@@ -1,0 +1,39 @@
+---
+globs: *.*
+name: test-driven-development
+description: "Strict Red-Green-Refactor implementation engine requiring a falsifiable test failure before production coding. Use when implementing new features or complex logic to guarantee test coverage and prevent unverified code."
+---
+
+# Test-Driven Development (TDD)
+
+Use when implementing new features, business logic, or complex algorithms. This skill enforces the Red-Green-Refactor cycle to ensure code is verified by tests from the moment it is written.
+
+## Workflow: The Red-Green-Refactor Cycle
+
+### Step 1: Red Phase (Falsifiable Failure)
+Write a minimal unit test covering the next specific requirement. Run the test runner.
+- **Goal:** Prove the test is valid and that the code does not already satisfy the requirement.
+- **Validation:** The test MUST fail with the expected error message. If it passes immediately, the test is invalid or tautological.
+
+### Step 2: Green Phase (Minimal Implementation)
+Write the absolute minimum production code necessary to make the failing test pass.
+- **Goal:** Satisfy the requirement without over-engineering.
+- **Validation:** The test runner returns a 100% pass status for the test file. Stop adding logic as soon as the test passes.
+
+### Step 3: Refactor Phase (Clean & Maintainable)
+Refactor both the production code and the test code to adhere to clean code standards (naming, function size, duplication removal).
+- **Goal:** Improve code quality while maintaining the exact same behavior.
+- **Validation:** The code is clean AND the full test suite remains completely green.
+
+## Hard Rules
+- **Test First, Always:** Never write production code before observing a failing test for that specific requirement.
+- **Falsifiable Tests:** Tests must be capable of failing. No tautological assertions (e.g., `expect(true).toBe(true)`).
+- **Minimal Code:** During the Green Phase, do not write logic beyond what is required to pass the current test. Handle edge cases by writing new failing tests first.
+
+## Constraints
+Do not use this skill for pure markdown documentation, boilerplate configuration, or UI cosmetic tweaks where automated testing is impractical. Use it for logic, data transformations, API endpoints, and core algorithms.
+
+## Related (dev-library cross-links)
+- Rules: testing-principles.md, function-design.md
+- Prompts: invoked via an "implement feature" goal in project-continuation-prompt.md
+- Workflows: ai-development-workflow-map.md

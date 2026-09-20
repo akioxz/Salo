@@ -1,0 +1,35 @@
+---
+description: Auto-generated dev-library rule for design-principles
+globs: *.*
+---
+# Rule: Design Principles (SOLID, Composition, DRY/KISS/YAGNI)
+
+> **Purpose:** Classical structural heuristics governing abstraction decisions. Attach this rule when designing modules, components, or class hierarchies.
+
+## 1. SOLID Principles
+- **Single Responsibility (SRP):** Each function, class, and component has one reason to change. Separate presentation from routing, data fetching, and state logic.
+- **Open/Closed (OCP):** Extend behavior through composition or strategy patterns. Do not mutate established core components to add variants.
+- **Liskov Substitution (LSP):** Subtypes and interface implementations must drop into any caller without breaking expectations.
+- **Interface Segregation (ISP):** Prefer small, specific interfaces over bloated multi-purpose interfaces. Consumers depend strictly on members they call.
+- **Dependency Inversion (DIP):** Depend on abstractions, not concrete implementations. Pass dependencies into functions or constructors.
+- **Polymorphism over Type Branching:** Replace repeated `switch`/`if` checks on type flags with discriminated unions, pattern matching, or polymorphic dispatch.
+
+## 2. Composition Over Inheritance
+- Compose behavior using small, single-purpose objects or functions rather than inheriting from deep class hierarchies.
+- Deep inheritance binds subclasses tightly to parent implementation details, leading to fragile base class problems.
+- Encapsulate varying algorithms behind strategy interfaces and delegate work to composed dependencies.
+
+## 3. DRY, KISS, YAGNI, and AHA
+- **DRY (Rule of Three):** Extract a shared abstraction only after a pattern repeats three distinct times. Premature extraction produces rigid code.
+- **AHA (Avoid Hasty Abstractions):** Prefer mild duplication over the wrong abstraction. Duplication is cheaper than a flawed abstraction that couples unrelated concerns.
+- **KISS:** Prefer the least complex design satisfying requirements. Avoid premature optimization and unnecessary indirection layers.
+- **YAGNI:** Build strictly what current requirements demand. Do not add features on speculation about future needs.
+
+## 4. Resolving Conflicts
+- When SRP and DRY conflict, resolve toward SRP first. A small duplicated block with one clear owner beats a shared abstraction with two reasons to change.
+- Treat every abstraction as a debt instrument. Each abstraction must pay rent through reduced duplication, isolated change, or simplified reasoning. Delete abstractions failing this test.
+
+## 5. Data, Behavior, and Boundaries
+- **Law of Demeter:** A method talks only to its own class, objects it creates, objects passed as arguments, and objects it holds as fields. Never chain calls through returned objects.
+- **Tell, Don't Ask:** Command objects to perform actions rather than querying internal state to decide externally.
+- **Functional Core, Imperative Shell:** Keep business logic pure and deterministic. Push side effects (I/O, database, APIs) to system boundaries.

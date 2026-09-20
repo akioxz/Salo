@@ -1,0 +1,27 @@
+---
+description: Auto-generated dev-library rule for testing-principles
+globs: *.*
+---
+# Rule: Testing Principles
+
+> **Purpose:** Testing engineering rules for unit, integration, and end-to-end test strategies. Attach this rule when writing tests or configuring a CI pipeline.
+
+## 1. Testing Pyramid
+- **Unit Tests (70%+):** Fast, isolated tests for individual functions. Must not depend on external services or databases.
+- **Integration Tests (20%):** Test interactions between components/APIs. Verify data flow without full UI rendering.
+- **E2E Tests (10%):** Simulate real user journeys. Critical paths only (login, checkout). Do not place business logic verification in E2E tests.
+
+## 2. Unit Testing Guidelines
+- **Test Isolation:** No shared state. Use `beforeEach`/`afterEach` for cleanup.
+- **Arrange-Act-Assert:** Structure every test file with clear setup (Arrange), execution (Act), and verification (Assert) sections.
+- **One Concept Per Test:** Never pack multiple behaviors into a single test. Split into separate focused tests so failure diagnosis is immediate.
+
+## 3. Mock and Stub Guidelines
+- **Mock What You Don't Own:** Mock external systems (APIs, databases, message queues). Do not mock types or interfaces defined in your own codebase.
+- **Avoid Over-Mocking:** If you mock 5 levels deep, the design is too layered or integration tests are needed.
+- **Stub Clock/Time:** Use fake timers only when testing time-dependent logic. Restore real timers after each test.
+
+## 4. Test Maintenance
+- **Treat Tests as Production Code:** Tests require the same code review, linting, and refactoring attention as production code.
+- **Delete Redundant Tests:** If a feature is removed, delete its tests. Do not leave orphaned tests.
+- **Document Test Intent:** Add a one-sentence comment at the top of each test explaining what behavior is being verified and why it matters.

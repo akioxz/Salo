@@ -8,25 +8,38 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 export default function Home() {
-  const { isAuthenticated, isLoading } = useConvexAuth();
+  const { isAuthenticated, isLoading: isAuthLoading } = useConvexAuth();
   const { signOut } = useAuthActions();
   const router = useRouter();
 
-  // Redirect if not logged in
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      router.push("/auth");
-    }
-  }, [isLoading, isAuthenticated, router]);
-
+  const myHousehold = useQuery(api.households.getMine);
   const posts = useQuery(api.posts.list);
 
-  if (isLoading || !isAuthenticated) {
+  // Redirect if not logged in
+  useEffect(() => {
+    if (!isAuthLoading && !isAuthenticated) {
+      router.push("/auth");
+    }
+  }, [isAuthLoading, isAuthenticated, router]);
+
+  // Redirect if logged in but no household
+  useEffect(() => {
+    if (isAuthenticated && myHousehold === null) {
+      router.push("/pairing");
+    }
+  }, [isAuthenticated, myHousehold, router]);
+
+  if (isAuthLoading || !isAuthenticated || myHousehold === undefined) {
     return (
       <div className="bg-zinc-50 dark:bg-black min-h-screen flex items-center justify-center">
         <p className="text-zinc-500">Loading...</p>
       </div>
     );
+  }
+
+  // If authenticated but no household, return empty while redirecting
+  if (myHousehold === null) {
+    return null;
   }
 
   return (

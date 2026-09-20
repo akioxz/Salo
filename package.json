@@ -11,11 +11,14 @@
   "dependencies": {
     "@auth/core": "^0.41.3",
     "@convex-dev/auth": "^0.0.95",
+    "clsx": "^2.1.1",
     "convex": "^1.46.0",
     "date-fns": "^4.4.0",
+    "lucide-react": "^1.47.0",
     "next": "16.3.3",
     "react": "19.2.8",
     "react-dom": "19.2.8",
+    "tailwind-merge": "^3.7.0",
     "zod": "^4.5.4"
   },
   "devDependencies": {

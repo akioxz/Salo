@@ -23,10 +23,21 @@ Follow these steps exactly to execute the audit.
 
 ### Step 2: The TasteSkill + Design Spells Doctrine (Anti-Slop Constraints)
 Apply Leon Lin's strict "Taste" rules combined with "Design Spells", "Motionsite", and "Google Flow" principles. You are STRICTLY FORBIDDEN from generating "cheap AI sci-fi" aesthetics.
-- **BANNED (The AI Slop List):** No generic neon cyan glows. No bloated 2018 dark mode templates. No excessively rounded, meaningless borders. No unstructured padding.
-- **The Design Spells Mandate:** Emulate top-tier startups (Vercel, Linear, Stripe). Use extremely subtle borders (e.g., `border-white/10` in dark mode). Use frosted glass (`backdrop-blur`) with high contrast text, NOT muddy transparency.
+- **The TasteSkill Framework (by Leon Lin):** BANNED AI TROPES: No "em-dashes everywhere." No generic warm-beige color palettes. No repetitive three-card feature rows. No neon cyan/purple glows. No bloated 2018 dark mode templates. No excessively rounded, meaningless borders.
+- **The Impeccable Vocabulary (by Paul Bakaus):** You must act as a deterministic design evaluator using these exact anti-patterns:
+  1. *Color & Contrast:* Never use gray text on colored backgrounds. Avoid pure black (`#000000`) or pure gray; always tint grays with the primary brand color (e.g., zinc/slate).
+  2. *Layout:* Never use nested cards (cards within cards). Do not use unstructured padding. Use generous negative space.
+  3. *Commands:* During the audit, you can internally execute `/distill` (simplify the UI), `/quieter` (reduce visual noise/borders), and `/bolder` (increase typography contrast).
+- **The Design Spells Mandate:** Emulate top-tier startups (Vercel, Linear, Stripe). Use extremely subtle borders (e.g., `border-white/10` in dark mode). Use frosted glass (`backdrop-blur-md`) with high contrast text, NOT muddy transparency.
 - **The Motionsite 3D Standard (Aral Planeta Specific):** For interactive 3D pages, the WebGL `<Canvas>` (React Three Fiber) MUST act as the immersive background. All HTML UI (sidebars, info cards, buttons) MUST float cleanly over the 3D scene using `absolute`/`fixed` positioning and `z-index`. Use GSAP to smoothly animate these floating UI elements in sync with the 3D model's interactions.
-- **Google Flow Usability:** Prioritize UX clarity over flashy garbage. The layout must have a strict grid, predictable navigation, and obvious visual hierarchy. 
+- **Anthropic Frontend Standards (Structural & A11y):** 
+  1. *No Div Soup:* Use semantic HTML5 (`<article>`, `<nav>`, `<aside>`, `<section>`, `<main>`). 
+  2. *Accessibility First:* All interactive elements MUST have visible focus states (`focus-visible:ring`), proper `aria-labels`, and full keyboard navigability. 
+  3. *Resilient UI:* Enforce React Suspense boundaries, Skeleton loaders (`animate-pulse`), and Error Boundaries for all async components. The UI must never freeze while waiting for data.
+- **Premium Component Registries (21st.dev & shadcn/ui):** You are FORBIDDEN from coding complex UI components (like animated buttons, bento grids, or sliders) from scratch if a premium version exists. Always default to integrating components from `21st.dev`, `shadcn/ui`, or `Magic UI`. 
+- **Design Inspiration (Dribbble & v0.dev):** If the user uploads a Dribbble screenshot or v0.dev generation, copy the structural constraints (padding, margins, font weights) pixel-perfectly. Do not revert to default Tailwind spacing.
+- **Premium Assets (3dicons.co):** Ban generic flat SVG illustrations for empty states or hero sections. Replace them with high-quality 3D assets (e.g., from `3dicons.co`) to elevate the visual fidelity.
+- **Google Flow Usability:** Prioritize UX clarity over flashy garbage. The layout must follow `websiteprompts.ai` best practices: a strict grid, predictable navigation, clear call-to-actions, and obvious visual hierarchy. 
 - **Elevation:** Remove heavy, opaque box-shadows. Replace them with subtle, layered, semi-transparent shadows (e.g., `rgba(0,0,0,0.05)`) or inner borders.
 - **Typography & Whitespace:** Ensure structural hierarchy. Use generous negative space between sections. Do not use generic AI-default fonts (like Inter) if the project ledger specifies a brand font.
 

@@ -1,0 +1,47 @@
+---
+globs: *.*
+name: design-prompt
+description: Generates a highly detailed, professional UI/UX mega-prompt meant to be copy-pasted into UI generators like v0.dev, Lovable, or Claude, ensuring the output matches premium aesthetics.
+trigger: explicit
+---
+
+# The Design Prompt Generator
+
+When the user runs `/design-prompt`, your job is NOT to write React code. Your job is to act as an Elite UI/UX Art Director and write a "Mega-Prompt" that the user can copy and paste into a specialized UI generator (like v0.dev or Lovable).
+
+## Workflow
+1. **Phase 1: Project Context Alignment (MANDATORY)**
+   Before searching the web, read the current project context (PRD, `task.md`, or schema) to understand the *exact nature and domain* of the project (e.g., Is this a Household Management App? An Educational 3D Solar System?). The design must fit the project's specific niche.
+2. **Phase 2: Domain-Specific Web Research** 
+   Use the `search_web` tool to search for current design trends, BUT strictly tailor the queries to the project's domain. 
+   - Search queries to use: `"[Project Niche/Domain] [feature name] UI UX Dribbble"`, `"[Project Niche] app layout Mobbin"`, or `"[Project Niche] micro-interactions Godly.website"`.
+   - Analyze the results to find layouts and vibes that make sense for *this specific project* (e.g., do not pull crypto-dashboard trends for a family household app).
+3. **Phase 3: The Mega-Prompt Generation**
+   Generate a highly detailed prompt using the **Template** below. Inject the domain-specific trends and structures you found into the "Aesthetic" and "Data/Content Requirements" sections.
+
+## The Mega-Prompt Template
+Output the generated prompt inside a markdown code block so the user can easily copy it.
+
+```text
+Act as an elite frontend design engineer. Generate a React component using Tailwind CSS, lucide-react icons, and shadcn/ui principles. 
+
+**Feature to build:** [Describe the specific feature/page based on the user's request]
+
+**Data/Content Requirements:**
+- [List specific data points that must be shown, e.g., Post Author, Timestamp, Likes, Planet Gravity, etc.]
+
+**Live Research Insights (Domain Trends):**
+- [Insert the specific layout structures, color palettes, and UX patterns you found during your live web search on Awwwards, Godly, or Mobbin here. Be highly specific.]
+
+**Aesthetic & Vibe (The Premium Vercel/Linear Standard):**
+- **Theme:** [Specify Dark Mode or Light Mode based on project context]
+- **Impeccable Rules:** NO nested cards (cards within cards). Use generous negative space. NEVER use gray text on a colored background. Avoid pure black (`#000000`) or pure gray; always tint grays with the primary brand color (e.g., zinc/slate).
+- **TasteSkill Bans:** NO "em-dashes everywhere." NO generic warm-beige color palettes. NO repetitive three-card feature rows. NO neon cyan/purple glows. NO excessively rounded, meaningless borders.
+- **Borders & Glass:** Use extremely subtle borders (e.g., `border-white/10`). Use frosted glass (`backdrop-blur-md`) with high contrast text, NOT muddy transparency.
+- **Typography:** Clean, hierarchical, and high contrast for primary text.
+- **Asset Replacement:** For primary illustrations or empty states, do NOT use generic flat SVGs. Assume the use of premium 3D assets (inspired by `3dicons.co`). Use `lucide-react` only for small utility icons.
+
+**Interactivity & Micro-interactions:**
+- Buttons and interactive cards should have subtle hover states (e.g., `hover:bg-zinc-800/50`, `hover:border-white/20`).
+- Add tactile feedback utility classes (`active:scale-[0.98] transition-all duration-200`).
+```

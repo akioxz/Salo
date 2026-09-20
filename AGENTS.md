@@ -1093,6 +1093,57 @@ For **every single slice**, you must complete this exact loop before moving to t
 
 
 
+## MODULE: DESIGN-PROMPTER
+====================================================
+---
+name: design-prompt
+description: Generates a highly detailed, professional UI/UX mega-prompt meant to be copy-pasted into UI generators like v0.dev, Lovable, or Claude, ensuring the output matches premium aesthetics.
+trigger: explicit
+---
+
+# The Design Prompt Generator
+
+When the user runs `/design-prompt`, your job is NOT to write React code. Your job is to act as an Elite UI/UX Art Director and write a "Mega-Prompt" that the user can copy and paste into a specialized UI generator (like v0.dev or Lovable).
+
+## Workflow
+1. **Phase 1: Project Context Alignment (MANDATORY)**
+   Before searching the web, read the current project context (PRD, `task.md`, or schema) to understand the *exact nature and domain* of the project (e.g., Is this a Household Management App? An Educational 3D Solar System?). The design must fit the project's specific niche.
+2. **Phase 2: Domain-Specific Web Research** 
+   Use the `search_web` tool to search for current design trends, BUT strictly tailor the queries to the project's domain. 
+   - Search queries to use: `"[Project Niche/Domain] [feature name] UI UX Dribbble"`, `"[Project Niche] app layout Mobbin"`, or `"[Project Niche] micro-interactions Godly.website"`.
+   - Analyze the results to find layouts and vibes that make sense for *this specific project* (e.g., do not pull crypto-dashboard trends for a family household app).
+3. **Phase 3: The Mega-Prompt Generation**
+   Generate a highly detailed prompt using the **Template** below. Inject the domain-specific trends and structures you found into the "Aesthetic" and "Data/Content Requirements" sections.
+
+## The Mega-Prompt Template
+Output the generated prompt inside a markdown code block so the user can easily copy it.
+
+```text
+Act as an elite frontend design engineer. Generate a React component using Tailwind CSS, lucide-react icons, and shadcn/ui principles. 
+
+**Feature to build:** [Describe the specific feature/page based on the user's request]
+
+**Data/Content Requirements:**
+- [List specific data points that must be shown, e.g., Post Author, Timestamp, Likes, Planet Gravity, etc.]
+
+**Live Research Insights (Domain Trends):**
+- [Insert the specific layout structures, color palettes, and UX patterns you found during your live web search on Awwwards, Godly, or Mobbin here. Be highly specific.]
+
+**Aesthetic & Vibe (The Premium Vercel/Linear Standard):**
+- **Theme:** [Specify Dark Mode or Light Mode based on project context]
+- **Impeccable Rules:** NO nested cards (cards within cards). Use generous negative space. NEVER use gray text on a colored background. Avoid pure black (`#000000`) or pure gray; always tint grays with the primary brand color (e.g., zinc/slate).
+- **TasteSkill Bans:** NO "em-dashes everywhere." NO generic warm-beige color palettes. NO repetitive three-card feature rows. NO neon cyan/purple glows. NO excessively rounded, meaningless borders.
+- **Borders & Glass:** Use extremely subtle borders (e.g., `border-white/10`). Use frosted glass (`backdrop-blur-md`) with high contrast text, NOT muddy transparency.
+- **Typography:** Clean, hierarchical, and high contrast for primary text.
+- **Asset Replacement:** For primary illustrations or empty states, do NOT use generic flat SVGs. Assume the use of premium 3D assets (inspired by `3dicons.co`). Use `lucide-react` only for small utility icons.
+
+**Interactivity & Micro-interactions:**
+- Buttons and interactive cards should have subtle hover states (e.g., `hover:bg-zinc-800/50`, `hover:border-white/20`).
+- Add tactile feedback utility classes (`active:scale-[0.98] transition-all duration-200`).
+```
+
+
+
 ## MODULE: DEV-LIBRARY
 ====================================================
 ---
@@ -1605,10 +1656,21 @@ Follow these steps exactly to execute the audit.
 
 ### Step 2: The TasteSkill + Design Spells Doctrine (Anti-Slop Constraints)
 Apply Leon Lin's strict "Taste" rules combined with "Design Spells", "Motionsite", and "Google Flow" principles. You are STRICTLY FORBIDDEN from generating "cheap AI sci-fi" aesthetics.
-- **BANNED (The AI Slop List):** No generic neon cyan glows. No bloated 2018 dark mode templates. No excessively rounded, meaningless borders. No unstructured padding.
-- **The Design Spells Mandate:** Emulate top-tier startups (Vercel, Linear, Stripe). Use extremely subtle borders (e.g., `border-white/10` in dark mode). Use frosted glass (`backdrop-blur`) with high contrast text, NOT muddy transparency.
+- **The TasteSkill Framework (by Leon Lin):** BANNED AI TROPES: No "em-dashes everywhere." No generic warm-beige color palettes. No repetitive three-card feature rows. No neon cyan/purple glows. No bloated 2018 dark mode templates. No excessively rounded, meaningless borders.
+- **The Impeccable Vocabulary (by Paul Bakaus):** You must act as a deterministic design evaluator using these exact anti-patterns:
+  1. *Color & Contrast:* Never use gray text on colored backgrounds. Avoid pure black (`#000000`) or pure gray; always tint grays with the primary brand color (e.g., zinc/slate).
+  2. *Layout:* Never use nested cards (cards within cards). Do not use unstructured padding. Use generous negative space.
+  3. *Commands:* During the audit, you can internally execute `/distill` (simplify the UI), `/quieter` (reduce visual noise/borders), and `/bolder` (increase typography contrast).
+- **The Design Spells Mandate:** Emulate top-tier startups (Vercel, Linear, Stripe). Use extremely subtle borders (e.g., `border-white/10` in dark mode). Use frosted glass (`backdrop-blur-md`) with high contrast text, NOT muddy transparency.
 - **The Motionsite 3D Standard (Aral Planeta Specific):** For interactive 3D pages, the WebGL `<Canvas>` (React Three Fiber) MUST act as the immersive background. All HTML UI (sidebars, info cards, buttons) MUST float cleanly over the 3D scene using `absolute`/`fixed` positioning and `z-index`. Use GSAP to smoothly animate these floating UI elements in sync with the 3D model's interactions.
-- **Google Flow Usability:** Prioritize UX clarity over flashy garbage. The layout must have a strict grid, predictable navigation, and obvious visual hierarchy. 
+- **Anthropic Frontend Standards (Structural & A11y):** 
+  1. *No Div Soup:* Use semantic HTML5 (`<article>`, `<nav>`, `<aside>`, `<section>`, `<main>`). 
+  2. *Accessibility First:* All interactive elements MUST have visible focus states (`focus-visible:ring`), proper `aria-labels`, and full keyboard navigability. 
+  3. *Resilient UI:* Enforce React Suspense boundaries, Skeleton loaders (`animate-pulse`), and Error Boundaries for all async components. The UI must never freeze while waiting for data.
+- **Premium Component Registries (21st.dev & shadcn/ui):** You are FORBIDDEN from coding complex UI components (like animated buttons, bento grids, or sliders) from scratch if a premium version exists. Always default to integrating components from `21st.dev`, `shadcn/ui`, or `Magic UI`. 
+- **Design Inspiration (Dribbble & v0.dev):** If the user uploads a Dribbble screenshot or v0.dev generation, copy the structural constraints (padding, margins, font weights) pixel-perfectly. Do not revert to default Tailwind spacing.
+- **Premium Assets (3dicons.co):** Ban generic flat SVG illustrations for empty states or hero sections. Replace them with high-quality 3D assets (e.g., from `3dicons.co`) to elevate the visual fidelity.
+- **Google Flow Usability:** Prioritize UX clarity over flashy garbage. The layout must follow `websiteprompts.ai` best practices: a strict grid, predictable navigation, clear call-to-actions, and obvious visual hierarchy. 
 - **Elevation:** Remove heavy, opaque box-shadows. Replace them with subtle, layered, semi-transparent shadows (e.g., `rgba(0,0,0,0.05)`) or inner borders.
 - **Typography & Whitespace:** Ensure structural hierarchy. Use generous negative space between sections. Do not use generic AI-default fonts (like Inter) if the project ledger specifies a brand font.
 
@@ -1701,13 +1763,3 @@ This skill audits and reports only. Never modify source code, install project de
 - Prompts: invoked via the "performance/SEO/accessibility audit" goal in project-continuation-prompt.md
 - Workflows: ai-development-workflow-map.md
 
-
-<!-- BEGIN:nextjs-agent-rules -->
-
-# This is NOT the Next.js you know
-
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
-
-This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
-
-<!-- END:nextjs-agent-rules -->

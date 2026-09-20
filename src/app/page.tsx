@@ -3,10 +3,11 @@
 import { useQuery } from "convex/react";
 import { useAuthActions, useConvexAuth } from "@convex-dev/auth/react";
 import { api } from "../../convex/_generated/api";
-import { formatDistanceToNow } from "date-fns";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import CreatePostModal from "../components/CreatePostModal";
+import HouseholdActivityFeed from "../components/feed/HouseholdActivityFeed";
+import type { HouseholdPost } from "../types/household";
 
 export default function Home() {
   const { isAuthenticated, isLoading: isAuthLoading } = useConvexAuth();
@@ -68,7 +69,7 @@ export default function Home() {
         </div>
 
         {/* Feed */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-zinc-50 dark:bg-black">
+        <div className="flex-1 overflow-y-auto bg-zinc-50 dark:bg-black">
           
           {posts === undefined ? (
             <div className="text-center text-zinc-500 py-10 text-sm">
@@ -81,62 +82,28 @@ export default function Home() {
               <p className="text-xs mt-1">Tap the + button to create an expense or need.</p>
             </div>
           ) : (
-            posts.map((post) => (
-              <div key={post._id} className={`bg-white dark:bg-[#0a0a0a] p-4 rounded-2xl shadow-sm border border-zinc-200 dark:border-zinc-800 transition-colors ${post.type === 'expense' ? 'hover:border-blue-500/50' : 'hover:border-amber-500/50'}`}>
-                <div className="flex items-center gap-3 mb-3">
-                  <div className={`h-10 w-10 rounded-full flex items-center justify-center font-bold ${
-                    post.type === 'expense' 
-                      ? 'bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300' 
-                      : 'bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-300'
-                  }`}>
-                    {post.author.name.charAt(0).toUpperCase()}
-                  </div>
-                  <div>
-                    <p className="font-semibold text-sm">
-                      {post.author.name} {post.author.role ? `(${post.author.role})` : ''}
-                    </p>
-                    <p className="text-[10px] text-zinc-500">
-                      {formatDistanceToNow(post._creationTime, { addSuffix: true })}
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="mb-3">
-                  <span className={`inline-block px-2 py-1 text-[10px] uppercase tracking-wider rounded font-bold mb-2 border ${
-                    post.type === 'expense'
-                      ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800/50'
-                      : 'bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800/50'
-                  }`}>
-                    {post.type} • {post.category}
-                  </span>
-                  
-                  {post.caption && (
-                    <p className="text-sm">{post.caption}</p>
-                  )}
-                  
-                  {post.amount !== undefined && (
-                    <div className="mt-2 text-2xl font-black">
-                      ₱{post.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                    </div>
-                  )}
-                </div>
-                
-                <div className="flex items-center gap-4 pt-3 border-t border-zinc-200 dark:border-zinc-800">
-                  <button className="flex items-center gap-1.5 text-zinc-500 hover:text-pink-500 text-xs transition-colors font-medium">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
-                    <span>{post.reactions.filter((r) => r.type === "heart").length}</span>
-                  </button>
-                  <button className="flex items-center gap-1.5 text-zinc-500 hover:text-pink-500 text-xs transition-colors font-medium">
-                    {/* Placeholder for thanks icon */}
-                    <span>🙏 {post.reactions.filter((r) => r.type === "thanks").length}</span>
-                  </button>
-                  <button className="flex items-center gap-1.5 text-zinc-500 hover:text-blue-500 text-xs transition-colors font-medium ml-auto">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
-                    <span>{post.comments.length}</span>
-                  </button>
-                </div>
-              </div>
-            ))
+            <HouseholdActivityFeed 
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              posts={posts.map((p: any) => ({
+                id: p._id,
+                type: p.type,
+                author: p.author || { name: "Unknown", role: "family" },
+                createdAt: new Date(p._creationTime).toISOString(),
+                content: p.caption || "",
+                category: p.category,
+                amount: p.amount,
+                reactionCount: p.reactions?.length || 0,
+                hasReacted: false,
+                commentCount: p.comments?.length || 0,
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                comments: p.comments?.map((c: any) => ({
+                  id: c._id,
+                  author: { name: "Unknown", role: "family" },
+                  createdAt: new Date(c._creationTime).toISOString(),
+                  content: "Comment content",
+                })) || []
+              })) as HouseholdPost[]}
+            />
           )}
 
         </div>

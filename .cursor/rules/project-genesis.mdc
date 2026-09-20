@@ -57,5 +57,22 @@ Map out how the data flows and where the app lives. Generate `docs/ARCHITECTURE.
 ## Pillar 7: The Execution Launchpad
 Do not write the whole app at once. 
 1. Provide the exact scaffolding commands (e.g., `npx create-next-app@latest`, `npm install zod zustand`).
-2. Generate a `task.md` checklist with atomic, step-by-step instructions. Ensure testing (TDD) is part of the checklist.
-3. Wait for the user to execute the setup commands or ask you to begin Step 1 on the checklist.
+2. **Pre-Commit Hooks Setup:** Include commands to set up hard security enforcement:
+   ```bash
+   npx husky init
+   echo "npx lint-staged" > .husky/pre-commit
+   ```
+   This ensures secrets, lint errors, and bad code are physically blocked from being committed.
+3. Generate a `task.md` checklist with atomic, step-by-step instructions. Ensure testing (TDD) is part of the checklist.
+4. Wait for the user to execute the setup commands or ask you to begin Step 1 on the checklist.
+
+## Pillar 7.5: Living Documentation Bootstrap (AUTO-EXECUTE)
+After the user approves Pillar 7 and the project is scaffolded, you MUST auto-generate the 6 living documents inside `docs/`. Use everything you learned from Pillars 1–7 to fill them in:
+- **`docs/REQUIREMENTS.md`** ← Populate from Pillar 1 (Ambiguity Hunter answers) + Pillar 2 (PRD user stories & business rules).
+- **`docs/DESIGN_NOTES.md`** ← Populate from Pillar 5 (Design System) + Pillar 6 (Architecture & component patterns). Include the Component Registry table.
+- **`docs/TECH_STACK.md`** ← Populate from Pillar 6 (Infrastructure choices) + Pillar 7 (exact packages from scaffolding commands). Read `package.json` to get real version numbers.
+- **`docs/ACTIVITY_LOG.md`** ← Initialize with the first entry using Keep a Changelog format: "Added — Initial project scaffold via `/project-genesis`."
+- **`docs/LEARNINGS.md`** ← Initialize with the TIL template header, organized by topic sections (Supabase, Next.js, Tailwind, etc.), empty and ready for entries.
+- **`docs/decisions/ADR-001-initial-architecture.md`** ← Create the first ADR documenting the core tech stack decision from Pillar 6 using MADR 3.0 format.
+
+> These documents are LIVING. They will be updated continuously by the `/build-engine` during development. Do not treat them as one-time artifacts.

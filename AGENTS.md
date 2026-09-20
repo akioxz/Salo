@@ -1091,6 +1091,26 @@ For **every single slice**, you must complete this exact loop before moving to t
 - **Rollback-Friendly:** Every commit should be independent so the user can easily revert one slice without breaking the others.
 - **Stop on Failure:** If a slice fails to work, STOP. Do not proceed to the next slice. Drop into debugging mode and fix the failure before moving forward.
 
+## Phase 4: Document-As-You-Go (Living Docs Updates)
+After EVERY successful atomic commit in Phase 3, you MUST update the project's living documents:
+
+1. **`docs/ACTIVITY_LOG.md` (MANDATORY after every commit):**
+   Append a new row with: timestamp, commit message, files changed, and a 1-liner explaining WHY.
+   ```
+   | HH:MM | `feat: add post creation form` | `PostForm.tsx`, `api/posts/route.ts` | Users need to create posts in the feed |
+   ```
+
+2. **`docs/LEARNINGS.md` (When something new is discovered):**
+   If during implementation you discover a gotcha, a workaround, a surprising API behavior, or a debugging breakthrough, append it immediately. Do not wait until the end of the session.
+
+3. **`docs/TECH_STACK.md` (When the stack changes):**
+   If you install a new package (`npm install X`), add a new service, or change infrastructure, update the relevant table in `TECH_STACK.md` with the package name, version, and purpose.
+
+4. **`docs/DESIGN_NOTES.md` (When a new pattern is introduced):**
+   If you introduce a new code pattern (e.g., a new custom hook, a new data fetching strategy, a new component structure), document it with a brief code snippet.
+
+> **IMPORTANT:** These updates are NOT optional. They are part of the commit loop. A slice is NOT complete until the living docs are updated.
+
 
 
 ## MODULE: DESIGN-PROMPTER
@@ -1264,11 +1284,271 @@ Start by acknowledging this handoff file. Inform the user that you have successf
 **[AI - Response]:**
 "..."
 *(Repeat for the entire chat history)*
+
+## 6. Next Prompt to Resume
+*Generate a single, ready-to-paste prompt that the user can copy into a new chat window to instantly resume work. This must be specific enough that the next AI can pick up exactly where this session left off.*
+
+> Copy-paste this into your new chat:
+> 
+> "Resume task. Read `docs/SESSION_HANDOFF.md` for full context.
+> Current status: [Exactly what was last being worked on].
+> Current blocker: [Any blocker or 'None'].
+> Next step: [The exact first thing the next AI should do]."
 ```
 
 ## Post-Execution
 After generating `docs/SESSION_HANDOFF.md`, tell the user: 
 *"Session successfully exported! Note: If the conversation was extremely long, the transcript might hit the output token limit. You can now start a new chat window and upload this file."*
+
+
+
+## MODULE: LIVING-DOCS
+====================================================
+---
+name: living-docs
+description: >-
+  Generates and maintains 5 living project documents (Requirements, Design Notes, Tech Stack, Activity Log, Learnings). 
+  Use when the user asks for "/living-docs", "initialize docs", "setup documentation", or at the end of /project-genesis.
+trigger: explicit
+---
+
+# The Living Documentation Engine
+
+When the user runs `/living-docs`, generate all 5 living documents inside the project's `docs/` directory. If any of these files already exist, do NOT overwrite them — read the existing content and update/append only.
+
+## The 5 Living Documents
+
+### 1. `docs/REQUIREMENTS.md` — Business Logic & Processes
+This is the **business brain** of the project. It answers: *"What does this app DO and WHY?"*
+
+```markdown
+# 📋 Requirements & Business Logic
+
+## 1. Project Overview
+- **App Name:** [Name]
+- **Core Purpose:** [One sentence: What problem does this solve?]
+- **Target Users:** [Who uses this?]
+
+## 2. Core Business Rules
+*The non-negotiable rules that govern how the app behaves.*
+- [Rule 1: e.g., "A household can have a maximum of 20 members"]
+- [Rule 2: e.g., "Only the household owner can delete the household"]
+
+## 3. User Stories & Processes
+*Step-by-step flows of how users interact with the app.*
+
+### [Feature Name] Flow
+1. User does X...
+2. System validates Y...
+3. Result: Z happens...
+
+## 4. Edge Cases & Constraints
+- [Edge case 1]
+- [Constraint 1]
+
+## 5. V2 / Future Scope (Out of Current Scope)
+- [Feature deferred to V2]
+```
+
+---
+
+### 2. `docs/DESIGN_NOTES.md` — Frontend & Backend Patterns
+This is the **code architecture playbook**. It answers: *"HOW is the code structured and WHY did we pick these patterns?"*
+
+```markdown
+# 🎨 Design Notes — Code Patterns & Structure
+
+## 1. Frontend Architecture
+- **Component Pattern:** [e.g., "Server Components by default, Client Components only for interactivity"]
+- **Styling Approach:** [e.g., "Tailwind CSS + shadcn/ui, NativeWind for mobile"]
+- **State Management:** [e.g., "Server State = React Query, Client State = Zustand"]
+
+## 2. Key UI Templates & Patterns
+*Reference snippets for recurring UI patterns used in this project.*
+
+### [Pattern Name] (e.g., "Feed Card Layout")
+```tsx
+// Reference implementation
+```
+
+## 3. Backend Architecture
+- **API Pattern:** [e.g., "Next.js Route Handlers, RESTful"]
+- **Database Access:** [e.g., "Drizzle ORM, repository pattern"]
+- **Auth Flow:** [e.g., "Supabase Auth → JWT → RLS policies"]
+
+## 4. Design Patterns In Use
+- [Pattern 1: e.g., "Repository Pattern for DB access"]
+- [Pattern 2: e.g., "Compound Components for complex UI"]
+
+## 5. Anti-Patterns to Avoid
+- [Anti-pattern 1: e.g., "Never fetch data inside client components directly"]
+
+## 6. Component Registry
+*Living table of all components in the project. Update as you create new components.*
+
+| Component | Path | Status | Description |
+|---|---|---|---|
+| [e.g., PostCard] | `src/components/feed/PostCard.tsx` | ✅ Done | [Single post in feed] |
+| [e.g., CreateForm] | `src/components/feed/CreateForm.tsx` | 🚧 WIP | [Post creation modal] |
+```
+
+---
+
+### 3. `docs/TECH_STACK.md` — Technology Blueprint
+This is the **tech DNA** of the project. It answers: *"WHAT tools are we using and WHERE?"*
+
+```markdown
+# 🛠️ Tech Stack Blueprint
+
+## Frontend
+| Technology | Version | Purpose |
+|---|---|---|
+| [e.g., Next.js] | [e.g., 15.x] | [Framework] |
+| [e.g., Tailwind CSS] | [e.g., 4.x] | [Styling] |
+| [e.g., shadcn/ui] | [latest] | [Component Library] |
+
+## Backend
+| Technology | Version | Purpose |
+|---|---|---|
+| [e.g., Supabase] | [latest] | [BaaS / Auth / DB] |
+| [e.g., Drizzle ORM] | [e.g., 0.38.x] | [Database ORM] |
+
+## Infrastructure & Cloud
+| Technology | Purpose |
+|---|---|
+| [e.g., Vercel] | [Hosting / CI/CD] |
+| [e.g., Supabase Cloud] | [Database / Auth / Storage] |
+
+## Dev Tools
+| Tool | Purpose |
+|---|---|
+| [e.g., ESLint] | [Linting] |
+| [e.g., Prettier] | [Formatting] |
+
+## Key Packages
+| Package | Purpose |
+|---|---|
+| [e.g., zod] | [Schema validation] |
+| [e.g., zustand] | [Client state] |
+```
+
+---
+
+### 4. `docs/ACTIVITY_LOG.md` — Session & Change History
+This is the **project diary**. It answers: *"WHAT changed, WHEN, and WHY?"*
+Uses the [Keep a Changelog](https://keepachangelog.com/) standard combined with Session Markers.
+
+```markdown
+# 📝 Activity Log & Changelog
+All notable changes to this project are documented here.
+Format based on [Keep a Changelog](https://keepachangelog.com/).
+
+---
+
+## [Unreleased]
+
+### 🟢 Session: [YYYY-MM-DD] — "[Session Goal Title]"
+
+#### Added
+- [New feature or file created, with file path]
+
+#### Changed
+- [Modification to existing feature or file]
+
+#### Fixed
+- [Bug fix, with what was broken and how it was fixed]
+
+#### Security
+- [Security-related change, e.g., patched CVE, hardened RLS]
+
+#### Removed
+- [Feature or file removed, with reason]
+
+🔴 SESSION END — Summary: [1-liner of what was accomplished]
+
+---
+
+## [1.0.0] - [YYYY-MM-DD]
+### Added
+- Initial project scaffold via `/project-genesis`
+```
+
+---
+
+### 5. `docs/LEARNINGS.md` — TIL (Today I Learned) Journal
+This is the **team brain dump** organized by topic. It answers: *"What did we LEARN and what should we NEVER FORGET?"*
+Inspired by [jbranchaud/til](https://github.com/jbranchaud/til) (14,150⭐).
+
+```markdown
+# 🧠 Today I Learned (TIL)
+
+A collection of concise write-ups on discoveries, gotchas, and debugging breakthroughs.
+
+---
+
+## Supabase
+
+### RLS Policies Block Service Role Key Too
+**Date:** [YYYY-MM-DD]  
+**Context:** Supabase RLS policies apply even to the `service_role` key unless you use `security_definer`.  
+**Fix:** Use `.rpc()` with `SECURITY DEFINER` functions for admin operations.  
+**Ref:** [Supabase RLS Docs](https://supabase.com/docs/guides/auth/row-level-security)
+
+---
+
+## Next.js
+
+### [Title of Discovery]
+**Date:** [YYYY-MM-DD]  
+**Context:** [Why this matters]  
+**Fix:** [Code snippet or solution]  
+
+---
+
+## Tailwind
+
+## Drizzle
+
+## General
+```
+
+---
+
+### 6. `docs/decisions/` — Architecture Decision Records (ADR)
+This is the **decision archive**. It answers: *"WHY did we choose X over Y, and what were the trade-offs?"*
+Uses the [MADR 3.0](https://github.com/adr/madr) standard (2,500⭐).
+
+Each decision gets its own file: `docs/decisions/ADR-001-short-title.md`
+
+```markdown
+# ADR-001: [Short Title of Decision]
+
+- **Status**: [Proposed | Accepted | Rejected | Superseded by ADR-XXX]
+- **Date**: [YYYY-MM-DD]
+- **Deciders**: [@username]
+
+## Context and Problem Statement
+[Describe the context and problem in 2-3 sentences.]
+
+## Considered Options
+- Option A: [Description]
+- Option B: [Description]
+
+## Decision Outcome
+Chosen: **Option [X]**, because [justification].
+
+### Consequences
+- **Good:** [Positive outcome]
+- **Bad:** [Downside or tech debt accepted]
+```
+
+---
+
+## Execution Rules
+1. **Initialize:** When `/living-docs` is run, create all 6 files/directories using the templates above. Read the project's existing `package.json`, `schema.ts`, PRD, and any config files to auto-fill as much as possible.
+2. **Never Overwrite:** If a doc already exists, READ it first. Append or update sections — never wipe existing content.
+3. **Cross-Reference:** When filling `TECH_STACK.md`, read the real `package.json` to extract actual versions. Do not hallucinate version numbers.
+4. **ADR Numbering:** ADR files are sequentially numbered (`ADR-001`, `ADR-002`, etc.). When a new decision supersedes an old one, update the old ADR's status to `Superseded by ADR-XXX`.
 
 
 
@@ -1332,8 +1612,25 @@ Map out how the data flows and where the app lives. Generate `docs/ARCHITECTURE.
 ## Pillar 7: The Execution Launchpad
 Do not write the whole app at once. 
 1. Provide the exact scaffolding commands (e.g., `npx create-next-app@latest`, `npm install zod zustand`).
-2. Generate a `task.md` checklist with atomic, step-by-step instructions. Ensure testing (TDD) is part of the checklist.
-3. Wait for the user to execute the setup commands or ask you to begin Step 1 on the checklist.
+2. **Pre-Commit Hooks Setup:** Include commands to set up hard security enforcement:
+   ```bash
+   npx husky init
+   echo "npx lint-staged" > .husky/pre-commit
+   ```
+   This ensures secrets, lint errors, and bad code are physically blocked from being committed.
+3. Generate a `task.md` checklist with atomic, step-by-step instructions. Ensure testing (TDD) is part of the checklist.
+4. Wait for the user to execute the setup commands or ask you to begin Step 1 on the checklist.
+
+## Pillar 7.5: Living Documentation Bootstrap (AUTO-EXECUTE)
+After the user approves Pillar 7 and the project is scaffolded, you MUST auto-generate the 6 living documents inside `docs/`. Use everything you learned from Pillars 1–7 to fill them in:
+- **`docs/REQUIREMENTS.md`** ← Populate from Pillar 1 (Ambiguity Hunter answers) + Pillar 2 (PRD user stories & business rules).
+- **`docs/DESIGN_NOTES.md`** ← Populate from Pillar 5 (Design System) + Pillar 6 (Architecture & component patterns). Include the Component Registry table.
+- **`docs/TECH_STACK.md`** ← Populate from Pillar 6 (Infrastructure choices) + Pillar 7 (exact packages from scaffolding commands). Read `package.json` to get real version numbers.
+- **`docs/ACTIVITY_LOG.md`** ← Initialize with the first entry using Keep a Changelog format: "Added — Initial project scaffold via `/project-genesis`."
+- **`docs/LEARNINGS.md`** ← Initialize with the TIL template header, organized by topic sections (Supabase, Next.js, Tailwind, etc.), empty and ready for entries.
+- **`docs/decisions/ADR-001-initial-architecture.md`** ← Create the first ADR documenting the core tech stack decision from Pillar 6 using MADR 3.0 format.
+
+> These documents are LIVING. They will be updated continuously by the `/build-engine` during development. Do not treat them as one-time artifacts.
 
 
 

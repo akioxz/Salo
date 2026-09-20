@@ -55,6 +55,16 @@ Start by acknowledging this handoff file. Inform the user that you have successf
 **[AI - Response]:**
 "..."
 *(Repeat for the entire chat history)*
+
+## 6. Next Prompt to Resume
+*Generate a single, ready-to-paste prompt that the user can copy into a new chat window to instantly resume work. This must be specific enough that the next AI can pick up exactly where this session left off.*
+
+> Copy-paste this into your new chat:
+> 
+> "Resume task. Read `docs/SESSION_HANDOFF.md` for full context.
+> Current status: [Exactly what was last being worked on].
+> Current blocker: [Any blocker or 'None'].
+> Next step: [The exact first thing the next AI should do]."
 ```
 
 ## Post-Execution

@@ -91,6 +91,7 @@ export default function Home() {
                 createdAt: new Date(p._creationTime).toISOString(),
                 content: p.caption || "",
                 category: p.category,
+                photoUrl: p.photoUrl,
                 amount: p.amount,
                 reactionCount: p.reactions?.length || 0,
                 hasReacted: false,

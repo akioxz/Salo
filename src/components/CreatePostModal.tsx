@@ -12,6 +12,7 @@ export default function CreatePostModal() {
   const [loading, setLoading] = useState(false);
 
   const createPost = useMutation(api.posts.create);
+  const generateUploadUrl = useMutation(api.files.generateUploadUrl);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,11 +20,34 @@ export default function CreatePostModal() {
 
     setLoading(true);
     try {
-      // The backend expects type, category, and caption
+      let photoStorageId: string | undefined;
+
+      // 1. Upload photo if present
+      if (photoFile) {
+        // Get short-lived upload URL
+        const uploadUrl = await generateUploadUrl();
+        // POST the file to the URL
+        const result = await fetch(uploadUrl, {
+          method: "POST",
+          headers: { "Content-Type": photoFile.type },
+          body: photoFile,
+        });
+
+        if (!result.ok) {
+          throw new Error("Failed to upload photo");
+        }
+
+        const { storageId } = await result.json();
+        photoStorageId = storageId;
+      }
+
+      // 2. Create the post
       await createPost({ 
         type: "need", 
         category: "General", 
-        caption: content.trim() 
+        caption: content.trim(),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        photoStorageId: photoStorageId as any,
       });
       setContent("");
       setPhotoFile(null);

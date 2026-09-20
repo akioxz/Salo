@@ -35,3 +35,23 @@ For **every single slice**, you must complete this exact loop before moving to t
 - **Scope Discipline:** Touch ONLY what the current slice requires. Do not refactor unrelated imports or "clean up" adjacent code while you are there.
 - **Rollback-Friendly:** Every commit should be independent so the user can easily revert one slice without breaking the others.
 - **Stop on Failure:** If a slice fails to work, STOP. Do not proceed to the next slice. Drop into debugging mode and fix the failure before moving forward.
+
+## Phase 4: Document-As-You-Go (Living Docs Updates)
+After EVERY successful atomic commit in Phase 3, you MUST update the project's living documents:
+
+1. **`docs/ACTIVITY_LOG.md` (MANDATORY after every commit):**
+   Append a new row with: timestamp, commit message, files changed, and a 1-liner explaining WHY.
+   ```
+   | HH:MM | `feat: add post creation form` | `PostForm.tsx`, `api/posts/route.ts` | Users need to create posts in the feed |
+   ```
+
+2. **`docs/LEARNINGS.md` (When something new is discovered):**
+   If during implementation you discover a gotcha, a workaround, a surprising API behavior, or a debugging breakthrough, append it immediately. Do not wait until the end of the session.
+
+3. **`docs/TECH_STACK.md` (When the stack changes):**
+   If you install a new package (`npm install X`), add a new service, or change infrastructure, update the relevant table in `TECH_STACK.md` with the package name, version, and purpose.
+
+4. **`docs/DESIGN_NOTES.md` (When a new pattern is introduced):**
+   If you introduce a new code pattern (e.g., a new custom hook, a new data fetching strategy, a new component structure), document it with a brief code snippet.
+
+> **IMPORTANT:** These updates are NOT optional. They are part of the commit loop. A slice is NOT complete until the living docs are updated.

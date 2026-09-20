@@ -66,8 +66,13 @@ export const list = query({
             .withIndex("by_post", (q) => q.eq("postId", post._id))
             .collect();
 
+          const photoUrl = post.photoStorageId 
+            ? await ctx.storage.getUrl(post.photoStorageId) 
+            : undefined;
+
           return {
             ...post,
+            photoUrl,
             author: {
               name: author?.name ?? author?.email ?? "Unknown",
               role: authorMembership?.role,

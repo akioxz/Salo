@@ -37,7 +37,7 @@ export default function AuthPage() {
   return (
     <div className="bg-zinc-50 dark:bg-black text-zinc-900 dark:text-zinc-100 min-h-screen flex justify-center">
       {/* Mobile Phone-like Container for desktop, full width on mobile */}
-      <div className="bg-white dark:bg-[#0a0a0a] w-full max-w-md md:border-x md:border-zinc-200 dark:md:border-zinc-800 shadow-sm relative flex flex-col justify-center min-h-screen px-8">
+      <div className="bg-white dark:bg-[#0a0a0a] w-full max-w-md md:border-x md:border-zinc-200 dark:md:border-zinc-800 shadow-[0_4px_20px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.3)] relative flex flex-col justify-center min-h-screen px-8">
         
         <div className="text-center mb-10">
           <h1 className="text-4xl font-black tracking-tight mb-2">Salo</h1>
@@ -61,7 +61,7 @@ export default function AuthPage() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full h-12 px-4 rounded-xl border border-zinc-300 dark:border-zinc-800 bg-zinc-50 dark:bg-[#111] text-lg focus:outline-none focus:ring-2 focus:ring-amber-500/50 transition-shadow"
+              className="w-full h-12 px-4 rounded-xl border border-zinc-300 dark:border-zinc-800 bg-zinc-50 dark:bg-[#111] text-lg focus:outline-none focus:ring-2 focus:ring-amber-500/20 transition-shadow"
               placeholder="juan@example.com"
               required
             />
@@ -79,7 +79,7 @@ export default function AuthPage() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full h-12 px-4 rounded-xl border border-zinc-300 dark:border-zinc-800 bg-zinc-50 dark:bg-[#111] text-lg focus:outline-none focus:ring-2 focus:ring-amber-500/50 transition-shadow"
+              className="w-full h-12 px-4 rounded-xl border border-zinc-300 dark:border-zinc-800 bg-zinc-50 dark:bg-[#111] text-lg focus:outline-none focus:ring-2 focus:ring-amber-500/20 transition-shadow"
               placeholder="••••••••"
               required
             />

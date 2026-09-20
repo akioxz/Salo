@@ -16,20 +16,26 @@ export default function Home() {
   const myHousehold = useQuery(api.households.getMine);
   const posts = useQuery(api.posts.list);
 
-  // Redirect if not logged in
+  // Redirect if not logged in (TEMPORARILY DISABLED FOR DEV)
   useEffect(() => {
+    /*
     if (!isAuthLoading && !isAuthenticated) {
       router.push("/auth");
     }
+    */
   }, [isAuthLoading, isAuthenticated, router]);
 
-  // Redirect if logged in but no household
+  // Redirect if logged in but no household (TEMPORARILY DISABLED FOR DEV)
   useEffect(() => {
+    /*
     if (isAuthenticated && myHousehold === null) {
       router.push("/pairing");
     }
+    */
   }, [isAuthenticated, myHousehold, router]);
 
+  // TEMPORARILY DISABLED Loading checks so unauthenticated users can see the UI
+  /*
   if (isAuthLoading || !isAuthenticated || myHousehold === undefined) {
     return (
       <div className="bg-zinc-50 dark:bg-black min-h-screen flex items-center justify-center">
@@ -42,6 +48,7 @@ export default function Home() {
   if (myHousehold === null) {
     return null;
   }
+  */
 
   return (
     <div className="bg-zinc-50 dark:bg-black text-zinc-900 dark:text-zinc-100 min-h-screen flex justify-center">

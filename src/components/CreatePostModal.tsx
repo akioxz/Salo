@@ -17,9 +17,12 @@ export default function CreatePostModal() {
 
     setLoading(true);
     try {
-      // In a later phase we will handle actual media uploads.
-      // For now, mediaUrl is omitted or undefined.
-      await createPost({ content: content.trim() });
+      // The backend expects type, category, and caption
+      await createPost({ 
+        type: "need", 
+        category: "General", 
+        caption: content.trim() 
+      });
       setContent("");
       setIsOpen(false);
     } catch (err) {
@@ -47,13 +50,13 @@ export default function CreatePostModal() {
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center bg-black/60 backdrop-blur-sm p-4">
           <div 
-            className="bg-white dark:bg-[#111] w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl animate-in slide-in-from-bottom-10 sm:zoom-in-95 duration-200"
+            className="bg-white dark:bg-[#111] w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)] animate-in slide-in-from-bottom-8 sm:zoom-in-95 duration-300 ease-out"
           >
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">Create Post</h2>
               <button
                 onClick={() => setIsOpen(false)}
-                className="w-10 h-10 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-500 rounded-full flex items-center justify-center transition-colors"
+                className="w-10 h-10 bg-zinc-100/50 dark:bg-zinc-800/50 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-500 rounded-full flex items-center justify-center transition-colors"
                 aria-label="Close"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -67,14 +70,14 @@ export default function CreatePostModal() {
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 placeholder="What's happening at home?"
-                className="w-full h-32 p-4 bg-zinc-50 dark:bg-[#0a0a0a] border border-zinc-200 dark:border-zinc-800 rounded-2xl resize-none focus:outline-none focus:ring-2 focus:ring-amber-500/50 text-lg transition-shadow placeholder:text-zinc-400"
+                className="w-full h-32 p-4 bg-zinc-50 dark:bg-[#0a0a0a] border border-zinc-200 dark:border-zinc-800 rounded-2xl resize-none focus:outline-none focus:ring-2 focus:ring-amber-500/20 text-lg transition-shadow placeholder:text-zinc-400"
                 autoFocus
               />
               
               <div className="mt-4 flex justify-between items-center">
                 <button
                   type="button"
-                  className="w-12 h-12 flex items-center justify-center text-zinc-400 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-950/30 rounded-xl transition-colors"
+                  className="w-12 h-12 flex items-center justify-center text-zinc-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/40 rounded-xl transition-colors"
                   aria-label="Attach Photo"
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

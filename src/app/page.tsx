@@ -6,6 +6,7 @@ import { api } from "../../convex/_generated/api";
 import { formatDistanceToNow } from "date-fns";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import CreatePostModal from "../components/CreatePostModal";
 
 export default function Home() {
   const { isAuthenticated, isLoading: isAuthLoading } = useConvexAuth();
@@ -151,6 +152,9 @@ export default function Home() {
             <span className="text-[10px] font-medium">Log out</span>
           </div>
         </div>
+        
+        {/* Create Post Modal */}
+        <CreatePostModal />
         
       </div>
     </div>

@@ -1,5 +1,12 @@
+"use client";
+
+import { useQuery } from "convex/react";
+import { api } from "../../convex/_generated/api";
+import { formatDistanceToNow } from "date-fns";
 
 export default function Home() {
+  const posts = useQuery(api.posts.list);
+
   return (
     <div className="bg-zinc-50 dark:bg-black text-zinc-900 dark:text-zinc-100 min-h-screen flex justify-center">
       
@@ -10,7 +17,7 @@ export default function Home() {
         <div className="px-6 pt-12 pb-4 bg-white dark:bg-[#0a0a0a] border-b border-zinc-200 dark:border-zinc-800 flex justify-between items-center sticky top-0 z-10">
           <div>
             <h1 className="text-xl font-bold tracking-tight">Salo</h1>
-            <p className="text-xs text-zinc-500">Reyes Household</p>
+            <p className="text-xs text-zinc-500">Your Household</p>
           </div>
           <button className="bg-black dark:bg-white text-white dark:text-black rounded-full h-8 w-8 flex items-center justify-center font-bold text-lg leading-none shadow-sm transition-transform hover:scale-95 active:scale-90 cursor-pointer">
             +
@@ -20,69 +27,74 @@ export default function Home() {
         {/* Feed */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-zinc-50 dark:bg-black">
           
-          {/* Post: Expense */}
-          <div className="bg-white dark:bg-[#0a0a0a] p-4 rounded-2xl shadow-sm border border-zinc-200 dark:border-zinc-800 hover:border-blue-500/50 transition-colors">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-blue-600 dark:text-blue-300 font-bold">
-                J
+          {posts === undefined ? (
+            <div className="text-center text-zinc-500 py-10 text-sm">
+              Loading posts...
+            </div>
+          ) : posts.length === 0 ? (
+            <div className="text-center text-zinc-500 py-10 flex flex-col items-center">
+              <svg className="w-12 h-12 mb-3 text-zinc-300 dark:text-zinc-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+              <p className="text-sm font-medium">No posts yet</p>
+              <p className="text-xs mt-1">Tap the + button to create an expense or need.</p>
+            </div>
+          ) : (
+            posts.map((post) => (
+              <div key={post._id} className={`bg-white dark:bg-[#0a0a0a] p-4 rounded-2xl shadow-sm border border-zinc-200 dark:border-zinc-800 transition-colors ${post.type === 'expense' ? 'hover:border-blue-500/50' : 'hover:border-amber-500/50'}`}>
+                <div className="flex items-center gap-3 mb-3">
+                  <div className={`h-10 w-10 rounded-full flex items-center justify-center font-bold ${
+                    post.type === 'expense' 
+                      ? 'bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300' 
+                      : 'bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-300'
+                  }`}>
+                    {post.author.name.charAt(0).toUpperCase()}
+                  </div>
+                  <div>
+                    <p className="font-semibold text-sm">
+                      {post.author.name} {post.author.role ? `(${post.author.role})` : ''}
+                    </p>
+                    <p className="text-[10px] text-zinc-500">
+                      {formatDistanceToNow(post._creationTime, { addSuffix: true })}
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="mb-3">
+                  <span className={`inline-block px-2 py-1 text-[10px] uppercase tracking-wider rounded font-bold mb-2 border ${
+                    post.type === 'expense'
+                      ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800/50'
+                      : 'bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800/50'
+                  }`}>
+                    {post.type} • {post.category}
+                  </span>
+                  
+                  {post.caption && (
+                    <p className="text-sm">{post.caption}</p>
+                  )}
+                  
+                  {post.amount !== undefined && (
+                    <div className="mt-2 text-2xl font-black">
+                      ₱{post.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </div>
+                  )}
+                </div>
+                
+                <div className="flex items-center gap-4 pt-3 border-t border-zinc-200 dark:border-zinc-800">
+                  <button className="flex items-center gap-1.5 text-zinc-500 hover:text-pink-500 text-xs transition-colors font-medium">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                    <span>{post.reactions.filter((r) => r.type === "heart").length}</span>
+                  </button>
+                  <button className="flex items-center gap-1.5 text-zinc-500 hover:text-pink-500 text-xs transition-colors font-medium">
+                    {/* Placeholder for thanks icon */}
+                    <span>🙏 {post.reactions.filter((r) => r.type === "thanks").length}</span>
+                  </button>
+                  <button className="flex items-center gap-1.5 text-zinc-500 hover:text-blue-500 text-xs transition-colors font-medium ml-auto">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                    <span>{post.comments.length}</span>
+                  </button>
+                </div>
               </div>
-              <div>
-                <p className="font-semibold text-sm">Juan (OFW)</p>
-                <p className="text-[10px] text-zinc-500">2 hours ago</p>
-              </div>
-            </div>
-            
-            <div className="mb-3">
-              <span className="inline-block px-2 py-1 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-[10px] uppercase tracking-wider rounded font-bold mb-2 border border-red-200 dark:border-red-800/50">
-                Expense • Groceries
-              </span>
-              <p className="text-sm">Padala for this month&apos;s groceries and rice. Kasya na ba ito?</p>
-              <div className="mt-2 text-2xl font-black">₱15,000.00</div>
-            </div>
-            
-            <div className="flex items-center gap-4 pt-3 border-t border-zinc-200 dark:border-zinc-800">
-              <button className="flex items-center gap-1.5 text-zinc-500 hover:text-pink-500 text-xs transition-colors font-medium">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
-                <span>Heart</span>
-              </button>
-              <button className="flex items-center gap-1.5 text-zinc-500 hover:text-blue-500 text-xs transition-colors font-medium">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
-                <span>2 Comments</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Post: Need */}
-          <div className="bg-white dark:bg-[#0a0a0a] p-4 rounded-2xl shadow-sm border border-zinc-200 dark:border-zinc-800 hover:border-amber-500/50 transition-colors">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="h-10 w-10 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center text-green-600 dark:text-green-300 font-bold">
-                M
-              </div>
-              <div>
-                <p className="font-semibold text-sm">Maria (Family)</p>
-                <p className="text-[10px] text-zinc-500">5 hours ago</p>
-              </div>
-            </div>
-            
-            <div className="mb-3">
-              <span className="inline-block px-2 py-1 bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 text-[10px] uppercase tracking-wider rounded font-bold mb-2 border border-amber-200 dark:border-amber-800/50">
-                Need • Tuition
-              </span>
-              <p className="text-sm">Kailangan na magbayad ng tuition fee para kay bunso next week. May deadline sa Friday.</p>
-              <div className="mt-2 text-2xl font-black">₱8,500.00</div>
-            </div>
-            
-            <div className="flex items-center gap-4 pt-3 border-t border-zinc-200 dark:border-zinc-800">
-              <button className="flex items-center gap-1.5 text-pink-500 text-xs transition-colors font-medium">
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd"></path></svg>
-                <span>Thanks</span>
-              </button>
-              <button className="flex items-center gap-1.5 text-zinc-500 hover:text-blue-500 text-xs transition-colors font-medium">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
-                <span>Comment</span>
-              </button>
-            </div>
-          </div>
+            ))
+          )}
 
         </div>
         

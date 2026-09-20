@@ -37,7 +37,7 @@ export const list = query({
   args: {},
   handler: async (ctx) => {
     try {
-      const { membership } = await verifyMembership(ctx);
+      const { user, membership } = await verifyMembership(ctx);
 
       const posts = await ctx.db
         .query("posts")
@@ -66,19 +66,41 @@ export const list = query({
             .withIndex("by_post", (q) => q.eq("postId", post._id))
             .collect();
 
+          const commentsWithAuthors = await Promise.all(
+            comments.map(async (c) => {
+              const cAuthor = await ctx.db.get(c.authorId);
+              const cMembership = await ctx.db
+                .query("householdMembers")
+                .withIndex("by_user", (q) => q.eq("userId", c.authorId))
+                .unique();
+              return {
+                ...c,
+                author: {
+                  name: cAuthor?.name ?? cAuthor?.email ?? "Unknown",
+                  role: cMembership?.role ?? "family",
+                },
+              };
+            })
+          );
+
           const photoUrl = post.photoStorageId 
             ? await ctx.storage.getUrl(post.photoStorageId) 
             : undefined;
 
+          const hasReacted = reactions.some(
+            (r) => r.userId === user._id && r.type === "heart"
+          );
+
           return {
             ...post,
             photoUrl,
+            hasReacted,
             author: {
               name: author?.name ?? author?.email ?? "Unknown",
               role: authorMembership?.role,
             },
             reactions,
-            comments,
+            comments: commentsWithAuthors,
           };
         }),
       );

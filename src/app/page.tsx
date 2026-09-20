@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery } from "convex/react";
+import { useQuery, useMutation } from "convex/react";
 import { useAuthActions, useConvexAuth } from "@convex-dev/auth/react";
 import { api } from "../../convex/_generated/api";
 import { useRouter } from "next/navigation";
@@ -16,6 +16,18 @@ export default function Home() {
 
   const myHousehold = useQuery(api.households.getMine);
   const posts = useQuery(api.posts.list);
+  const toggleReaction = useMutation(api.reactions.toggle);
+  const addComment = useMutation(api.comments.add);
+
+  const handleReact = (postId: string) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    toggleReaction({ postId: postId as any, type: "heart" });
+  };
+
+  const handleAddComment = (postId: string, content: string) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    addComment({ postId: postId as any, content });
+  };
 
   // Redirect if not logged in (TEMPORARILY DISABLED FOR DEV)
   useEffect(() => {
@@ -83,6 +95,11 @@ export default function Home() {
             </div>
           ) : (
             <HouseholdActivityFeed 
+              currentUser={myHousehold?.user 
+                ? { name: myHousehold.user.name || "Unknown", role: myHousehold.membership.role } 
+                : undefined}
+              onReact={handleReact}
+              onAddComment={handleAddComment}
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               posts={posts.map((p: any) => ({
                 id: p._id,
@@ -94,14 +111,14 @@ export default function Home() {
                 photoUrl: p.photoUrl,
                 amount: p.amount,
                 reactionCount: p.reactions?.length || 0,
-                hasReacted: false,
+                hasReacted: p.hasReacted || false,
                 commentCount: p.comments?.length || 0,
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 comments: p.comments?.map((c: any) => ({
                   id: c._id,
-                  author: { name: "Unknown", role: "family" },
+                  author: c.author,
                   createdAt: new Date(c._creationTime).toISOString(),
-                  content: "Comment content",
+                  content: c.content,
                 })) || []
               })) as HouseholdPost[]}
             />

@@ -118,7 +118,7 @@ export function CommentsThread({
             className={cn(
               "flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-all duration-200 active:scale-[0.98]",
               draft.trim()
-                ? "bg-amber-400 text-zinc-950 hover:bg-amber-300"
+                ? "bg-amber-400 text-amber-950 hover:bg-amber-300"
                 : "bg-zinc-100 text-zinc-300 dark:bg-zinc-800 dark:text-zinc-600"
             )}
           >

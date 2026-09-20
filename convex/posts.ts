@@ -6,12 +6,14 @@ import { v } from "convex/values";
  * Helper to authenticate and verify household membership.
  * Returns the user and their household membership.
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function verifyMembership(ctx: any) {
   const identity = await ctx.auth.getUserIdentity();
   if (!identity) throw new Error("Not authenticated");
 
   const user = await ctx.db
     .query("users")
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     .withIndex("by_token", (q: any) =>
       q.eq("tokenIdentifier", identity.tokenIdentifier),
     )
@@ -21,6 +23,7 @@ async function verifyMembership(ctx: any) {
 
   const membership = await ctx.db
     .query("householdMembers")
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     .withIndex("by_user", (q: any) => q.eq("userId", user._id))
     .unique();
 
@@ -74,7 +77,7 @@ export const list = query({
           };
         }),
       );
-    } catch (e) {
+    } catch (_e) {
       // Return empty array if not authenticated or no household yet
       return [];
     }

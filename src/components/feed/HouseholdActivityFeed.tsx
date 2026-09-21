@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Heart, MessageCircle, X } from "lucide-react";
+import { Heart, MessageCircle, X, Banknote, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/cn";
 import {
   formatTimeAgo,
@@ -10,7 +10,11 @@ import {
   getCategoryIcon,
   ROLE_STYLES,
 } from "@/lib/format";
-import type { HouseholdComment, HouseholdMember, HouseholdPost } from "@/types/household";
+import type {
+  HouseholdComment,
+  HouseholdMember,
+  HouseholdPost,
+} from "@/types/household";
 import { CommentsThread } from "./CommentsThread";
 
 interface HouseholdActivityFeedProps {
@@ -117,7 +121,7 @@ function PostCard({
   const [imgLoaded, setImgLoaded] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [localComments, setLocalComments] = useState<HouseholdComment[]>(
-    post.comments ?? []
+    post.comments ?? [],
   );
 
   useEffect(() => {
@@ -166,25 +170,25 @@ function PostCard({
   }
 
   return (
-    <article
-      className={cn(
-        "rounded-2xl border bg-white dark:bg-zinc-900",
-        "border-zinc-200/80 dark:border-white/10",
-        "shadow-[0_4px_20px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.4)]",
-        "p-4",
-        "transition-all motion-safe:duration-500 ease-out motion-reduce:transition-none",
-        mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"
-      )}
-    >
+      <article
+        className={cn(
+          "rounded-3xl border bg-white dark:bg-[#0A0B0E]",
+          "border-zinc-200/80 dark:border-white/10 dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)]",
+          "shadow-sm dark:shadow-inner dark:ethereal-glass",
+          "p-4",
+          "transition-all motion-safe:duration-500 ease-out motion-reduce:transition-none",
+          mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3",
+        )}
+      >
       {/* Header */}
-      <div className="flex items-start gap-3">
+      <div className="flex items-start gap-4">
         <div
           role="img"
           aria-label={post.author.name}
           className={cn(
             "flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold",
             role.avatarBg,
-            role.avatarText
+            role.avatarText,
           )}
         >
           {getInitials(post.author.name)}
@@ -199,16 +203,29 @@ function PostCard({
               {role.label}
             </span>
           </div>
-          <span className="text-xs text-zinc-500 dark:text-zinc-400">
+          <span className="text-[10px] font-medium tracking-wide text-zinc-500/80 dark:text-zinc-500">
             {formatTimeAgo(post.createdAt)}
           </span>
         </div>
       </div>
 
       {/* Content */}
-      <p className="mt-3 text-[15px] leading-relaxed text-zinc-700 dark:text-zinc-300">
+      <p className="mt-4 text-[15px] leading-relaxed text-zinc-700 dark:text-zinc-300">
         {post.content}
       </p>
+
+      {/* Audio */}
+      {post.audioUrl && (
+        <div className="mt-4 bg-zinc-100 dark:bg-zinc-800/50 p-2 rounded-xl flex items-center gap-4 w-full">
+          <div className="w-8 h-8 rounded-full bg-amber-500 text-white flex items-center justify-center shrink-0">
+            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z" />
+              <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z" />
+            </svg>
+          </div>
+          <audio src={post.audioUrl} controls className="h-8 flex-1 w-full" />
+        </div>
+      )}
 
       {/* Photo */}
       {post.photoUrl && (
@@ -216,7 +233,7 @@ function PostCard({
           type="button"
           onClick={() => setLightboxOpen(true)}
           aria-label="View photo full size"
-          className="relative mt-3 block w-full overflow-hidden rounded-xl bg-zinc-100 dark:bg-zinc-800"
+          className="relative mt-4 block w-full overflow-hidden rounded-xl bg-zinc-100 dark:bg-zinc-800"
         >
           {!imgLoaded && (
             <div className="absolute inset-0 animate-pulse bg-zinc-200 dark:bg-zinc-800" />
@@ -228,7 +245,7 @@ function PostCard({
             onLoad={() => setImgLoaded(true)}
             className={cn(
               "aspect-[4/3] w-full object-cover transition-opacity duration-300",
-              imgLoaded ? "opacity-100" : "opacity-0"
+              imgLoaded ? "opacity-100" : "opacity-0",
             )}
           />
         </button>
@@ -238,19 +255,26 @@ function PostCard({
       {(post.category || typeof post.amount === "number") && (
         <div
           className={cn(
-            "mt-3 flex items-center justify-between gap-3 rounded-xl px-3 py-2",
-            post.type === "expense"
+            "mt-5 flex items-center justify-between gap-4 rounded-2xl px-4 py-3",
+            post.type === "padala"
+              ? "bg-emerald-500/[0.1] dark:bg-emerald-400/[0.1]"
+              : post.type === "expense"
               ? "bg-zinc-100/80 dark:bg-white/5"
-              : "bg-amber-500/[0.06] dark:bg-amber-400/[0.06]"
+              : "bg-amber-500/[0.06] dark:bg-amber-400/[0.06]",
           )}
         >
           {post.category ? (
             <span className="flex min-w-0 items-center gap-1.5 text-sm text-zinc-600 dark:text-zinc-300">
               {(() => {
+                if (post.type === "padala") {
+                  return <Banknote className="h-4 w-4 shrink-0 text-emerald-500" />;
+                }
                 const Icon = getCategoryIcon(post.category);
-                return <Icon className="h-4 w-4 shrink-0 text-zinc-400 dark:text-zinc-500" />;
+                return (
+                  <Icon className="h-4 w-4 shrink-0 text-zinc-400 dark:text-zinc-500" />
+                );
               })()}
-              <span className="truncate">{post.category}</span>
+              <span className={cn("truncate font-medium", post.type === "padala" && "text-emerald-700 dark:text-emerald-400")}>{post.category}</span>
             </span>
           ) : (
             <span />
@@ -258,21 +282,31 @@ function PostCard({
 
           {typeof post.amount === "number" && (
             <span
-              className={cn(
-                "shrink-0 font-semibold tabular-nums tracking-tight",
-                post.type === "expense"
-                  ? "text-[17px] text-zinc-900 dark:text-zinc-50"
-                  : "text-sm text-amber-700 dark:text-amber-300"
-              )}
+                className={cn(
+                  "shrink-0 font-black tabular-nums tracking-tighter",
+                  post.type === "padala"
+                    ? "text-3xl text-emerald-700 dark:text-emerald-400"
+                    : post.type === "expense"
+                    ? "text-3xl text-zinc-900 dark:text-zinc-50"
+                    : "text-3xl text-amber-700 dark:text-amber-300",
+                )}
             >
-              {formatPHP(post.amount)}
+              {post.type === "padala" ? "+" : ""}{formatPHP(post.amount)}
             </span>
           )}
         </div>
       )}
 
+      {/* Covered Badge */}
+      {post.type === "need" && post.isCovered && (
+        <div className="mt-4 flex items-center gap-2 bg-emerald-50 dark:bg-emerald-950/40 px-3 py-2 rounded-lg border border-emerald-400 dark:border-emerald-500/50 glow-success spring-bounce hover:scale-[1.02]">
+          <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
+          <span className="text-emerald-700 dark:text-emerald-400 text-sm font-bold tracking-tight">Covered na!</span>
+        </div>
+      )}
+
       {/* Footer actions */}
-      <div className="mt-3 flex items-center gap-1">
+      <div className="mt-4 flex items-center gap-1">
         <button
           type="button"
           onClick={handleReact}
@@ -285,10 +319,13 @@ function PostCard({
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/60 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-zinc-900",
             hasReacted
               ? "text-rose-500 dark:text-rose-400"
-              : "text-zinc-500 dark:text-zinc-400"
+              : "text-zinc-500 dark:text-zinc-400",
           )}
         >
-          <Heart className="h-[18px] w-[18px]" fill={hasReacted ? "currentColor" : "none"} />
+          <Heart
+            className="h-[18px] w-[18px]"
+            fill={hasReacted ? "currentColor" : "none"}
+          />
           <span className="tabular-nums">{reactionCount}</span>
         </button>
 
@@ -301,7 +338,7 @@ function PostCard({
             "flex h-11 items-center gap-1.5 rounded-lg px-3 text-sm text-zinc-500 dark:text-zinc-400",
             "transition-all duration-200 active:scale-[0.98]",
             "hover:bg-zinc-100 dark:hover:bg-zinc-800/50",
-            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/60 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-zinc-900"
+            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/60 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-zinc-900",
           )}
         >
           <MessageCircle className="h-[18px] w-[18px]" />
@@ -311,7 +348,7 @@ function PostCard({
 
       {/* Inline comments */}
       {commentsOpen && (
-        <div className="mt-3 border-t border-zinc-100 pt-3 dark:border-white/5">
+        <div className="mt-4 border-t border-zinc-100 pt-4 dark:border-white/5">
           <CommentsThread
             comments={localComments}
             currentUser={currentUser}
@@ -361,7 +398,7 @@ export default function HouseholdActivityFeed({
   onAddComment,
 }: HouseholdActivityFeedProps) {
   return (
-    <div className="flex flex-col gap-3 pb-24 pt-4 px-4">
+    <div className="flex flex-col gap-4 pb-24">
       {posts.map((post, index) => (
         <PostCard
           key={post.id}

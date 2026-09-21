@@ -1,0 +1,18 @@
+---
+globs: *.*
+name: systematic-debug
+description: "Run the Agent-Spec 4-Phase Systematic Debugging Protocol. Forces minimal reproduction, bisection, and explicit hypothesis testing."
+trigger: explicit
+---
+
+# Systematic Debugging Protocol (Agent-Spec Engine)
+
+This skill executes the strict 4-phase debugging protocol from the agent-spec. Use this when the user types `/systematic-debug` or asks to fix a deep regression/bug.
+
+## Execution Workflow
+You are strictly forbidden from making speculative, trial-and-error code edits. Follow these phases sequentially:
+
+1. **Phase 1: Minimal Reproduction**: Do not edit app code yet. Write or run an automated test/script (or instruct the user to run a specific command) that deterministically reproduces the bug. The bug MUST be visible in terminal output.
+2. **Phase 2: Isolation & Bisection**: Pinpoint the exact state divergence line. Identify the specific file, line number, and state variable causing the issue. Output this finding to the user.
+3. **Phase 3: Hypothesis Formulation**: Explicitly state to the user: "My hypothesis for the failure mechanism is X." Wait for the user to acknowledge, or immediately test the hypothesis via a minimal diagnostic `console.log` or isolated edit.
+4. **Phase 4: Targeted Fix & Regression Proof**: Apply the actual fix. Verify that the reproduction test from Phase 1 now passes. Prove that no regressions exist by running the test suite.

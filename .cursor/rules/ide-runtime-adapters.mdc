@@ -1,0 +1,33 @@
+---
+globs: *.*
+name: ide-runtime-adapters
+description: "Rules for compiling instructions into various IDE dotfiles (Cursor, Claude, Windsurf, Copilot, Cline) using the Polyglot Sync Engine."
+trigger: model_decision
+---
+
+# Dev-Library Rule Extensions: IDE Runtime Adapters
+
+## Cursor
+- **Mechanics:** Use `.cursor/rules/*.mdc` (recommended over legacy `.cursorrules`). Subdirectories can also contain their own `.cursor/rules/` for localized scoping.
+- **Scoping:** Leverage YAML frontmatter (`alwaysApply: true|false`, `globs: "pattern"`, and `description` for model-decided triggering).
+- **Best Practices:** Create a global rule (e.g., `00-agent-spec.mdc`) with `alwaysApply: true` pointing to `AGENTS.md`. Define path-scoped rules or specialist skills with `alwaysApply: false`, a precise `description` for model triggering, and targeted `globs`.
+
+## Claude Code
+- **Mechanics:** Relies on `CLAUDE.md` at the repository root, within subdirectories (for subtree-scoped memory), or globally (`~/.claude/CLAUDE.md`).
+- **Imports:** Supports `@path/to/file` syntax to dynamically pull in context without inlining file contents.
+- **Best Practices:** Keep the root `CLAUDE.md` concise with bulleted commands, pointing directly to `@AGENTS.md` and `@context` files. Use subdirectory `CLAUDE.md` files for subsystem specifics.
+
+## Windsurf
+- **Mechanics:** Utilizes the `.windsurf/rules/` directory to store multiple Markdown files (legacy: `.windsurfrules`).
+- **Activation:** Rules can be Always-On, manual, model-decided (glob/description), or file-glob-scoped.
+- **Best Practices:** Establish a core `agent-spec.md` with "Always-On" activation pointing to `AGENTS.md`. Segregate on-demand specialist workflows into separate rules configured for manual or model-decided activation to respect context limits.
+
+## GitHub Copilot
+- **Mechanics:** Uses `.github/copilot-instructions.md` at the repository root for primary instructions.
+- **Scoping:** `.github/instructions/*.instructions.md` files use YAML frontmatter (`applyTo: "glob"`) to restrict rules to matching paths.
+- **Best Practices:** Enforce global `AGENTS.md` behaviors in the primary instructions file. Write clear, imperative, short rules in scoped `.instructions.md` files, and reference required skills dynamically.
+
+## Cline
+- **Mechanics:** Employs a `.clinerules/` directory for discrete Markdown rule files (legacy: `.clinerules`).
+- **Toggling:** Individual rule files can be explicitly toggled on or off depending on the current task.
+- **Best Practices:** Maintain a minimal standing rule file (e.g., `00-agent-spec.md`) pointing to `AGENTS.md`. Implement specialized skills as dedicated rule files and toggle them on strictly when that specialized workflow is active.

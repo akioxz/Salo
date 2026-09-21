@@ -1,0 +1,25 @@
+---
+globs: *.*
+name: viral-content-synthesis
+description: "Run the Agent-Spec Viral Content & Growth Synthesis. Executes technical SEO checks, Reddit/X sentiment scraping, and structural blueprinting."
+trigger: explicit
+---
+
+# Viral Content Synthesis (Agent-Spec Engine)
+
+This skill executes the strict content and growth engineering protocol from the agent-spec. Use this when the user types `/viral-content-synthesis` or wants to reverse-engineer a viral post/concept.
+
+## Execution Workflow
+
+1. **Algorithmic Source Weighting**: Ask the user for the topic. Search for the topic prioritizing Reddit, X (Twitter), and YouTube. Apply a strict penalty to generic Web/SEO articles.
+2. **Cross-Source Validation**: Identify claims that overlap across multiple platforms. Filter out single-source unverified opinions.
+3. **Structural Blueprinting**: Reverse engineer the reference material into abstract narrative beats:
+   - Hook expectation/subversion
+   - Tension trigger
+   - Evidence block
+   - Resolution/Payoff
+4. **Draft Generation**: Draft the content using the "Anti-AI Styling Rules". 
+   - ZERO em-dashes. 
+   - ZERO copulative verbs (serves as, stands as). 
+   - ZERO AI tells (delve, realm, harness).
+   - Use concrete numbers and names over adjectives.

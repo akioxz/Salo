@@ -1,5 +1,5 @@
 export type HouseholdRole = "ofw" | "family";
-export type PostType = "expense" | "need";
+export type PostType = "expense" | "need" | "padala";
 
 export interface HouseholdMember {
   name: string;
@@ -25,8 +25,10 @@ export interface HouseholdPost {
   /** In PHP. Omit for a need post with no attached amount. */
   amount?: number;
   photoUrl?: string;
+  audioUrl?: string;
   reactionCount: number;
   hasReacted?: boolean;
+  isCovered?: boolean;
   /**
    * Omit entirely if comments haven't been fetched yet for this post
    * (the feed will fall back to showing commentCount only, and expand

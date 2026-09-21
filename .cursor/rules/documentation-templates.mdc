@@ -1,0 +1,55 @@
+---
+globs: *.*
+name: documentation-templates
+description: "Structural requirements and templates for documentation (PRD, Architecture, Database Schema, and ADRs)."
+trigger: model_decision
+---
+
+# Dev-Library Rule Extensions: Context & Documentation Templates
+
+### 1. PRD (Product Requirements Document) Format
+A tiered document to define scope, audience, and features to keep implementations bounded.
+- **Executive Summary:** High-level product vision and value proposition.
+- **Problem Statement & Context:** Define the problem, target audience, and why current solutions fall short.
+- **Core Goals & Objectives:** Enumerate primary business and user objectives.
+- **Target Users & Audience:** User personas, roles, and key needs/permissions.
+- **MVP Features (Scope):** Non-negotiable features for the Minimum Viable Product launch.
+- **Full Feature List & Prioritization:** MoSCoW prioritization (Must-Have (P0), Should-Have (P1), Could-Have (P2), Won't-Have).
+- **Success Metrics & KPIs:** Measurable signals like User Adoption, Performance, and Reliability.
+- **Tech Stack & Technical Requirements:** Frontend, Backend, Database, Runtime, and Key Dependencies.
+- **Deployment & Infrastructure Strategy:** Hosting, Environments (dev, staging, prod), and CI/CD Pipeline.
+- **Phase Roadmap:** Milestone timeline (Phase 1 MVP, Phase 2 Enhancement, Phase 3 Scaling).
+
+### 2. ARCHITECTURE Document Format
+High-level description of system topologies and cross-cutting concerns to align implementation decisions.
+- **System Overview & High-Level Architecture:** Topology summary, key services, entry points, and an Architecture Diagram (Mermaid `graph TD`).
+- **Layered Architecture & Conventions:** Pattern structures (e.g., Presentation Layer, Domain Layer, Infrastructure Layer).
+- **Directory & Domain Structure:** Explicit folder layout and module boundary rules (e.g., no barrel files across feature boundaries).
+- **Middleware & Request Pipeline:** Step-by-step HTTP request/response pipeline execution order.
+- **Client-Side Architecture:** View Layer, State Management (Local, Server, Global), and Routing Strategy.
+- **Data Layer & Database Strategy:** Persistence methods, ORM, connection management, caching.
+- **Authentication & Authorization Flow:** Auth Provider, Session Model (e.g., JWT), Authorization Model (RBAC/ABAC).
+- **Key Data Flows & Sequence Diagrams:** End-to-end data flows using Mermaid `sequenceDiagram`.
+- **Domain Logic Highlights:** Complex business rules, state machines, and calculations.
+- **Cross-Cutting Concerns:** Standardized error handling, boundary validation, security (CSP, SRI), observability, and performance budgets.
+
+### 3. SCHEMA (Database & API) Format
+The single source of truth for database structure, relationships, and API contracts.
+- **Data Layer Overview:** Primary datastores, caching layers, and object storage.
+- **Database Tables & ER Diagram:** Visual entity relationships using Mermaid `erDiagram`.
+- **Table Schemas & Column Definitions:** Markdown tables including Column Name, Data Type, Nullable, Default, Constraints/Index, and Description.
+- **Row-Level Security (RLS) & Access Policies:** Explicit Action/Rule definitions per table for `SELECT`, `INSERT`, `UPDATE`, `DELETE`.
+- **API Routes by Domain:** Categorized endpoints (REST / GraphQL / RPC) and their purposes.
+- **Request & Response Payload Examples:** Concrete JSON payload examples for requests, success (`2xx`), and errors (`4xx`).
+- **Phase-Based Route Priority:** Prioritization of endpoints across delivery phases.
+- **Migrations & Schema Versioning:** Tooling, file naming conventions, and additive/zero-downtime execution strategies.
+
+### 4. ADR (Architecture Decision Record) Format
+Based on the MADR (Markdown Architectural Decision Records) standard to capture significant architectural choices and trade-offs.
+- **Header:** `ADR-[NUMBER]: [SHORT_TITLE]`
+- **Metadata:** Status (`PROPOSED` | `ACCEPTED` | `REJECTED` | `DEPRECATED` | `SUPERSEDED`), Date, and Deciders.
+- **Context and Problem Statement:** Concise problem description.
+- **Decision Drivers:** Competing forces or factors driving the decision.
+- **Considered Options:** The alternatives evaluated.
+- **Decision Outcome:** Chosen Option and the specific rationale behind it.
+- **Consequences:** Positive Consequences and Negative Consequences.

@@ -48,7 +48,13 @@ Apply Emil Kowalski's polish and animation rules to interactive elements:
 - **Micro-interactions:** Ensure every clickable element (buttons, links, cards) has a distinct `:hover` and `:active` state. The `:active` state should usually feature a subtle scale-down (e.g., `transform: scale(0.98)`) to provide tactile feedback.
 - **Details:** Swap solid borders on cards/buttons for inner semi-transparent shadows for a more refined look.
 
-### Step 4: Fix and Generate Verdict
+### Step 4: Advanced Aesthetic Tuning Engines
+If the project PRD or user specifies a high-end visual style, apply the following engine rules from the design-engineering spec instead of generic UI constraints:
+- **Ethereal Glass (Agency Look):** Extremely thin typographic weights, hyper-subtle gradients, heavy use of backdrop-blur (frosted glass), huge negative space, zero hard borders.
+- **Industrial Brutalist (Telemetry HUD):** Swiss print typography (Space Grotesk / Geist Mono), high-contrast borders (1px solid), raw unstyled tables, data-dense layouts, neon accent colors (e.g., `#00FF41`) on pitch black.
+- **Apple Spring Physics:** Use fluid, physics-based spring animations for all interactions (never linear CSS transitions). Elements should possess "mass" and "stiffness" (e.g., Framer Motion `type: "spring"`).
+
+### Step 5: Fix and Generate Verdict
 Rewrite the frontend components to comply with all three passes. Once fixed, generate or update `.impeccable/review/VERDICT.md` with the following format:
 
 ```markdown

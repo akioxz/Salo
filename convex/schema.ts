@@ -12,9 +12,9 @@ export default defineSchema({
   // Users (lightweight profile, linked to Convex Auth identity)
   // ---------------------------------------------------------------
   users: defineTable({
-    email: v.string(),
+    email: v.optional(v.string()),
     name: v.optional(v.string()),
-    tokenIdentifier: v.string(), // Convex Auth identity reference
+    tokenIdentifier: v.optional(v.string()), // Convex Auth identity reference
   })
     .index("by_token", ["tokenIdentifier"])
     .index("by_email", ["email"]),
@@ -23,8 +23,10 @@ export default defineSchema({
   // Households — max 2 members, invite-code pairing
   // ---------------------------------------------------------------
   households: defineTable({
+    name: v.optional(v.string()), // Dev-only field from old dummy data
     inviteCode: v.optional(v.string()), // null once redeemed
     inviteExpiresAt: v.optional(v.number()), // Unix ms timestamp
+    nextVisitDate: v.optional(v.number()), // Unix ms timestamp for the OFW's homecoming
   }).index("by_invite_code", ["inviteCode"]),
 
   householdMembers: defineTable({
@@ -41,11 +43,26 @@ export default defineSchema({
   posts: defineTable({
     householdId: v.id("households"),
     authorId: v.id("users"),
-    type: v.union(v.literal("expense"), v.literal("need")),
+    type: v.union(v.literal("expense"), v.literal("need"), v.literal("padala")),
     amount: v.optional(v.number()),
     category: v.string(),
     caption: v.optional(v.string()),
     photoStorageId: v.optional(v.id("_storage")),
+    audioStorageId: v.optional(v.id("_storage")), // For Voice Notes
+    linkedNeedId: v.optional(v.id("posts")), // Links an Expense to the Need it fulfills
+  })
+    .index("by_household", ["householdId"])
+    .index("by_linked_need", ["linkedNeedId"]),
+
+  // ---------------------------------------------------------------
+  // Balikbayan Box (Wishlist / Alkansya)
+  // ---------------------------------------------------------------
+  balikbayanBox: defineTable({
+    householdId: v.id("households"),
+    authorId: v.id("users"),
+    title: v.string(),
+    price: v.optional(v.number()),
+    status: v.union(v.literal("open"), v.literal("bought"), v.literal("packed")),
   }).index("by_household", ["householdId"]),
 
   // ---------------------------------------------------------------

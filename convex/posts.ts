@@ -1,36 +1,7 @@
 // convex/posts.ts
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
-
-/**
- * Helper to authenticate and verify household membership.
- * Returns the user and their household membership.
- */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function verifyMembership(ctx: any) {
-  const identity = await ctx.auth.getUserIdentity();
-  if (!identity) throw new Error("Not authenticated");
-
-  const user = await ctx.db
-    .query("users")
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    .withIndex("by_token", (q: any) =>
-      q.eq("tokenIdentifier", identity.tokenIdentifier),
-    )
-    .unique();
-
-  if (!user) throw new Error("User not found");
-
-  const membership = await ctx.db
-    .query("householdMembers")
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    .withIndex("by_user", (q: any) => q.eq("userId", user._id))
-    .unique();
-
-  if (!membership) throw new Error("You do not belong to a household");
-
-  return { user, membership };
-}
+import { verifyMembership } from "./auth_dev_helper";
 
 /** Get all posts for the current user's household, with reactions and comments. */
 export const list = query({
@@ -87,14 +58,29 @@ export const list = query({
             ? await ctx.storage.getUrl(post.photoStorageId) 
             : undefined;
 
+          const audioUrl = post.audioStorageId 
+            ? await ctx.storage.getUrl(post.audioStorageId) 
+            : undefined;
+
           const hasReacted = reactions.some(
             (r) => r.userId === user._id && r.type === "heart"
           );
 
+          let isCovered = false;
+          if (post.type === "need") {
+            const coveringExpense = await ctx.db
+              .query("posts")
+              .withIndex("by_linked_need", (q) => q.eq("linkedNeedId", post._id))
+              .first();
+            isCovered = !!coveringExpense;
+          }
+
           return {
             ...post,
             photoUrl,
+            audioUrl,
             hasReacted,
+            isCovered,
             author: {
               name: author?.name ?? author?.email ?? "Unknown",
               role: authorMembership?.role,
@@ -114,11 +100,13 @@ export const list = query({
 /** Create a new post in the user's household. */
 export const create = mutation({
   args: {
-    type: v.union(v.literal("expense"), v.literal("need")),
+    type: v.union(v.literal("expense"), v.literal("need"), v.literal("padala")),
     amount: v.optional(v.number()),
     category: v.string(),
     caption: v.optional(v.string()),
     photoStorageId: v.optional(v.id("_storage")),
+    audioStorageId: v.optional(v.id("_storage")),
+    linkedNeedId: v.optional(v.id("posts")),
   },
   handler: async (ctx, args) => {
     const { user, membership } = await verifyMembership(ctx);
@@ -131,6 +119,8 @@ export const create = mutation({
       category: args.category,
       caption: args.caption,
       photoStorageId: args.photoStorageId,
+      audioStorageId: args.audioStorageId,
+      linkedNeedId: args.linkedNeedId,
     });
 
     return postId;

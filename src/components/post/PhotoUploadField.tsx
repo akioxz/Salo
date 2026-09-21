@@ -55,7 +55,7 @@ export function PhotoUploadField({
       window.setTimeout(() => setStatus("ready"), 900);
       // ---------------------------------------------------------------
     },
-    [maxSizeMb, onChange]
+    [maxSizeMb, onChange],
   );
 
   function handleRemove() {
@@ -122,10 +122,10 @@ export function PhotoUploadField({
           handleFile(e.dataTransfer.files?.[0]);
         }}
         className={cn(
-          "flex min-h-[120px] w-full flex-col items-center justify-center gap-2 rounded-2xl border border-dashed px-4 py-6 text-center transition-all duration-200 active:scale-[0.99]",
+          "flex min-h-[120px] w-full flex-col items-center justify-center gap-2 rounded-2xl border px-4 py-6 text-center transition-all duration-200 active:scale-[0.99]",
           dragActive
             ? "border-amber-400 bg-amber-500/[0.06] dark:bg-amber-400/[0.06]"
-            : "border-zinc-300 hover:border-zinc-400 dark:border-white/15 dark:hover:border-white/25"
+            : "border-zinc-200 bg-zinc-50 hover:bg-zinc-100 dark:border-white/5 dark:bg-white/5 dark:hover:bg-white/10",
         )}
       >
         <ImagePlus className="h-5 w-5 text-zinc-400 dark:text-zinc-500" />

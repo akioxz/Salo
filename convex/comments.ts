@@ -1,28 +1,22 @@
 // convex/comments.ts
 import { mutation } from "./_generated/server";
 import { v } from "convex/values";
+import { verifyMembership } from "./auth_dev_helper";
 
+/** Add a comment to a post. */
 export const add = mutation({
   args: {
     postId: v.id("posts"),
     content: v.string(),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Not authenticated");
+    const { user, membership } = await verifyMembership(ctx);
 
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_token", (q) =>
-        q.eq("tokenIdentifier", identity.tokenIdentifier),
-      )
-      .unique();
-
-    if (!user) throw new Error("User not found");
-
-    // We should also check if they are in the same household as the post,
-    // but for simplicity in this MVP, we assume UI only shows them posts
-    // they can access. A strict implementation would verify membership here too.
+    const post = await ctx.db.get(args.postId);
+    if (!post) throw new Error("Post not found");
+    if (post.householdId !== membership.householdId) {
+      throw new Error("Post not in your household");
+    }
 
     await ctx.db.insert("comments", {
       postId: args.postId,

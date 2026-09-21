@@ -11,17 +11,17 @@ type FlowState = "choose" | "create" | "join" | "showCode";
 export default function PairingPage() {
   const router = useRouter();
   const { signOut } = useAuthActions();
-  
+
   const createHousehold = useMutation(api.households.create);
   const joinHousehold = useMutation(api.households.join);
 
   const [step, setStep] = useState<FlowState>("choose");
   const [role, setRole] = useState<"family" | "ofw">("family");
   const [inviteCode, setInviteCode] = useState("");
-  
+
   // State for generated code
   const [generatedCode, setGeneratedCode] = useState("");
-  
+
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -34,7 +34,10 @@ export default function PairingPage() {
       setStep("showCode");
     } catch (err: unknown) {
       console.error(err);
-      setError((err as Error).message || "Failed to create household. You might already belong to one.");
+      setError(
+        (err as Error).message ||
+          "Failed to create household. You might already belong to one.",
+      );
     } finally {
       setLoading(false);
     }
@@ -43,7 +46,7 @@ export default function PairingPage() {
   const handleJoin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inviteCode.trim()) return;
-    
+
     setError("");
     setLoading(true);
     try {
@@ -66,7 +69,6 @@ export default function PairingPage() {
     <div className="bg-zinc-50 dark:bg-black text-zinc-900 dark:text-zinc-100 min-h-screen flex justify-center">
       {/* Mobile Phone-like Container for desktop, full width on mobile */}
       <div className="bg-white dark:bg-[#0a0a0a] w-full max-w-md md:border-x md:border-zinc-200 dark:md:border-zinc-800 shadow-[0_4px_20px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.3)] relative flex flex-col justify-center min-h-screen px-8 py-12">
-        
         <div className="text-center mb-10">
           <h1 className="text-3xl font-black tracking-tight mb-2">Connect</h1>
           <p className="text-zinc-500 text-sm">
@@ -91,15 +93,19 @@ export default function PairingPage() {
               className="w-full h-16 bg-white dark:bg-[#111] border-2 border-zinc-200 dark:border-zinc-800 hover:border-amber-500 dark:hover:border-amber-500 rounded-2xl flex flex-col items-center justify-center transition-colors shadow-sm"
             >
               <span className="font-bold text-lg">Create a Household</span>
-              <span className="text-xs text-zinc-500">I want to invite someone</span>
+              <span className="text-xs text-zinc-500">
+                I want to invite someone
+              </span>
             </button>
-            
+
             <button
               onClick={() => setStep("join")}
               className="w-full h-16 bg-white dark:bg-[#111] border-2 border-zinc-200 dark:border-zinc-800 hover:border-amber-500 dark:hover:border-amber-500 rounded-2xl flex flex-col items-center justify-center transition-colors shadow-sm"
             >
               <span className="font-bold text-lg">Join a Household</span>
-              <span className="text-xs text-zinc-500">I have an invite code</span>
+              <span className="text-xs text-zinc-500">
+                I have an invite code
+              </span>
             </button>
           </div>
         )}
@@ -210,7 +216,19 @@ export default function PairingPage() {
               onClick={copyToClipboard}
               className="w-full h-14 bg-white dark:bg-[#1a1a1a] border-2 border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 font-bold text-lg rounded-xl transition-colors shadow-sm flex items-center justify-center gap-2"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"
+                ></path>
+              </svg>
               Copy Code
             </button>
 
@@ -220,13 +238,13 @@ export default function PairingPage() {
             >
               Go to Feed
             </button>
-            
+
             <p className="text-xs text-zinc-500">
               Code expires in 48 hours. Only one person can join.
             </p>
           </div>
         )}
-        
+
         {/* Absolute Logout button for emergencies/resetting state */}
         <button
           onClick={() => signOut()}
@@ -234,7 +252,6 @@ export default function PairingPage() {
         >
           Sign out
         </button>
-
       </div>
     </div>
   );

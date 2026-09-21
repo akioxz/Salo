@@ -187,3 +187,24 @@ export const getMine = query({
     };
   },
 });
+
+import { verifyMembership } from "./auth_dev_helper";
+
+export const setVisitDate = mutation({
+  args: {
+    nextVisitDate: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const { membership } = await verifyMembership(ctx);
+
+    // Only OFW can set the date
+    if (membership.role !== "ofw") {
+      throw new Error("Only the OFW can set the visit date");
+    }
+
+    await ctx.db.patch(membership.householdId, {
+      nextVisitDate: args.nextVisitDate,
+    });
+  },
+});
+

@@ -1,0 +1,31 @@
+---
+globs: *.*
+name: content-growth-research
+description: "Rules for anti-AI content styling, humanizer protocols, technical SEO, and product research validation."
+trigger: model_decision
+---
+
+# Dev-Library Rule Extensions: Content, Growth & Product Research
+
+## 1. Content Creation & Anti-AI Styling (Humanizer Rules)
+- **The Reframe Ban:** Eliminate negative parallelism and rhetorical pivots used to fake depth (e.g., *"It's not X. It's Y"*, *"Forget X. Focus on Y"*, *"Is it X? No. Y"*). When found, delete the rejected half and state the positive claim as a direct sentence.
+- **Punctuation & Rhythm:** Ban em dashes (—) completely; force structural rewrites instead (use periods, colons, or parentheses). Ban perfectly parallel sentences, uniform paragraph lengths, and the "Rule of Three". Humans write lopsidedly; follow a 30-word sentence with a 4-word one.
+- **Copulative Avoidance:** Ban bloated verbs used to dodge "is" or "has" (e.g., *"serves as"*, *"stands as"*, *"features a"*, *"aims to"*). Use plain verbs: *"is"*, *"has"*, *"uses"*, *"shows"*, *"causes"*.
+- **Vocabulary & Tell Elimination:** Cut AI-giveaway abstraction words (*delve, realm, unleash, navigate, tapestry, testament, crucial, robust, moreover*). Cut engagement bait (*"Let that sink in"*), fake-depth participles (*"highlighting its importance"*), and meta-commentary (*"In this article I will"*).
+- **Concrete Specificity:** Prefer numbers and names over adjectives. "Cut processing from two days to twenty minutes" beats "Increased efficiency." Always attribute claims to an owner rather than using evasive passive voice (*"I think this is a mistake"* vs *"This could potentially be seen as problematic"*).
+
+## 2. Technical SEO & Distribution
+- **Metadata Strictness:** Meta titles must be strictly 50-60 characters. Meta descriptions must be strictly 150-160 characters. Canonical URLs must be present on every indexable page.
+- **OpenGraph & Schema Fidelity:** Inject valid Schema.org JSON-LD scripts (e.g., `TechArticle`, `SoftwareApplication`) into the layout. OpenGraph arrays must specify `og:image` properties with strict `width: 1200` and `height: 630` bounds to ensure rich previews.
+- **Core Web Vitals (CLS Guardrail):** Zero Cumulative Layout Shift (CLS) regressions allowed. All frontend `<img>` elements or Next.js `<Image>` components must declare explicit `width` and `height` properties or use CSS `aspect-ratio`.
+
+## 3. Growth Engineering & Viral Mechanics
+- **Structural Blueprinting:** Reverse engineer reference material strictly into abstract narrative beats: Hook expectation/subversion, Tension trigger, Evidence block, Resolution/Payoff, and Call-to-action.
+- **Mechanics Mapping:** Translate narrative beats into domain-agnostic mechanics (e.g., status quo disruption, hidden industry cost, paradigm shift) rather than analyzing specific nouns.
+- **Anti-Plagiarism Gate:** When applying a viral recipe to a new topic, zero consecutive phrases may be copied from the source text. Never swap target nouns into the original sentence structure; generate original drafts that purely mimic the underlying tension pacing.
+
+## 4. Product Research & User Behavior Synthesis
+- **Intent Classification & Source Weighting:** Classify research intents (*comparison, product, how_to, prediction*) and dynamically prioritize sources. Product/opinion queries heavily prioritize Reddit, X, and YouTube; breaking news prioritizes X and Web; tech concepts prioritize Hacker News.
+- **Cross-Source Validation:** Deduplicate findings by mapping meaningful token overlaps (40%+) across different platforms. Stories/signals that organically span multiple domains (e.g., validated on both Reddit and Hacker News) are treated as the highest fidelity truth and must lead the report.
+- **Algorithmic Scoring:** Rank insights using source-specific engagement formulas (e.g., weighting upvote ratios on Reddit, or replies/quotes on X). Apply severe algorithmic penalties (10-15 point deductions) to Web/SEO sources that lack real-time crowd validation. 
+- **Grounded Attribution:** Extract direct transcript highlights (YouTube) and exact quotes (Reddit). Never fabricate findings or inject pre-existing model knowledge. Use 1-2 exact citations per claim (*"per @handle"*, *"per r/subreddit"*). Expose and report contradictions explicitly; never average away community disagreements. 

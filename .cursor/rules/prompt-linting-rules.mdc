@@ -1,0 +1,47 @@
+---
+globs: *.*
+name: prompt-linting-rules
+description: "Programmatic rules for linting and formatting AI skill files, including the 10 mandatory sections and the anti-AI writing style banned words list."
+trigger: model_decision
+---
+
+# Dev-Library Rule Extensions: Automated Prompt Linting & Compilation
+
+### 1. Structural Validation (`skill-structure-required`)
+**Severity: Error**
+The linter enforces strict compliance on any file named `SKILL.md` residing within a `skills/` directory (excluding `/references/`). If any of the following 10 exact section headers are missing from the markdown file, the linter throws a hard error:
+- `## 0. Identity`
+- `## 1. Intent`
+- `## 2. Trigger Matrix`
+- `## 3. Execution Workflow`
+- `## 4. Output Specification`
+- `## 5. Validation Gate`
+- `## 6. Anti-Triggers`
+- `## 7. Anti-Pattern Compliance`
+- `## 8. Versioning`
+- `## 9. Portability Matrix`
+
+### 2. Stylistic Banned Words (`anti-ai-writing-style`)
+**Severity: Warning**
+To maintain clean and direct documentation (free from typical LLM "buzzword slop"), the engine scans general markdown files. The audit is skipped for files in specific structural folders (`spec/`, `shared/writing/`, `docs/`, `scripts/`, `core/`, or `skills/`).
+It checks every line against a case-insensitive regex pattern. The following words trigger an `anti-ai-writing-style` violation unless the line contains the exception keywords `"BANNED_WORDS"` or `"banned"`:
+> *delve, embark, esteemed, shed light, craft, crafting, imagine, remarkable, glimpse, unlock, discover, skyrocket, innovative, revolutionary, disruptive, utilize, illuminate, unveil, pivotal, intricate, paradigm, harness, exciting, groundbreaking, game-changer, supercharge, elevate, curate.*
+
+### 3. Cross-Platform Compilation (`compile / sync`)
+The compiler transforms a canonical directory of `SKILL.md` files (ignoring directories named `_template`) into specific formats consumable by different AI agent runtimes:
+
+- **Claude (`targetRuntime: "claude"`)**
+  - **Output:** `.claude/skills/<skillName>/SKILL.md`
+  - **Transform:** Direct copy; maintains the exact `SKILL.md` format.
+- **Cursor (`targetRuntime: "cursor"`)**
+  - **Output:** `.cursor/rules/<skillName>.mdc`
+  - **Transform:** Translates the markdown into a Cursor rule file (`.mdc`), dynamically injecting YAML frontmatter at the top of the file:
+    ```yaml
+    ---
+    description: "Agent Skill: <skillName>"
+    globs: "*"
+    ---
+    ```
+- **Cline (`targetRuntime: "cline"`)**
+  - **Output:** `.cline/rules/<skillName>.md`
+  - **Transform:** Direct copy of the markdown contents into flat files using the skill's directory name.

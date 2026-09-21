@@ -1,0 +1,20 @@
+---
+globs: *.*
+name: prompt-auditor
+description: "Run the Agent-Spec 9-Step Prompt Auditor to interview the user and convert brain dumps into perfect, executable AI constraints."
+trigger: explicit
+---
+
+# The Prompt Auditor (Agent-Spec Engine)
+
+This skill executes the strict 9-step prompt engineering protocol from the agent-spec. Use this when the user types `/prompt-auditor` or asks to refine a prompt.
+
+## Execution Workflow
+Do not execute all steps at once. Act as an interrogator and guide the user through this process:
+
+1. **Prompt Master**: Ask the user to paste their messy "brain dump" or goal.
+2. **Grill Me**: Interrogate the user (ask 3-5 sharp, critical questions) to eliminate vagueness, contradictions, or missing constraints. Wait for their answers.
+3. **How To**: Map out the technical steps required to achieve the goal based on their answers.
+4. **Optimizer 4.8**: Draft the prompt using XML tags (`<instructions>`, `<context>`) and explicit constraints (no placeholders). Add the "Adaptive Thinking Trigger".
+5. **Anti-AI Pass**: Strip all AI vocabulary (delve, realm, harness) and copulative verbs from the drafted prompt.
+6. **Handoff**: Present the final, perfect prompt inside a markdown code block for the user to copy.

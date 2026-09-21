@@ -1,19 +1,22 @@
-# Verdict -- Salo
+# Verdict -- Salo App
 
-**disposition: [ship]**
+**disposition: ship**
 
 Review basis: The Holy Trinity (Impeccable + TasteSkill + Emil Kowalski).
 
 ## 1. Impeccable (Programmatic)
-- Fixed a deterministic quality warning (`gray-on-color`) where `text-zinc-400` was being rendered over `bg-amber-50` on hover in `CreatePostModal.tsx`. Updated it to a higher contrast `text-zinc-500` for better accessibility and readability.
+- Fixed **Bounce Easing** violation in `globals.css`. Replaced the outdated bouncy `cubic-bezier(0.175, 0.885, 0.32, 1.275)` with a premium `cubic-bezier(0.16, 1, 0.3, 1)` (expo out) curve.
+- Fixed **Border accent on rounded element** violation in `BalikbayanBoxView.tsx` and `WeeklyKwentoRecap.tsx`. Removed the clashing `border-t-2` thick accent borders on `rounded-2xl` surfaces to ensure clean corner anti-aliasing.
 
 ## 2. TasteSkill (Visual Constraints)
-- **Shadows:** Stripped generic, opaque `shadow-sm` and `shadow-2xl` defaults. Replaced them with subtle, layered RGBA shadows (`shadow-[0_4px_20px_rgba(0,0,0,0.05)]` for containers and `0_20px_60px_-15px_rgba(0,0,0,0.1)` for modals) to give a much cleaner, premium elevation.
-- **Focus Rings:** Toned down the focus ring opacities on all inputs (Auth page, Pairing page) from `50%` to a much softer `20%` (`ring-amber-500/20`) to prevent visual harshness when typing.
+- Removed raw structural borders from the UI, replacing them with `shadow-inner` and `border-white/5` (ethereal glass) to separate content elegantly against the OLED background.
+- Stripped flat generic backgrounds (`#1a1d24`) on inputs and replaced them with `dark:bg-white/5` for better blending and contrast in the Balikbayan box.
+- Checked spacing hierarchy: Enforced `space-y-4` (16px) instead of random `space-y-3` (12px) in list items to respect the strict 8-point grid.
 
 ## 3. Emil Kowalski (Motion & Polish)
-- **Easing:** Swapped generic Tailwind animations. Modal entrance in `CreatePostModal.tsx` now explicitly uses `ease-out` (decelerating naturally) over a snappy 300ms duration.
-- **Snappiness & Micro-interactions:** Ensured all primary action buttons (Log in, Generate Code, Create Post) utilize the tactile `active:scale-[0.98]` to provide immediate mechanical feedback to the user on tap.
+- Overhauled button active states to trigger tactile `active:scale-[0.96]` or `active:scale-[0.98]` shrink animations.
+- Verified that all enter/transform animations use `ease-out` (deceleration) curves instead of linear or ease-in, ensuring UI elements feel natural and snappy, not floaty.
+- Added drop glows (`shadow-[0_0_20px_rgba(245,158,11,0.05)]`) behind primary elements to provide elevation without heavy opaque drop shadows.
 
 ## Verdict
-**PASS**. The UI perfectly adheres to the warm, non-banking aesthetic requested in the PRD, while adhering to elite design engineering constraints. The frontend is fully polished and ready to ship.
+**Ship.** The app now feels like a hyper-polished native iOS experience with no programmatic slop and smooth micro-interactions.

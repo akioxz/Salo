@@ -55,7 +55,7 @@ export function CommentsThread({
                   className={cn(
                     "flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold",
                     role.avatarBg,
-                    role.avatarText
+                    role.avatarText,
                   )}
                 >
                   {getInitials(comment.author.name)}
@@ -63,7 +63,7 @@ export function CommentsThread({
                 <div
                   className={cn(
                     "min-w-0 flex-1 rounded-2xl px-3 py-2",
-                    role.bubbleBg
+                    role.bubbleBg,
                   )}
                 >
                   <div className="flex items-baseline gap-2">
@@ -95,7 +95,7 @@ export function CommentsThread({
               : "bg-zinc-200 dark:bg-zinc-800",
             currentUser
               ? ROLE_STYLES[currentUser.role].avatarText
-              : "text-zinc-500 dark:text-zinc-400"
+              : "text-zinc-500 dark:text-zinc-400",
           )}
         >
           {currentUser ? getInitials(currentUser.name) : "?"}
@@ -119,7 +119,7 @@ export function CommentsThread({
               "flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-all duration-200 active:scale-[0.98]",
               draft.trim()
                 ? "bg-amber-400 text-amber-950 hover:bg-amber-300"
-                : "bg-zinc-100 text-zinc-300 dark:bg-zinc-800 dark:text-zinc-600"
+                : "bg-zinc-100 text-zinc-300 dark:bg-zinc-800 dark:text-zinc-600",
             )}
           >
             <Send className="h-[18px] w-[18px]" />

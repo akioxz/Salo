@@ -1,33 +1,111 @@
 ---
-description: Auto-generated dev-library rule for api-design-principles
 globs: *.*
+name: api-design-principles
+description: Master REST and GraphQL API design principles to build intuitive, scalable, and maintainable APIs that delight developers. Use when designing new APIs, reviewing API specifications, or establishing API design standards.
 ---
-# Rule: API Design Principles
 
-> **Purpose:** API design engineering rules for REST, GraphQL, and OpenAPI specifications. Attach this rule to enforce strict API standards and consistent service contracts.
+# API Design Principles
 
-## 1. REST API Design
-- **Resource-Noun URLs:** Use plural nouns for resource endpoints (`/users`, `/orders`). Avoid verbs in URLs; use HTTP methods (`GET`, `POST`, `PUT`, `DELETE`) to indicate actions.
-- **HTTP Status Codes:** `200` for successful GET/PUT, `201` for created resources (POST), `204` for deleted resources, `400` for client errors, `401`/`403` for auth, `404` for not found, `500` for server errors.
-- **Filtering and Pagination:** Use query parameters for filtering (`?status=active`), sorting (`?sort=created_at`), and pagination (`?page=2&limit=10`). 
-- **HTTP Methods Semantics:**
-  - `GET`: Retrieve resource. Must be idempotent and safe.
-  - `POST`: Create a new resource. Not idempotent.
-  - `PUT`: Replace a resource entirely. Must be idempotent.
-  - `PATCH`: Partially update a resource.
-  - `DELETE`: Remove a resource. Must be idempotent.
+Master REST and GraphQL API design principles to build intuitive, scalable, and maintainable APIs that delight developers and stand the test of time.
 
-## 2. API Versioning
-- **URL Versioning (Preferred for Breaking Changes):** `/v1/users`, `/v2/users`. Use when the change is not backward-compatible.
-- **Header Versioning:** `Accept: application/vnd.api+v1+json`. Good for minor versioning.
-- **Deprecation, Not Removal:** Deprecate old versions with `Deprecation` header and timeline. 
+## When to Use This Skill
 
-## 3. OpenAPI/Swagger Specification
-- **Versioned Specs:** Store OpenAPI YAML/JSON files versioned in the repository (`openapi/v1.yaml`). Never generate specs solely at runtime without source control.
-- **Security Schemes:** Define `securitySchemes` for OAuth2, API keys, or Bearer tokens. Reference them in individual operation `security` blocks.
-- **Request/Response Models:** Define inline or referenced models for every request body and response type. Use `examples` fields to illustrate typical payloads.
+- Designing new REST or GraphQL APIs
+- Refactoring existing APIs for better usability
+- Establishing API design standards for your team
+- Reviewing API specifications before implementation
+- Migrating between API paradigms (REST to GraphQL, etc.)
+- Creating developer-friendly API documentation
+- Optimizing APIs for specific use cases (mobile, third-party integrations)
 
-## 4. Authentication and Authorization
-- **Bearer Tokens:** Use `Authorization: Bearer <jwt>` for stateless authentication. JWTs should be short-lived (15-30 minutes) with refresh token flow.
-- **Scope-Based Authorization:** Attach scopes to tokens (`scope: read:users`). Check scopes on the server side for every protected resource.
-- **Rate Limiting:** Implement per-IP or per-token rate limiting. Return `429 Too Many Requests`.
+## Core Concepts
+
+### 1. RESTful Design Principles
+
+**Resource-Oriented Architecture**
+
+- Resources are nouns (users, orders, products), not verbs
+- Use HTTP methods for actions (GET, POST, PUT, PATCH, DELETE)
+- URLs represent resource hierarchies
+- Consistent naming conventions
+
+**HTTP Methods Semantics:**
+
+- `GET`: Retrieve resources (idempotent, safe)
+- `POST`: Create new resources
+- `PUT`: Replace entire resource (idempotent)
+- `PATCH`: Partial resource updates
+- `DELETE`: Remove resources (idempotent)
+
+### 2. GraphQL Design Principles
+
+**Schema-First Development**
+
+- Types define your domain model
+- Queries for reading data
+- Mutations for modifying data
+- Subscriptions for real-time updates
+
+**Query Structure:**
+
+- Clients request exactly what they need
+- Single endpoint, multiple operations
+- Strongly typed schema
+- Introspection built-in
+
+### 3. API Versioning Strategies
+
+**URL Versioning:**
+
+```
+/api/v1/users
+/api/v2/users
+```
+
+**Header Versioning:**
+
+```
+Accept: application/vnd.api+json; version=1
+```
+
+**Query Parameter Versioning:**
+
+```
+/api/users?version=1
+```
+
+## Detailed patterns and worked examples
+
+Detailed pattern documentation lives in `references/details.md`. Read that file when the navigation tier above is insufficient.
+
+## Best Practices
+
+### REST APIs
+
+1. **Consistent Naming**: Use plural nouns for collections (`/users`, not `/user`)
+2. **Stateless**: Each request contains all necessary information
+3. **Use HTTP Status Codes Correctly**: 2xx success, 4xx client errors, 5xx server errors
+4. **Version Your API**: Plan for breaking changes from day one
+5. **Pagination**: Always paginate large collections
+6. **Rate Limiting**: Protect your API with rate limits
+7. **Documentation**: Use OpenAPI/Swagger for interactive docs
+
+### GraphQL APIs
+
+1. **Schema First**: Design schema before writing resolvers
+2. **Avoid N+1**: Use DataLoaders for efficient data fetching
+3. **Input Validation**: Validate at schema and resolver levels
+4. **Error Handling**: Return structured errors in mutation payloads
+5. **Pagination**: Use cursor-based pagination (Relay spec)
+6. **Deprecation**: Use `@deprecated` directive for gradual migration
+7. **Monitoring**: Track query complexity and execution time
+
+## Common Pitfalls
+
+- **Over-fetching/Under-fetching (REST)**: Fixed in GraphQL but requires DataLoaders
+- **Breaking Changes**: Version APIs or use deprecation strategies
+- **Inconsistent Error Formats**: Standardize error responses
+- **Missing Rate Limits**: APIs without limits are vulnerable to abuse
+- **Poor Documentation**: Undocumented APIs frustrate developers
+- **Ignoring HTTP Semantics**: POST for idempotent operations breaks expectations
+- **Tight Coupling**: API structure shouldn't mirror database schema

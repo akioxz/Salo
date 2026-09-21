@@ -1,0 +1,34 @@
+{
+  "brand": {
+    "colors": {
+      "primary": "amber-500",
+      "accent": "amber-400",
+      "surface": "zinc-50",
+      "surfaceDark": "zinc-900"
+    }
+  },
+  "typography": {
+    "fontFamily": "Inter, sans-serif",
+    "headings": {
+      "weight": "bold",
+      "tracking": "tight"
+    }
+  },
+  "spacing": {
+    "containerPadding": "px-4",
+    "elementGap": "gap-3"
+  },
+  "borders": {
+    "radius": "rounded-2xl",
+    "width": "border",
+    "color": "border-zinc-200/80 dark:border-white/10"
+  },
+  "shadows": {
+    "elevation1": "shadow-[0_4px_20px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.4)]"
+  },
+  "motion": {
+    "duration": "duration-200",
+    "enterEasing": "ease-out",
+    "microInteraction": "active:scale-[0.98]"
+  }
+}

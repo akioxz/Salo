@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useRouter } from "next/navigation";
+import { cn } from "@/lib/cn";
 
 export default function AuthPage() {
   const { signIn } = useAuthActions();
@@ -27,7 +28,7 @@ export default function AuthPage() {
       setError(
         step === "signIn"
           ? "Invalid email or password."
-          : "Could not create account. Email might be in use."
+          : "Could not create account. Email might be in use.",
       );
     } finally {
       setLoading(false);
@@ -35,58 +36,43 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="bg-zinc-50 dark:bg-black text-zinc-900 dark:text-zinc-100 min-h-screen flex justify-center">
+    <div className="bg-background text-zinc-900 dark:text-zinc-100 min-h-screen flex justify-center">
       {/* Mobile Phone-like Container for desktop, full width on mobile */}
-      <div className="bg-white dark:bg-[#0a0a0a] w-full max-w-md md:border-x md:border-zinc-200 dark:md:border-zinc-800 shadow-[0_4px_20px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.3)] relative flex flex-col justify-center min-h-screen px-8">
+      <div className="bg-background w-full max-w-md md:border-x md:border-zinc-200 dark:md:border-white/5 relative flex flex-col justify-center min-h-screen px-8">
         
         <div className="text-center mb-10">
-          <h1 className="text-4xl font-black tracking-tight mb-2">Salo</h1>
+          <h1 className="text-3xl font-bold tracking-tight mb-2 text-zinc-900 dark:text-zinc-50">Salo</h1>
           <p className="text-zinc-500 text-sm">
             {step === "signIn"
               ? "Welcome back to your household"
-              : "Create an account for your household"}
+              : "Create a household account"}
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label
-              htmlFor="email"
-              className="block text-xs font-semibold uppercase tracking-wider text-zinc-500 mb-1"
-            >
-              Email Address
-            </label>
+        <form onSubmit={handleSubmit}>
+          <div className="bg-white dark:bg-[#0f1115] rounded-2xl border border-zinc-200 dark:border-white/5 dark:shadow-inner dark:ethereal-glass overflow-hidden flex flex-col">
             <input
               id="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full h-12 px-4 rounded-xl border border-zinc-300 dark:border-zinc-800 bg-zinc-50 dark:bg-[#111] text-lg focus:outline-none focus:ring-2 focus:ring-amber-500/20 transition-shadow"
-              placeholder="juan@example.com"
+              className="w-full h-14 px-4 bg-transparent focus:outline-none text-base border-b border-zinc-200 dark:border-white/5 placeholder:text-zinc-400"
+              placeholder="Email"
               required
             />
-          </div>
-
-          <div>
-            <label
-              htmlFor="password"
-              className="block text-xs font-semibold uppercase tracking-wider text-zinc-500 mb-1"
-            >
-              Password
-            </label>
             <input
               id="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full h-12 px-4 rounded-xl border border-zinc-300 dark:border-zinc-800 bg-zinc-50 dark:bg-[#111] text-lg focus:outline-none focus:ring-2 focus:ring-amber-500/20 transition-shadow"
-              placeholder="••••••••"
+              className="w-full h-14 px-4 bg-transparent focus:outline-none text-base placeholder:text-zinc-400"
+              placeholder="Password"
               required
             />
           </div>
 
           {error && (
-            <div className="p-3 bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 text-sm font-medium rounded-lg border border-red-200 dark:border-red-900/50">
+            <div className="mt-4 p-3 bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 text-sm font-medium rounded-xl border border-red-200 dark:border-red-900/50">
               {error}
             </div>
           )}
@@ -94,21 +80,27 @@ export default function AuthPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full h-14 mt-4 bg-amber-500 hover:bg-amber-600 text-white font-bold text-lg rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm active:scale-[0.98]"
+            className="w-full h-14 mt-6 bg-amber-500 hover:bg-amber-400 text-black font-bold text-base rounded-2xl transition-all spring-bounce disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_20px_rgba(245,158,11,0.2)] active:scale-[0.96]"
           >
-            {loading ? "Please wait..." : step === "signIn" ? "Sign In" : "Create Account"}
+            {loading
+              ? "Please wait..."
+              : step === "signIn"
+                ? "Sign In"
+                : "Create Account"}
           </button>
         </form>
 
         <div className="mt-8 text-center">
           <p className="text-sm text-zinc-500">
-            {step === "signIn" ? "Don't have an account?" : "Already have an account?"}
+            {step === "signIn"
+              ? "Don't have an account? "
+              : "Already have an account? "}
             <button
               onClick={() => {
                 setStep(step === "signIn" ? "signUp" : "signIn");
                 setError("");
               }}
-              className="ml-2 font-bold text-black dark:text-white hover:underline transition-all"
+              className="font-medium text-amber-600 dark:text-amber-500 hover:underline transition-all"
             >
               {step === "signIn" ? "Sign Up" : "Log In"}
             </button>

@@ -9,7 +9,10 @@
  */
 
 import type * as auth from "../auth.js";
+import type * as auth_dev_helper from "../auth_dev_helper.js";
+import type * as balikbayan from "../balikbayan.js";
 import type * as comments from "../comments.js";
+import type * as files from "../files.js";
 import type * as households from "../households.js";
 import type * as http from "../http.js";
 import type * as posts from "../posts.js";
@@ -23,7 +26,10 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
+  auth_dev_helper: typeof auth_dev_helper;
+  balikbayan: typeof balikbayan;
   comments: typeof comments;
+  files: typeof files;
   households: typeof households;
   http: typeof http;
   posts: typeof posts;

@@ -26,3 +26,5 @@ Format based on [Keep a Changelog](https://keepachangelog.com/).
 - RLS logic implemented at the Convex schema level to isolate data by `householdId`.
 
 🔴 SESSION END — Summary: Migrated to Convex, built Auth/Pairing, and seamlessly integrated a polished, anti-slop UI kit for the Feed.
+- **2026-09-21**: Added new dashboard components (HeroDashboard, BoxStatusMini) and updated session handoff.
+

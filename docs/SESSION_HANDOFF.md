@@ -1,45 +1,58 @@
-# 💾 Session Handoff State
-**Last Updated:** 2026-09-20
+﻿# 💾 Session Handoff State
+**Last Updated:** 2026-09-21 13:27:35
 
 ## 1. Project Context
-- **Project Name:** Salo
-- **Core Goal:** A warm, collaborative household management and expense tracking app for families and OFWs.
-- **Current Phase:** Phase 2 (Core Feed & Onboarding) Completed. Ready for Phase 3 (Feed Items, Interactions, and Media).
+- **Project Name:** Salo App (Family Finance / OFW Tracker)
+- **Core Goal:** Build an ultra-premium, Apple Minimalist, dark-mode-first family financial tracking app using Next.js and Convex.
+- **Current Phase:** Frontend Redesign Phase (The Cinematic Bento Grid).
 
 ## 2. Resolved Decisions & Mechanics
-- **Backend Architecture:** Migrated entirely from Supabase to Convex. Data schema, RLS logic, and Auth (via `@convex-dev/auth`) are fully implemented in Convex.
-- **Household Pairing:** Users authenticate, then are forced into a route guard (`/pairing`) if they don't belong to a household. They can select a role (Family/OFW) and generate a 128-bit secure hex code, which their partner uses to join. Max 2 members per household.
-- **Create Post UI:** Implemented a mobile-first `CreatePostModal` triggered by a Floating Action Button (FAB) on the feed. It submits to `api.posts.create` with type, category, and caption.
-- **UI/UX Audit Applied:** Applied strict design engineering constraints. Removed heavy shadows, changed harsh focus rings to 20% opacity, fixed contrast warnings (Impeccable), and applied `ease-out` enter animations and `active:scale-[0.98]` tactile clicks (Emil Kowalski rules).
-- **Master Orchestrator:** Synced the Dev-Library global rules into the project (`.cursor/rules`).
+- **Styling Architecture:** We adopted a strict 60-30-10 color rule. True OLED Black (#000000) background, Slate Dark (#0f1115) cards, and Amber (#f59e0b) accents. 
+- **Glassmorphism:** Ethereal glass (ackdrop-blur-xl, g-black/50) with subtle order-white/5 micro-borders is used for floating elements like sticky headers and navs.
+- **Micro-interactions:** Integrated Apple Spring easing (cubic-bezier(0.16, 1, 0.3, 1)) for buttons and segmented controls, with ctive:scale-[0.96] tactile feedback.
+- **Create Post Modal:** Upgraded to an iOS Grouped Form aesthetic with a unified internal border layout, rounded-3xl container, and glowing Amber "Post" button.
+- **Home Feed Bento Layout:** Authorized a massive structural change to a "Cinematic Bento Grid" featuring a HeroDashboard (Total Fund), CountdownBanner tile, BoxStatusMini tile, and WeeklyKwentoRecap.
+- **Iconography:** Replaced all cheap emojis with clean lucide-react SVGs across the app.
 
 ## 3. Pending Items & Next Steps
-- Implement the UI for individual Feed Items (Posts/Expenses) so they render beautifully on the feed instead of just raw data.
-- Build the Image/Media Upload feature in `CreatePostModal` (requires Convex storage integration).
-- Implement Reactions (hearts) and Comments UI for the posts.
+- We just created HeroDashboard.tsx and BoxStatusMini.tsx as part of the Bento Grid implementation plan.
+- **PENDING:** We still need to finish modifying src/app/page.tsx to actually arrange these components into the CSS Grid layout.
+- **PENDING:** We need to adapt CountdownBanner.tsx and WeeklyKwentoRecap.tsx to fit perfectly into their designated Bento grid tiles (Half-width and Full-width respectively).
+- **PENDING:** Apply ounded-3xl and Bento-card styling to the main HouseholdActivityFeed.tsx components.
 
 ## 4. How to Resume
 *To the next AI reading this file:* 
-Start by acknowledging this handoff file. Inform the user that you have successfully ingested the context, summarize what you know, and immediately ask the user if they are ready to tackle the first item in the "Pending Items" list (Feed Items UI & Media Uploads).
+Start by acknowledging this handoff file. Inform the user that you have successfully ingested the context, summarize what you know, and immediately ask the user if they are ready to tackle the first item in the "Pending Items" list.
 
-## 5. Full Conversation Log (Back-and-Forth Transcript Summary)
-*(Due to token limits, this is a compressed summary of the session)*
+## 5. Full Conversation Log (Back-and-Forth Transcript)
+**[User - Session Start]**
+Requested a massive UI/UX redesign using the /design-engineer, /redesign-manager, /ui-ux-pro-max, and /frontend-design skills, specifying "massive redesign pero same color pallete. after search ask me."
 
-**[User]:** Initiated Phase 2 build and migrated to Convex due to Supabase limits.
-**[AI]:** Rewrote Postgres schema into `convex/schema.ts` and migrated RPCs into Convex mutations.
-**[User]:** Requested to build the UI.
-**[AI]:** Built `src/app/auth/page.tsx` for Login/Signup.
-**[AI]:** Built `src/app/pairing/page.tsx` for Household creation and joining.
-**[AI]:** Added route protection in `src/app/page.tsx` using `api.households.getMine`.
-**[User]:** Triggered `/build` for Create Post UI.
-**[AI]:** Implemented `CreatePostModal.tsx` with a FAB and integrated it into the feed.
-**[User]:** Wanted to view UI without logging in.
-**[AI]:** Temporarily commented out auth route guards in `page.tsx` for visual testing.
-**[User]:** Triggered `/ui-ux-design-audit`.
-**[AI]:** Refactored UI components to use subtle `rgba` shadows, `ease-out` animations, tactile button scales, and fixed contrast issues. Documented in `VERDICT.md`.
-**[User]:** Triggered `/sync-library`.
-**[AI]:** Initialized the Dev-Library Master Orchestrator, generating all local `.cursor/rules`.
-**[User]:** Triggered `/design-prompt`.
-**[AI]:** Generated a mega-prompt tailored for Dribbble/Mobbin trends regarding Expense/Household Feeds for use in v0/Lovable.
-**[User]:** Triggered `/export-session`.
-**[AI]:** Generated this handoff document.
+**[AI - Response]**
+Searched Dribbble and fintech UI trends. Proposed 3 options:
+A. The Cinematic Bento
+B. The Minimalist Ledger
+C. The Ethereal Glass
+
+**[User - Selection]**
+Chose Option A (The Cinematic Bento).
+
+**[AI - Implementation Plan]**
+Generated an implementation plan to split the top feed into a CSS grid (Hero Dashboard, Countdown tile, Box Status tile, Weekly Recap).
+
+**[User - Approval]**
+Approved the implementation plan.
+
+**[AI - Execution]**
+Created HeroDashboard.tsx and BoxStatusMini.tsx.
+
+**[User - Current]**
+Invoked /export-session and /sync-library.
+
+## 6. Next Prompt to Resume
+> Copy-paste this into your new chat:
+> 
+> "Resume task. Read docs/SESSION_HANDOFF.md for full context.
+> Current status: Created HeroDashboard and BoxStatusMini components for the new Bento grid.
+> Current blocker: None.
+> Next step: Restructure src/app/page.tsx to implement the grid grid-cols-2 layout and adapt CountdownBanner.tsx and WeeklyKwentoRecap.tsx to fit their tiles."

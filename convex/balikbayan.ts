@@ -14,7 +14,17 @@ export const list = query({
         .order("asc")
         .collect();
 
-      return items;
+      const itemsWithAuthor = await Promise.all(
+        items.map(async (item) => {
+          const author = await ctx.db.get(item.authorId);
+          return {
+            ...item,
+            authorName: author?.name || "Family Member",
+          };
+        })
+      );
+
+      return itemsWithAuthor;
     } catch (_e) {
       return [];
     }

@@ -8,13 +8,17 @@ import { useEffect, useState } from "react";
 import CreatePostModal from "../components/CreatePostModal";
 import { CountdownBanner } from "../components/feed/CountdownBanner";
 import { WeeklyKwentoRecap } from "../components/feed/WeeklyKwentoRecap";
+import { HeroDashboard } from "../components/feed/HeroDashboard";
+import { BoxStatusMini } from "../components/feed/BoxStatusMini";
+import { ThemeToggle } from "../components/ui/ThemeToggle";
+import { AnalyticsDashboard } from "../components/analytics/AnalyticsDashboard";
 import HouseholdActivityFeed from "../components/feed/HouseholdActivityFeed";
 import { BalikbayanBoxView } from "../components/box/BalikbayanBoxView";
 import type { HouseholdPost } from "../types/household";
 import { cn } from "@/lib/cn";
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState<"home" | "box">("home");
+  const [activeTab, setActiveTab] = useState<"home" | "box" | "analytics">("home");
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   
   const { isAuthenticated, isLoading: isAuthLoading } = useConvexAuth();
@@ -58,7 +62,7 @@ export default function Home() {
   /*
   if (isAuthLoading || !isAuthenticated || myHousehold === undefined) {
     return (
-      <div className="bg-zinc-50 dark:bg-black min-h-screen flex items-center justify-center">
+      <div className="bg-zinc-50  min-h-screen flex items-center justify-center">
         <p className="text-zinc-500">Loading...</p>
       </div>
     );
@@ -71,30 +75,33 @@ export default function Home() {
   */
 
   return (
-    <div className="bg-background text-zinc-900 dark:text-zinc-100 min-h-screen flex justify-center">
-      {/* Mobile Phone-like Container for desktop, full width on mobile */}
-      <div className="bg-background w-full max-w-md md:border-x md:border-zinc-200 dark:md:border-white/5 shadow-sm relative flex flex-col min-h-screen">
+    <div className="w-full h-full flex flex-col relative text-zinc-900 ">
         {/* Header */}
-        <div className="px-6 pt-12 pb-4 bg-white/70 dark:bg-black/70 backdrop-blur-xl border-b border-zinc-200 dark:border-white/5 flex justify-between items-center sticky top-0 z-10">
+        <div className="px-6 pt-12 pb-4 bg-white/70  backdrop-blur-xl border-b border-zinc-200  flex justify-between items-center sticky top-0 z-10">
           <div>
             <h1 className="text-xl font-bold tracking-tight">Salo</h1>
             <p className="text-xs text-zinc-500">Your Household</p>
           </div>
-          <button 
-            onClick={() => setIsCreateModalOpen(true)}
-            aria-label="Create Post"
-            className="bg-black dark:bg-white text-white dark:text-black rounded-full h-8 w-8 flex items-center justify-center shadow-sm transition-transform hover:scale-95 active:scale-90 cursor-pointer"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="12" y1="5" x2="12" y2="19"></line>
-              <line x1="5" y1="12" x2="19" y2="12"></line>
-            </svg>
-          </button>
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
+            <button 
+              onClick={() => setIsCreateModalOpen(true)}
+              aria-label="Create Post"
+              className="bg-[#FBFBFA]  text-white  rounded-full h-8 w-8 flex items-center justify-center shadow-sm transition-transform hover:scale-95 active:scale-90 cursor-pointer"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+            </button>
+          </div>
         </div>
 
-        {/* Feed or Box */}
-        <div className="flex-1 overflow-y-auto bg-transparent">
-          {activeTab === "box" ? (
+        {/* Main Content Area */}
+        <div className="flex-1 overflow-y-auto no-scrollbar relative z-0">
+          {activeTab === "analytics" ? (
+            <AnalyticsDashboard posts={posts || []} myHousehold={myHousehold} />
+          ) : activeTab === "box" ? (
             <BalikbayanBoxView />
           ) : posts === undefined ? (
             <div className="text-center text-zinc-500 py-10 text-sm">
@@ -103,7 +110,7 @@ export default function Home() {
           ) : posts.length === 0 ? (
             <div className="text-center text-zinc-500 py-10 flex flex-col items-center">
               <svg
-                className="w-12 h-12 mb-3 text-zinc-300 dark:text-zinc-700"
+                className="w-12 h-12 mb-3 text-zinc-300 "
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -122,8 +129,12 @@ export default function Home() {
             </div>
           ) : (
             <div className="p-6">
-              <CountdownBanner />
-              <WeeklyKwentoRecap />
+              <div className="grid grid-cols-2 gap-4 mb-8">
+                <HeroDashboard />
+                <CountdownBanner />
+                <BoxStatusMini onClick={() => setActiveTab("box")} />
+                <WeeklyKwentoRecap />
+              </div>
               <HouseholdActivityFeed
                 currentUser={
                   myHousehold
@@ -169,37 +180,49 @@ export default function Home() {
         </div>
 
         {/* Bottom Nav */}
-        <div className="bg-white/70 dark:bg-black/70 backdrop-blur-xl border-t border-zinc-200 dark:border-white/5 p-6 flex justify-around items-center pb-8 sticky bottom-0 z-10">
+        <div className="bg-white/80 dark:bg-[#111111]/80 backdrop-blur-2xl border-t border-[#EAEAEA] dark:border-[#222222] p-6 flex justify-around items-center pb-8 sticky bottom-0 z-10 transition-colors duration-300">
           <div 
             onClick={() => setActiveTab("home")}
             className={cn(
-              "flex flex-col items-center gap-1 cursor-pointer transition-colors",
-              activeTab === "home" ? "text-black dark:text-white" : "text-zinc-500 hover:text-black dark:hover:text-white"
+              "flex flex-col items-center gap-1 cursor-pointer transition-all",
+              activeTab === "home" ? "text-[#111111] dark:text-[#FBFBFA] scale-110" : "text-[#A1A1AA] hover:text-[#111111] dark:hover:text-[#FBFBFA]"
             )}
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
             </svg>
-            <span className="text-[10px] font-medium">Home</span>
+            <span className="text-[10px] font-bold tracking-tight">Home</span>
           </div>
           <div 
             onClick={() => setActiveTab("box")}
             className={cn(
-              "flex flex-col items-center gap-1 cursor-pointer transition-colors",
-              activeTab === "box" ? "text-black dark:text-white" : "text-zinc-500 hover:text-black dark:hover:text-white"
+              "flex flex-col items-center gap-1 cursor-pointer transition-all",
+              activeTab === "box" ? "text-[#111111] dark:text-[#FBFBFA] scale-110" : "text-[#A1A1AA] hover:text-[#111111] dark:hover:text-[#FBFBFA]"
             )}
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
             </svg>
-            <span className="text-[10px] font-medium">Box</span>
+            <span className="text-[10px] font-bold tracking-tight">Box</span>
+          </div>
+          <div 
+            onClick={() => setActiveTab("analytics")}
+            className={cn(
+              "flex flex-col items-center gap-1 cursor-pointer transition-all",
+              activeTab === "analytics" ? "text-[#111111] dark:text-[#FBFBFA] scale-110" : "text-[#A1A1AA] hover:text-[#111111] dark:hover:text-[#FBFBFA]"
+            )}
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+            </svg>
+            <span className="text-[10px] font-bold tracking-tight">Analytics</span>
           </div>
           <div
             onClick={() => {
               signOut();
               router.push("/auth");
             }}
-            className="flex flex-col items-center gap-1 text-zinc-500 hover:text-black dark:hover:text-white transition-colors cursor-pointer"
+            className="flex flex-col items-center gap-1 text-[#A1A1AA] hover:text-[#E03E3E] dark:hover:text-[#F87171] transition-all cursor-pointer"
           >
             <svg
               className="w-6 h-6"
@@ -214,7 +237,7 @@ export default function Home() {
                 d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
               ></path>
             </svg>
-            <span className="text-[10px] font-medium">Log out</span>
+            <span className="text-[10px] font-bold tracking-tight">Log out</span>
           </div>
         </div>
 
@@ -223,7 +246,7 @@ export default function Home() {
           isOpen={isCreateModalOpen} 
           onClose={() => setIsCreateModalOpen(false)} 
         />
-      </div>
     </div>
   );
 }
+

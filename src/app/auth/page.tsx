@@ -36,27 +36,26 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="bg-background text-zinc-900 dark:text-zinc-100 min-h-screen flex justify-center">
-      {/* Mobile Phone-like Container for desktop, full width on mobile */}
-      <div className="bg-background w-full max-w-md md:border-x md:border-zinc-200 dark:md:border-white/5 relative flex flex-col justify-center min-h-screen px-8">
+    <div className="w-full h-full flex flex-col relative text-[#111111] dark:text-[#FBFBFA] justify-center px-8 pb-10">
         
         <div className="text-center mb-10">
-          <h1 className="text-3xl font-bold tracking-tight mb-2 text-zinc-900 dark:text-zinc-50">Salo</h1>
-          <p className="text-zinc-500 text-sm">
+          <h1 className="text-4xl font-extrabold tracking-tight mb-2 text-[#111111] dark:text-[#FBFBFA]">Salo</h1>
+          <p className="text-[#52525B] dark:text-[#A1A1AA] text-sm font-medium">
             {step === "signIn"
               ? "Welcome back to your household"
               : "Create a household account"}
           </p>
         </div>
 
-        <form onSubmit={handleSubmit}>
-          <div className="bg-white dark:bg-[#0f1115] rounded-2xl border border-zinc-200 dark:border-white/5 dark:shadow-inner dark:ethereal-glass overflow-hidden flex flex-col">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <div className="bg-white dark:bg-[#0A0A0A] rounded-[20px] border border-[#EAEAEA] dark:border-[#333333] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none overflow-hidden flex flex-col relative">
+            <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-[#F8F9FA] dark:from-[#222222] to-transparent pointer-events-none" />
             <input
               id="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full h-14 px-4 bg-transparent focus:outline-none text-base border-b border-zinc-200 dark:border-white/5 placeholder:text-zinc-400"
+              className="w-full h-14 px-5 bg-transparent focus:outline-none text-sm border-b border-[#EAEAEA] dark:border-[#333333] placeholder:text-[#A1A1AA] text-[#111111] dark:text-[#FBFBFA] relative z-10"
               placeholder="Email"
               required
             />
@@ -65,14 +64,14 @@ export default function AuthPage() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full h-14 px-4 bg-transparent focus:outline-none text-base placeholder:text-zinc-400"
+              className="w-full h-14 px-5 bg-transparent focus:outline-none text-sm placeholder:text-[#A1A1AA] text-[#111111] dark:text-[#FBFBFA] relative z-10"
               placeholder="Password"
               required
             />
           </div>
 
           {error && (
-            <div className="mt-4 p-3 bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 text-sm font-medium rounded-xl border border-red-200 dark:border-red-900/50">
+            <div className="p-3 bg-[#FFF3F3] dark:bg-[#2A1111] text-[#E03E3E] dark:text-[#F87171] text-sm font-medium rounded-xl border border-[#FEE2E2] dark:border-[#4B1C1C]">
               {error}
             </div>
           )}
@@ -80,7 +79,7 @@ export default function AuthPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full h-14 mt-6 bg-amber-500 hover:bg-amber-400 text-black font-bold text-base rounded-2xl transition-all spring-bounce disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_20px_rgba(245,158,11,0.2)] active:scale-[0.96]"
+            className="w-full h-14 mt-2 bg-[#111111] dark:bg-[#FBFBFA] text-white dark:text-[#111111] font-semibold text-sm rounded-[18px] transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
           >
             {loading
               ? "Please wait..."
@@ -91,7 +90,7 @@ export default function AuthPage() {
         </form>
 
         <div className="mt-8 text-center">
-          <p className="text-sm text-zinc-500">
+          <p className="text-sm text-[#787774] dark:text-[#A1A1AA]">
             {step === "signIn"
               ? "Don't have an account? "
               : "Already have an account? "}
@@ -100,13 +99,12 @@ export default function AuthPage() {
                 setStep(step === "signIn" ? "signUp" : "signIn");
                 setError("");
               }}
-              className="font-medium text-amber-600 dark:text-amber-500 hover:underline transition-all"
+              className="font-bold text-[#111111] dark:text-[#FBFBFA] transition-all hover:opacity-80"
             >
               {step === "signIn" ? "Sign Up" : "Log In"}
             </button>
           </p>
         </div>
       </div>
-    </div>
   );
 }

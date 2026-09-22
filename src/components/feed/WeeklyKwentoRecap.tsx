@@ -50,16 +50,17 @@ export function WeeklyKwentoRecap() {
   }
 
   return (
-    <div className="bg-white dark:bg-[#0A0B0E] rounded-2xl p-4 mb-6 shadow-sm border border-zinc-200 dark:border-white/10 dark:border-t-amber-500/50 dark:shadow-[inset_0_1px_0_0_rgba(245,158,11,0.2)] transition-all">
-      <div className="flex items-start gap-4">
-        <div className="mt-1 shrink-0 bg-amber-100 dark:bg-amber-500/20 p-2 rounded-xl">
-          <BookOpen className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+    <div className="col-span-2 bg-[#FBFBFA] dark:bg-[#0A0A0A] rounded-[24px] p-6 border border-[#EAEAEA] dark:border-[#333333] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none transition-colors duration-300 relative overflow-hidden">
+      <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-white dark:from-[#111111] to-transparent pointer-events-none opacity-50" />
+      <div className="flex items-start gap-4 relative z-10">
+        <div className="mt-1 shrink-0 bg-white dark:bg-[#222222] p-2.5 rounded-[14px] border border-[#EAEAEA] dark:border-[#333333] shadow-sm flex items-center justify-center">
+          <BookOpen className="w-5 h-5 text-[#111111] dark:text-[#FBFBFA]" />
         </div>
         <div>
-          <h3 className="text-sm font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
+          <h3 className="text-sm font-bold tracking-tight text-[#111111] dark:text-[#FBFBFA]">
             Kwento ng Linggo
           </h3>
-          <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-1 leading-relaxed">
+          <p className="text-sm text-[#52525B] dark:text-[#A1A1AA] mt-1 leading-relaxed font-medium">
             {kwento}
           </p>
         </div>
@@ -67,3 +68,4 @@ export function WeeklyKwentoRecap() {
     </div>
   );
 }
+

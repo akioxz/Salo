@@ -17,6 +17,7 @@ import type * as households from "../households.js";
 import type * as http from "../http.js";
 import type * as posts from "../posts.js";
 import type * as reactions from "../reactions.js";
+import type * as seed from "../seed.js";
 
 import type {
   ApiFromModules,
@@ -34,6 +35,7 @@ declare const fullApi: ApiFromModules<{
   http: typeof http;
   posts: typeof posts;
   reactions: typeof reactions;
+  seed: typeof seed;
 }>;
 
 /**

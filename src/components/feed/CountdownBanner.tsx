@@ -27,34 +27,34 @@ export function CountdownBanner() {
   const isOfw = myRole === "ofw";
 
   return (
-    <div className="bg-amber-100 dark:bg-amber-900/30 rounded-2xl p-4 mb-6 shadow-[0_4px_20px_rgba(0,0,0,0.05)] border border-amber-200/50 dark:border-amber-700/30 flex items-center justify-between">
+    <div className="col-span-1 bg-white rounded-xl p-5 border border-[#EAEAEA] flex flex-col justify-between">
       <div className="flex flex-col">
-        <span className="text-sm text-amber-800 dark:text-amber-400 font-medium tracking-tight">
+        <span className="text-[10px] uppercase font-semibold text-[#787774] tracking-wider">
           🏠 Countdown to Uwi
         </span>
         {isEditing ? (
           <div className="flex items-center gap-2 mt-2">
             <input
               type="date"
-              className="px-2 py-1 rounded-lg text-black border border-amber-300 outline-none focus:ring-2 focus:ring-amber-500"
+              className="px-2 py-1 rounded-lg text-black border border-[#EAEAEA] outline-none focus:ring-2 focus:ring-[#111111]"
               value={tempDate}
               onChange={(e) => setTempDate(e.target.value)}
             />
             <button
               onClick={handleSave}
-              className="bg-amber-500 text-white px-3 py-1 rounded-lg text-sm font-bold active:scale-[0.98] transition-transform duration-200 ease-out shadow-sm"
+              className="bg-[#111111] text-white px-3 py-1 rounded-lg text-sm font-bold active:scale-[0.98] transition-transform duration-200 ease-out"
             >
               Save
             </button>
             <button
               onClick={() => setIsEditing(false)}
-              className="text-amber-700 text-sm px-2 font-medium"
+              className="text-[#787774] text-sm px-2 font-medium"
             >
               Cancel
             </button>
           </div>
         ) : (
-          <span className="text-xl font-bold text-amber-950 dark:text-amber-100 mt-1">
+          <span className="text-xl font-bold text-[#111111] mt-1">
             {targetDate
               ? `${formatDistanceToNow(new Date(targetDate))} na lang!`
               : "Wala pang petsa"}
@@ -65,7 +65,7 @@ export function CountdownBanner() {
       {!isEditing && isOfw && (
         <button
           onClick={() => setIsEditing(true)}
-          className="text-amber-600 bg-amber-200/50 hover:bg-amber-200 px-3 py-1.5 rounded-xl text-sm font-medium transition-colors active:scale-[0.98] duration-200 ease-out"
+          className="text-[#1F6C9F] bg-[#E1F3FE] hover:bg-[#E1F3FE]/80 mt-3 px-3 py-1.5 rounded-xl text-sm font-medium transition-colors active:scale-[0.98] duration-200 ease-out text-center"
         >
           {targetDate ? "Edit" : "Set Date"}
         </button>
@@ -73,3 +73,4 @@ export function CountdownBanner() {
     </div>
   );
 }
+

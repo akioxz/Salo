@@ -20,26 +20,21 @@ export function getCategoryIcon(category?: string): LucideIcon {
   return CATEGORY_ICONS[category] ?? Tag;
 }
 
-/**
- * Role color split is grounded in the product's subject, not decorative:
- * sky/blue for the OFW (across the ocean), amber for the family at home
- * (hearth, warmth).
- */
 export const ROLE_STYLES: Record<
   HouseholdRole,
   { label: string; avatarBg: string; avatarText: string; bubbleBg: string }
 > = {
   ofw: {
     label: "OFW",
-    avatarBg: "bg-sky-500/15 dark:bg-sky-400/15",
-    avatarText: "text-sky-600 dark:text-sky-300",
-    bubbleBg: "bg-sky-500/[0.06] dark:bg-sky-400/[0.07]",
+    avatarBg: "bg-[#E1F3FE]",
+    avatarText: "text-[#1F6C9F]",
+    bubbleBg: "bg-[#E1F3FE]/50",
   },
   family: {
     label: "Family",
-    avatarBg: "bg-amber-500/15 dark:bg-amber-400/15",
-    avatarText: "text-amber-600 dark:text-amber-300",
-    bubbleBg: "bg-amber-500/[0.06] dark:bg-amber-400/[0.07]",
+    avatarBg: "bg-[#FBF3DB]",
+    avatarText: "text-[#956400]",
+    bubbleBg: "bg-[#FBF3DB]/50",
   },
 };
 

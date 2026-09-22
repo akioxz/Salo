@@ -214,7 +214,7 @@ export default function PairingPage() {
 
             <button
               onClick={copyToClipboard}
-              className="w-full h-14 bg-white dark:bg-[#1a1a1a] border-2 border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 font-bold text-lg rounded-xl transition-colors shadow-sm flex items-center justify-center gap-2"
+              className="w-full h-14 bg-white dark:bg-[#0a0a0a] border-2 border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 font-bold text-lg rounded-xl transition-colors shadow-sm flex items-center justify-center gap-2"
             >
               <svg
                 className="w-5 h-5"

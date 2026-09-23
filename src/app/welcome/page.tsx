@@ -23,28 +23,36 @@ import { cn } from "@/lib/cn";
 
 type FlowState = "choose" | "create" | "join" | "showCode";
 
-export default function PairingPage() {
+export default function WelcomePage() {
   const router = useRouter();
-  const { signOut } = useAuthActions();
+  const { signIn, signOut } = useAuthActions();
 
   const createHousehold = useMutation(api.households.create);
   const joinHousehold = useMutation(api.households.join);
 
   const [step, setStep] = useState<FlowState>("choose");
   const [role, setRole] = useState<"family" | "ofw">("family");
+  const [name, setName] = useState("");
   const [inviteCode, setInviteCode] = useState("");
 
-  // State for generated code
   const [generatedCode, setGeneratedCode] = useState("");
   const [copied, setCopied] = useState(false);
-
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleCreate = async () => {
+    if (!name.trim()) {
+      setError("Ilagay ang iyong pangalan o palayaw.");
+      return;
+    }
+
     setError("");
     setLoading(true);
     try {
+      // 1. Sign in anonymously first
+      await signIn("anonymous", { name: name.trim() });
+      
+      // 2. Create the household
       const result = await createHousehold({ role });
       setGeneratedCode(result.inviteCode);
       setStep("showCode");
@@ -61,11 +69,18 @@ export default function PairingPage() {
 
   const handleJoin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inviteCode.trim()) return;
+    if (!inviteCode.trim() || !name.trim()) {
+      setError("Ilagay ang invite code at ang iyong pangalan.");
+      return;
+    }
 
     setError("");
     setLoading(true);
     try {
+      // 1. Sign in anonymously first
+      await signIn("anonymous", { name: name.trim() });
+      
+      // 2. Join the household
       await joinHousehold({ inviteCode: inviteCode.trim() });
       router.push("/");
     } catch (err: unknown) {
@@ -88,12 +103,11 @@ export default function PairingPage() {
       try {
         await navigator.share({
           title: "Salo - Tahanan ng Pamilya",
-          text: "Salo tayo sa budget at kwento ng ating pamilya! Pindutin mo 'to para makasalo ka agad:",
-          url: inviteUrl,
+          text: shareText,
         });
         return;
       } catch {
-        // User cancelled or share failed, fallback to copy
+        // Fallback
       }
     }
     await navigator.clipboard.writeText(shareText);
@@ -109,9 +123,7 @@ export default function PairingPage() {
 
   return (
     <div className="bg-zinc-50 dark:bg-black text-zinc-900 dark:text-zinc-100 min-h-screen flex justify-center selection:bg-zinc-900 selection:text-white dark:selection:bg-white dark:selection:text-black">
-      {/* Mobile-first Container with tactile border on desktop */}
       <div className="bg-white dark:bg-[#0A0A0A] w-full max-w-md md:border-x md:border-zinc-200/80 dark:md:border-zinc-800/80 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.4)] relative flex flex-col justify-center min-h-screen px-7 py-12">
-        {/* Header Icon & Brand Title */}
         <div className="text-center mb-8">
           <div className="w-12 h-12 rounded-2xl bg-zinc-100 dark:bg-[#161616] border border-zinc-200/60 dark:border-zinc-800/80 flex items-center justify-center text-zinc-800 dark:text-zinc-200 mx-auto mb-3 shadow-xs">
             <HeartHandshake className="w-6 h-6 stroke-[1.75]" />
@@ -129,7 +141,6 @@ export default function PairingPage() {
           </p>
         </div>
 
-        {/* Error Notice */}
         {error && (
           <div className="flex items-center gap-2.5 p-3.5 mb-6 bg-rose-500/[0.08] dark:bg-rose-500/[0.12] text-rose-600 dark:text-rose-400 text-xs font-semibold rounded-xl border border-rose-500/20 animate-in fade-in slide-in-from-top-1">
             <AlertCircle className="w-4 h-4 shrink-0" />
@@ -137,7 +148,6 @@ export default function PairingPage() {
           </div>
         )}
 
-        {/* STEP 1: CHOOSE PATH */}
         {step === "choose" && (
           <div className="space-y-3.5">
             <button
@@ -182,7 +192,6 @@ export default function PairingPage() {
           </div>
         )}
 
-        {/* STEP 2A: CREATE HOUSEHOLD */}
         {step === "create" && (
           <div className="space-y-6">
             <div>
@@ -190,8 +199,7 @@ export default function PairingPage() {
                 Ano ang iyong gampanin?
               </label>
 
-              {/* Tactile Segmented Role Selector */}
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-3 mb-5">
                 <button
                   type="button"
                   onClick={() => setRole("family")}
@@ -266,12 +274,22 @@ export default function PairingPage() {
                   </div>
                 </button>
               </div>
+
+              <div className="relative">
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full h-14 px-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#121212] text-zinc-900 dark:text-zinc-100 text-sm placeholder:text-zinc-400 focus:outline-none focus:border-zinc-900 dark:focus:border-zinc-100 focus:ring-4 focus:ring-zinc-500/10 transition-all duration-300"
+                  placeholder="Iyong Pangalan o Palayaw"
+                  required
+                />
+              </div>
             </div>
 
-            {/* Primary Action Button (Salo Signature Obsidian) */}
             <button
               onClick={handleCreate}
-              disabled={loading}
+              disabled={loading || !name.trim()}
               className="w-full h-14 bg-[#111111] hover:bg-black dark:bg-[#FBFBFA] dark:hover:bg-white text-white dark:text-[#111111] font-bold text-sm rounded-xl transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed shadow-sm flex items-center justify-center gap-2 cursor-pointer"
             >
               {loading ? (
@@ -284,20 +302,18 @@ export default function PairingPage() {
               )}
             </button>
 
-            {/* Back Button */}
             <button
               onClick={() => setStep("choose")}
               className="w-full h-11 bg-transparent text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 font-medium text-xs rounded-xl transition-colors flex items-center justify-center gap-1.5"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Bumalik sa Pagpipilian</span>
+              <span>Bumalik</span>
             </button>
           </div>
         )}
 
-        {/* STEP 2B: JOIN HOUSEHOLD */}
         {step === "join" && (
-          <form onSubmit={handleJoin} noValidate className="space-y-6">
+          <form onSubmit={handleJoin} noValidate className="space-y-5">
             <div>
               <label
                 htmlFor="code"
@@ -305,29 +321,39 @@ export default function PairingPage() {
               >
                 Invite Code
               </label>
-              <div className="relative">
-                <input
-                  id="code"
-                  type="text"
-                  value={inviteCode}
-                  onChange={(e) => setInviteCode(e.target.value)}
-                  className="w-full h-14 px-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/80 dark:bg-[#121212] text-zinc-900 dark:text-zinc-100 text-base font-mono tracking-widest text-center uppercase placeholder:text-zinc-400 placeholder:normal-case placeholder:font-sans placeholder:tracking-normal focus:outline-none focus:border-zinc-900 dark:focus:border-zinc-100 focus:ring-4 focus:ring-zinc-500/10 transition-all duration-300"
-                  placeholder="I-paste ang code dito"
-                  required
-                />
-              </div>
-              <p className="text-[11px] text-zinc-400 dark:text-zinc-500 mt-2 text-center leading-relaxed">
-                Humingi ng invite code o link mula sa iyong kapamilya.
-              </p>
+              <input
+                id="code"
+                type="text"
+                value={inviteCode}
+                onChange={(e) => setInviteCode(e.target.value)}
+                className="w-full h-14 px-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/80 dark:bg-[#121212] text-zinc-900 dark:text-zinc-100 text-base font-mono tracking-widest text-center uppercase placeholder:text-zinc-400 placeholder:normal-case placeholder:font-sans placeholder:tracking-normal focus:outline-none focus:border-zinc-900 dark:focus:border-zinc-100 focus:ring-4 focus:ring-zinc-500/10 transition-all duration-300 mb-4"
+                placeholder="I-paste ang code dito"
+                required
+              />
+
+              <label
+                htmlFor="join-name"
+                className="block text-[11px] font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 mb-2 text-center"
+              >
+                Pangalan
+              </label>
+              <input
+                id="join-name"
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full h-14 px-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#121212] text-zinc-900 dark:text-zinc-100 text-sm placeholder:text-zinc-400 focus:outline-none focus:border-zinc-900 dark:focus:border-zinc-100 focus:ring-4 focus:ring-zinc-500/10 transition-all duration-300"
+                placeholder="Iyong Pangalan o Palayaw"
+                required
+              />
             </div>
 
-            {/* Primary Join Button */}
             <button
               type="submit"
-              disabled={loading || !inviteCode.trim()}
+              disabled={loading || !inviteCode.trim() || !name.trim()}
               className={cn(
                 "w-full h-14 font-bold text-sm rounded-xl transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] flex items-center justify-center gap-2",
-                !inviteCode.trim() || loading
+                !inviteCode.trim() || !name.trim() || loading
                   ? "bg-zinc-100 dark:bg-zinc-900 text-zinc-400 dark:text-zinc-600 border border-zinc-200/80 dark:border-zinc-800/80 cursor-not-allowed"
                   : "bg-[#111111] hover:bg-black dark:bg-[#FBFBFA] dark:hover:bg-white text-white dark:text-[#111111] active:scale-[0.98] shadow-sm cursor-pointer",
               )}
@@ -342,19 +368,17 @@ export default function PairingPage() {
               )}
             </button>
 
-            {/* Back Button */}
             <button
               type="button"
               onClick={() => setStep("choose")}
               className="w-full h-11 bg-transparent text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 font-medium text-xs rounded-xl transition-colors flex items-center justify-center gap-1.5"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Bumalik sa Pagpipilian</span>
+              <span>Bumalik</span>
             </button>
           </form>
         )}
 
-        {/* STEP 3: SHOW GENERATED CODE & MESSENGER SHARE */}
         {step === "showCode" && (
           <div className="space-y-5 text-center animate-in fade-in duration-300">
             <div className="p-6 bg-[#FBFBFA] dark:bg-[#121212] border border-zinc-200/80 dark:border-zinc-800/80 rounded-2xl relative overflow-hidden text-left shadow-xs">
@@ -369,7 +393,6 @@ export default function PairingPage() {
                 I-share ito sa Messenger, WhatsApp, o Viber. Walang password na kailangan para makasalo sa inyong tahanan.
               </p>
 
-              {/* Link Box */}
               <div className="flex items-center justify-between gap-2 p-2.5 bg-white dark:bg-[#1A1A1A] border border-zinc-200 dark:border-zinc-800 rounded-xl">
                 <span className="text-xs font-mono text-zinc-600 dark:text-zinc-400 truncate select-all px-1">
                   {inviteUrl}
@@ -389,7 +412,6 @@ export default function PairingPage() {
               </div>
             </div>
 
-            {/* Primary Share Button */}
             <button
               onClick={handleShare}
               className="w-full h-14 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl transition-all shadow-sm active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer"
@@ -398,7 +420,6 @@ export default function PairingPage() {
               <span>I-share sa Messenger / WhatsApp</span>
             </button>
 
-            {/* Secondary Copy Button */}
             <button
               onClick={handleCopyLink}
               className="w-full h-12 bg-white dark:bg-[#121212] border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 font-semibold text-xs rounded-xl transition-colors shadow-2xs flex items-center justify-center gap-2 text-zinc-700 dark:text-zinc-300 active:scale-[0.99] cursor-pointer"
@@ -416,7 +437,6 @@ export default function PairingPage() {
               )}
             </button>
 
-            {/* Proceed to Feed */}
             <button
               onClick={() => router.push("/")}
               className="w-full h-11 bg-transparent text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 font-medium text-xs rounded-xl transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
@@ -424,20 +444,8 @@ export default function PairingPage() {
               <span>Dumiretso sa Hapag-kainan</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
-
-            <p className="text-[11px] text-zinc-400">
-              May bisa ang link sa loob ng 48 oras. Isa lang ang maaaring sumalo bawat code.
-            </p>
           </div>
         )}
-
-        {/* Absolute Logout button for emergencies/resetting state */}
-        <button
-          onClick={() => signOut()}
-          className="absolute bottom-6 left-0 right-0 mx-auto text-xs text-zinc-400 hover:text-red-500 transition-colors w-fit cursor-pointer"
-        >
-          Sign out
-        </button>
       </div>
     </div>
   );

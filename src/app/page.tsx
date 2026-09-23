@@ -40,29 +40,24 @@ export default function Home() {
     addComment({ postId: postId as any, content });
   };
 
-  // Redirect if not logged in (TEMPORARILY DISABLED FOR DEV)
+  // Redirect if not logged in
   useEffect(() => {
-    /*
     if (!isAuthLoading && !isAuthenticated) {
-      router.push("/auth");
+      router.push("/welcome");
     }
-    */
   }, [isAuthLoading, isAuthenticated, router]);
 
-  // Redirect if logged in but no household (TEMPORARILY DISABLED FOR DEV)
+  // Redirect if logged in but no household
   useEffect(() => {
-    /*
     if (isAuthenticated && myHousehold === null) {
-      router.push("/pairing");
+      router.push("/welcome");
     }
-    */
   }, [isAuthenticated, myHousehold, router]);
 
-  // TEMPORARILY DISABLED Loading checks so unauthenticated users can see the UI
-  /*
+  // Loading checks
   if (isAuthLoading || !isAuthenticated || myHousehold === undefined) {
     return (
-      <div className="bg-zinc-50  min-h-screen flex items-center justify-center">
+      <div className="bg-zinc-50 dark:bg-black min-h-screen flex items-center justify-center">
         <p className="text-zinc-500">Loading...</p>
       </div>
     );
@@ -72,7 +67,7 @@ export default function Home() {
   if (myHousehold === null) {
     return null;
   }
-  */
+
 
   return (
     <div className="w-full h-full flex flex-col relative text-zinc-900 ">
@@ -222,7 +217,7 @@ export default function Home() {
           <div
             onClick={() => {
               signOut();
-              router.push("/auth");
+              router.push("/welcome");
             }}
             className="flex flex-col items-center gap-1 text-zinc-400 hover:text-rose-500 transition-all cursor-pointer"
           >

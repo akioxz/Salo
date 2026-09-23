@@ -2,7 +2,7 @@
 
 import { HouseholdPost, Household } from "@/types/household";
 import { formatPHP, getCategoryIcon, formatTimeAgo } from "@/lib/format";
-import { useTheme } from "next-themes";
+import { useTheme } from "@/components/ThemeProvider";
 import { useState, useMemo } from "react";
 import { 
   ArrowDownLeft, 

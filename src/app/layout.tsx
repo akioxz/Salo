@@ -66,6 +66,23 @@ export default function RootLayout({
       className={`${inter.variable} ${geistMono.variable} h-full`}
       suppressHydrationWarning
     >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                let theme = localStorage.getItem('theme');
+                let sys = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                if (theme === 'dark' || (theme === 'system' && sys) || (!theme && sys)) {
+                  document.documentElement.classList.add('dark');
+                } else {
+                  document.documentElement.classList.remove('dark');
+                }
+              } catch (e) {}
+            `,
+          }}
+        />
+      </head>
       <body className="min-h-full flex flex-col bg-zinc-100 dark:bg-[#0A0A0A] text-foreground font-sans transition-colors duration-300">
         <ConvexClientProvider>
           <ThemeProvider

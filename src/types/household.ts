@@ -37,3 +37,13 @@ export interface HouseholdPost {
   comments?: HouseholdComment[];
   commentCount: number;
 }
+
+export interface Household {
+  _id?: string;
+  id?: string;
+  name?: string;
+  joinCode?: string;
+  members?: HouseholdMember[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any;
+}

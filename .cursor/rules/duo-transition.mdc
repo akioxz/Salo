@@ -1,0 +1,47 @@
+---
+description: Auto-generated dev-library rule for duo-transition
+globs: *.*
+---
+﻿---
+name: duo-transition
+description: >-
+  Generates fluid, seamless 'unfolding' spatial animations inspired by the Apple iPhone Duo. Uses Framer Motion layout animations (or CSS View Transitions) to transition UI elements from a small state to a full-screen state while keeping content optically locked in space with Liquid Glass effects.
+trigger: "/duo-transition"
+---
+
+# Apple iPhone Duo Transition Standard
+
+When the user invokes /duo-transition, you must apply the "Seamless Spatial Expansion" animation principles inspired by the iPhone Duo's folding/unfolding software transition.
+
+## 1. The Core Philosophy (Locked in Space)
+When a user clicks a small element (like a card) to expand it into a larger view, the transition must feel like a physical screen unfolding. 
+- **DO NOT** simply fade out page A and fade in page B. 
+- **DO NOT** stretch or distort the text/images during the expansion.
+- The UI content must appear "locked in space" while the container expands around it.
+
+## 2. Implementation Rules (Framer Motion)
+If generating React code, you MUST use \ramer-motion\ to achieve this effect.
+
+### A. Shared Layout Expansion (\layoutId\)
+Wrap both the compact card and the expanded modal in a \motion.div\ with the exact same \layoutId\. This creates the optical illusion of the physical frame expanding.
+`jsx
+// Compact State
+<motion.div layoutId="duo-container-\" className="w-64 h-32 rounded-3xl">...</motion.div>
+
+// Expanded State
+<motion.div layoutId="duo-container-\" className="fixed inset-0 w-full h-full">...</motion.div>
+`
+
+### B. Counter-Scaling & Opacity
+Content inside the expanding container must NOT stretch. Use \layout="position"\ on children, or animate their opacity with a slight delay so they fade in smoothly as the container reaches its full size.
+
+### C. Apple Spring Physics
+You must use a highly fluid, slightly damped spring transition. Do not use linear or simple ease-in-out tweens.
+`jsx
+transition={{ type: "spring", stiffness: 300, damping: 30, mass: 1 }}
+`
+
+## 3. The Liquid Glass Integration
+As the container unfolds into the expanded state, the background behind it (the overlay) MUST apply the Liquid Glass effect to blur out the rest of the application seamlessly.
+- Use \ackdrop-blur-3xl backdrop-saturate-150\ on the overlay.
+- Fade the overlay in using \motion.div\ with \initial={{ opacity: 0 }}\ and \nimate={{ opacity: 1 }}\.

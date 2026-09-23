@@ -1,0 +1,26 @@
+---
+globs: *.*
+name: resume-session
+description: Generates the perfect resume prompt for Cursor, Windsurf, or OpenCode to safely ingest a SESSION_HANDOFF.md file without AI amnesia.
+trigger: "/resume-session"
+---
+
+# Session Resume Engine
+
+When the user invokes `/resume-session`, your job is to provide them with the exact instructions and copy-paste prompt they need to resume a project in a new AI IDE (like Cursor, Windsurf, or OpenCode) using their generated handoff file.
+
+## Execution Output
+
+Do not write code. Output the following exact block to the user:
+
+```markdown
+Here is your Session Resume prompt. 
+
+### Step 1: Tag the Handoff File
+In your new IDE (Cursor/Windsurf/OpenCode), open the AI Chat and type `@` followed by your handoff file (e.g., `@SESSION_HANDOFF.md`) to attach it.
+
+### Step 2: Paste this Initialization Prompt
+Copy and paste this exact text into the chat:
+
+> Read the attached handoff file to absorb our current project state, pending tasks, and strict design boundaries. Resume the session as the Lead Developer. Do not write any code yet. Just give me a quick summary of your understanding, and ask me what specific component we should tackle next.
+```

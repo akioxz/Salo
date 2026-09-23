@@ -1,0 +1,14 @@
+---
+description: Auto-generated dev-library rule for knowledge-graph
+globs: *.*
+---
+﻿---
+name: knowledge-graph
+description: DevLib Polyglot Knowledge Graph rule. Maps codebase architecture deterministically without burning tokens on blind reading.
+trigger: "/knowledge-graph"
+---
+# Codebase Knowledge Graph
+
+Do not dump entire files into context to understand topology. 
+Instead, output a structural dependency list or request to run AST parsing scripts to generate a graph-report.md. Understand the God Modules and circular dependencies BEFORE proposing architectural changes.
+

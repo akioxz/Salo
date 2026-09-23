@@ -5,6 +5,21 @@ import { useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { useRouter } from "next/navigation";
 import { useAuthActions } from "@convex-dev/auth/react";
+import {
+  Share2,
+  Copy,
+  Check,
+  MessageCircle,
+  ArrowRight,
+  ArrowLeft,
+  Home,
+  Medal,
+  AlertCircle,
+  PlusCircle,
+  Users,
+  HeartHandshake,
+} from "lucide-react";
+import { cn } from "@/lib/cn";
 
 type FlowState = "choose" | "create" | "join" | "showCode";
 
@@ -21,6 +36,7 @@ export default function PairingPage() {
 
   // State for generated code
   const [generatedCode, setGeneratedCode] = useState("");
+  const [copied, setCopied] = useState(false);
 
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -36,7 +52,7 @@ export default function PairingPage() {
       console.error(err);
       setError(
         (err as Error).message ||
-          "Failed to create household. You might already belong to one.",
+          "Hindi makagawa ng tahanan. Maaaring may kasalukuyang tahanan ka na.",
       );
     } finally {
       setLoading(false);
@@ -54,58 +70,114 @@ export default function PairingPage() {
       router.push("/");
     } catch (err: unknown) {
       console.error(err);
-      setError((err as Error).message || "Invalid or expired invite code.");
+      setError((err as Error).message || "Hindi wasto o nag-expire na ang invite code.");
     } finally {
       setLoading(false);
     }
   };
 
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(generatedCode);
-    alert("Code copied to clipboard!");
+  const inviteUrl =
+    typeof window !== "undefined"
+      ? `${window.location.origin}/join?code=${generatedCode}`
+      : `/join?code=${generatedCode}`;
+
+  const shareText = `Salo tayo sa budget at kwento ng ating pamilya! Pindutin mo 'to para makasalo ka agad:\n${inviteUrl}`;
+
+  const handleShare = async () => {
+    if (typeof navigator !== "undefined" && navigator.share) {
+      try {
+        await navigator.share({
+          title: "Salo - Tahanan ng Pamilya",
+          text: "Salo tayo sa budget at kwento ng ating pamilya! Pindutin mo 'to para makasalo ka agad:",
+          url: inviteUrl,
+        });
+        return;
+      } catch {
+        // User cancelled or share failed, fallback to copy
+      }
+    }
+    await navigator.clipboard.writeText(shareText);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2500);
+  };
+
+  const handleCopyLink = async () => {
+    await navigator.clipboard.writeText(inviteUrl);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2500);
   };
 
   return (
-    <div className="bg-zinc-50 dark:bg-black text-zinc-900 dark:text-zinc-100 min-h-screen flex justify-center">
-      {/* Mobile Phone-like Container for desktop, full width on mobile */}
-      <div className="bg-white dark:bg-[#0a0a0a] w-full max-w-md md:border-x md:border-zinc-200 dark:md:border-zinc-800 shadow-[0_4px_20px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.3)] relative flex flex-col justify-center min-h-screen px-8 py-12">
-        <div className="text-center mb-10">
-          <h1 className="text-3xl font-black tracking-tight mb-2">Connect</h1>
-          <p className="text-zinc-500 text-sm">
-            {step === "choose" && "Link up with your partner"}
-            {step === "create" && "Create a new household"}
-            {step === "join" && "Join an existing household"}
-            {step === "showCode" && "Your invite code"}
+    <div className="bg-zinc-50 dark:bg-black text-zinc-900 dark:text-zinc-100 min-h-screen flex justify-center selection:bg-zinc-900 selection:text-white dark:selection:bg-white dark:selection:text-black">
+      {/* Mobile-first Container with tactile border on desktop */}
+      <div className="bg-white dark:bg-[#0A0A0A] w-full max-w-md md:border-x md:border-zinc-200/80 dark:md:border-zinc-800/80 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.4)] relative flex flex-col justify-center min-h-screen px-7 py-12">
+        {/* Header Icon & Brand Title */}
+        <div className="text-center mb-8">
+          <div className="w-12 h-12 rounded-2xl bg-zinc-100 dark:bg-[#161616] border border-zinc-200/60 dark:border-zinc-800/80 flex items-center justify-center text-zinc-800 dark:text-zinc-200 mx-auto mb-3 shadow-xs">
+            <HeartHandshake className="w-6 h-6 stroke-[1.75]" />
+          </div>
+
+          <h1 className="text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-50 mb-1.5">
+            Salo
+          </h1>
+
+          <p className="text-zinc-500 dark:text-zinc-400 text-xs sm:text-sm max-w-xs mx-auto leading-relaxed">
+            {step === "choose" && "Pag-ugnayin ang inyong tahanan"}
+            {step === "create" && "Simulan ang inyong tahanan"}
+            {step === "join" && "Sumalo sa inyong tahanan"}
+            {step === "showCode" && "Family Invite Link"}
           </p>
         </div>
 
+        {/* Error Notice */}
         {error && (
-          <div className="p-3 mb-6 bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 text-sm font-medium rounded-lg border border-red-200 dark:border-red-900/50">
-            {error}
+          <div className="flex items-center gap-2.5 p-3.5 mb-6 bg-rose-500/[0.08] dark:bg-rose-500/[0.12] text-rose-600 dark:text-rose-400 text-xs font-semibold rounded-xl border border-rose-500/20 animate-in fade-in slide-in-from-top-1">
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            <span className="leading-snug">{error}</span>
           </div>
         )}
 
         {/* STEP 1: CHOOSE PATH */}
         {step === "choose" && (
-          <div className="space-y-4">
+          <div className="space-y-3.5">
             <button
               onClick={() => setStep("create")}
-              className="w-full h-16 bg-white dark:bg-[#111] border-2 border-zinc-200 dark:border-zinc-800 hover:border-amber-500 dark:hover:border-amber-500 rounded-2xl flex flex-col items-center justify-center transition-colors shadow-sm"
+              className="w-full p-4.5 rounded-2xl bg-white dark:bg-[#121212] border border-zinc-200/90 dark:border-zinc-800/90 hover:border-zinc-400 dark:hover:border-zinc-600 shadow-[0_2px_12px_rgba(0,0,0,0.03)] dark:shadow-none transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] flex items-center justify-between text-left group active:scale-[0.98]"
             >
-              <span className="font-bold text-lg">Create a Household</span>
-              <span className="text-xs text-zinc-500">
-                I want to invite someone
-              </span>
+              <div className="flex items-center gap-3.5">
+                <div className="w-11 h-11 rounded-xl bg-zinc-100 dark:bg-[#1A1A1A] border border-zinc-200/60 dark:border-zinc-800/80 flex items-center justify-center text-zinc-900 dark:text-zinc-100 group-hover:scale-105 transition-transform duration-300">
+                  <PlusCircle className="w-5 h-5 stroke-[1.75]" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-sm text-zinc-900 dark:text-zinc-100">
+                    Gumawa ng Tahanan
+                  </h3>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+                    Ako ang unang magsisimula at mag-iimbita
+                  </p>
+                </div>
+              </div>
+              <ArrowRight className="w-4 h-4 text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 group-hover:translate-x-0.5 transition-all duration-300" />
             </button>
 
             <button
               onClick={() => setStep("join")}
-              className="w-full h-16 bg-white dark:bg-[#111] border-2 border-zinc-200 dark:border-zinc-800 hover:border-amber-500 dark:hover:border-amber-500 rounded-2xl flex flex-col items-center justify-center transition-colors shadow-sm"
+              className="w-full p-4.5 rounded-2xl bg-white dark:bg-[#121212] border border-zinc-200/90 dark:border-zinc-800/90 hover:border-zinc-400 dark:hover:border-zinc-600 shadow-[0_2px_12px_rgba(0,0,0,0.03)] dark:shadow-none transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] flex items-center justify-between text-left group active:scale-[0.98]"
             >
-              <span className="font-bold text-lg">Join a Household</span>
-              <span className="text-xs text-zinc-500">
-                I have an invite code
-              </span>
+              <div className="flex items-center gap-3.5">
+                <div className="w-11 h-11 rounded-xl bg-zinc-100 dark:bg-[#1A1A1A] border border-zinc-200/60 dark:border-zinc-800/80 flex items-center justify-center text-zinc-900 dark:text-zinc-100 group-hover:scale-105 transition-transform duration-300">
+                  <Users className="w-5 h-5 stroke-[1.75]" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-sm text-zinc-900 dark:text-zinc-100">
+                    Sumalo sa Tahanan
+                  </h3>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+                    May natanggap akong invite link o code
+                  </p>
+                </div>
+              </div>
+              <ArrowRight className="w-4 h-4 text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 group-hover:translate-x-0.5 transition-all duration-300" />
             </button>
           </div>
         )}
@@ -114,133 +186,247 @@ export default function PairingPage() {
         {step === "create" && (
           <div className="space-y-6">
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-500 mb-3 text-center">
-                What is your role?
+              <label className="block text-[11px] font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 mb-3 text-center">
+                Ano ang iyong gampanin?
               </label>
-              <div className="flex gap-4">
+
+              {/* Tactile Segmented Role Selector */}
+              <div className="grid grid-cols-2 gap-3">
                 <button
+                  type="button"
                   onClick={() => setRole("family")}
-                  className={`flex-1 h-14 rounded-xl font-bold border-2 transition-colors ${
+                  className={cn(
+                    "p-4 rounded-2xl border text-left transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] relative flex flex-col justify-between h-20 active:scale-[0.98]",
                     role === "family"
-                      ? "border-amber-500 bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400"
-                      : "border-zinc-200 dark:border-zinc-800 text-zinc-500 hover:border-zinc-300"
-                  }`}
+                      ? "border-zinc-900 dark:border-white bg-zinc-900/[0.03] dark:bg-white/[0.06] shadow-[0_2px_12px_rgba(0,0,0,0.06)] ring-1 ring-zinc-900/10 dark:ring-white/20"
+                      : "border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#121212] hover:border-zinc-300 dark:hover:border-zinc-700 text-zinc-500",
+                  )}
                 >
-                  Family (PH)
+                  <div className="flex items-center justify-between w-full">
+                    <Home
+                      className={cn(
+                        "w-5 h-5 stroke-[1.75]",
+                        role === "family"
+                          ? "text-zinc-900 dark:text-zinc-100"
+                          : "text-zinc-400 dark:text-zinc-500",
+                      )}
+                    />
+                    {role === "family" && (
+                      <span className="w-2 h-2 rounded-full bg-zinc-900 dark:bg-white" />
+                    )}
+                  </div>
+                  <div>
+                    <span
+                      className={cn(
+                        "font-bold text-sm block",
+                        role === "family"
+                          ? "text-zinc-900 dark:text-zinc-100"
+                          : "text-zinc-600 dark:text-zinc-400",
+                      )}
+                    >
+                      Family
+                    </span>
+                  </div>
                 </button>
+
                 <button
+                  type="button"
                   onClick={() => setRole("ofw")}
-                  className={`flex-1 h-14 rounded-xl font-bold border-2 transition-colors ${
+                  className={cn(
+                    "p-4 rounded-2xl border text-left transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] relative flex flex-col justify-between h-20 active:scale-[0.98]",
                     role === "ofw"
-                      ? "border-amber-500 bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400"
-                      : "border-zinc-200 dark:border-zinc-800 text-zinc-500 hover:border-zinc-300"
-                  }`}
+                      ? "border-zinc-900 dark:border-white bg-zinc-900/[0.03] dark:bg-white/[0.06] shadow-[0_2px_12px_rgba(0,0,0,0.06)] ring-1 ring-zinc-900/10 dark:ring-white/20"
+                      : "border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#121212] hover:border-zinc-300 dark:hover:border-zinc-700 text-zinc-500",
+                  )}
                 >
-                  OFW
+                  <div className="flex items-center justify-between w-full">
+                    <Medal
+                      className={cn(
+                        "w-5 h-5 stroke-[1.75]",
+                        role === "ofw"
+                          ? "text-zinc-900 dark:text-zinc-100"
+                          : "text-zinc-400 dark:text-zinc-500",
+                      )}
+                    />
+                    {role === "ofw" && (
+                      <span className="w-2 h-2 rounded-full bg-zinc-900 dark:bg-white" />
+                    )}
+                  </div>
+                  <div>
+                    <span
+                      className={cn(
+                        "font-bold text-sm block",
+                        role === "ofw"
+                          ? "text-zinc-900 dark:text-zinc-100"
+                          : "text-zinc-600 dark:text-zinc-400",
+                      )}
+                    >
+                      OFW
+                    </span>
+                  </div>
                 </button>
               </div>
             </div>
 
+            {/* Primary Action Button (Salo Signature Obsidian) */}
             <button
               onClick={handleCreate}
               disabled={loading}
-              className="w-full h-14 bg-amber-500 hover:bg-amber-600 text-white font-bold text-lg rounded-xl transition-colors disabled:opacity-50 shadow-sm active:scale-[0.98]"
+              className="w-full h-14 bg-[#111111] hover:bg-black dark:bg-[#FBFBFA] dark:hover:bg-white text-white dark:text-[#111111] font-bold text-sm rounded-xl transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed shadow-sm flex items-center justify-center gap-2 cursor-pointer"
             >
-              {loading ? "Generating..." : "Generate Invite Code"}
+              {loading ? (
+                "Inihahanda ang Tahanan..."
+              ) : (
+                <>
+                  <span>Gumawa ng Invite Link</span>
+                  <ArrowRight className="w-4 h-4" />
+                </>
+              )}
             </button>
 
+            {/* Back Button */}
             <button
               onClick={() => setStep("choose")}
-              className="w-full h-14 bg-transparent text-zinc-500 font-bold rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors"
+              className="w-full h-11 bg-transparent text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 font-medium text-xs rounded-xl transition-colors flex items-center justify-center gap-1.5"
             >
-              Back
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Bumalik sa Pagpipilian</span>
             </button>
           </div>
         )}
 
         {/* STEP 2B: JOIN HOUSEHOLD */}
         {step === "join" && (
-          <form onSubmit={handleJoin} className="space-y-6">
+          <form onSubmit={handleJoin} noValidate className="space-y-6">
             <div>
               <label
                 htmlFor="code"
-                className="block text-xs font-semibold uppercase tracking-wider text-zinc-500 mb-1"
+                className="block text-[11px] font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 mb-2 text-center"
               >
                 Invite Code
               </label>
-              <input
-                id="code"
-                type="text"
-                value={inviteCode}
-                onChange={(e) => setInviteCode(e.target.value)}
-                className="w-full h-14 px-4 rounded-xl border border-zinc-300 dark:border-zinc-800 bg-zinc-50 dark:bg-[#111] text-lg font-mono tracking-widest focus:outline-none focus:ring-2 focus:ring-amber-500/20 transition-shadow text-center uppercase"
-                placeholder="Paste code here"
-                required
-              />
-              <p className="text-xs text-zinc-500 mt-2 text-center">
-                Ask your partner to generate a code for you.
+              <div className="relative">
+                <input
+                  id="code"
+                  type="text"
+                  value={inviteCode}
+                  onChange={(e) => setInviteCode(e.target.value)}
+                  className="w-full h-14 px-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/80 dark:bg-[#121212] text-zinc-900 dark:text-zinc-100 text-base font-mono tracking-widest text-center uppercase placeholder:text-zinc-400 placeholder:normal-case placeholder:font-sans placeholder:tracking-normal focus:outline-none focus:border-zinc-900 dark:focus:border-zinc-100 focus:ring-4 focus:ring-zinc-500/10 transition-all duration-300"
+                  placeholder="I-paste ang code dito"
+                  required
+                />
+              </div>
+              <p className="text-[11px] text-zinc-400 dark:text-zinc-500 mt-2 text-center leading-relaxed">
+                Humingi ng invite code o link mula sa iyong kapamilya.
               </p>
             </div>
 
+            {/* Primary Join Button */}
             <button
               type="submit"
               disabled={loading || !inviteCode.trim()}
-              className="w-full h-14 bg-amber-500 hover:bg-amber-600 text-white font-bold text-lg rounded-xl transition-colors disabled:opacity-50 shadow-sm active:scale-[0.98]"
+              className={cn(
+                "w-full h-14 font-bold text-sm rounded-xl transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] flex items-center justify-center gap-2",
+                !inviteCode.trim() || loading
+                  ? "bg-zinc-100 dark:bg-zinc-900 text-zinc-400 dark:text-zinc-600 border border-zinc-200/80 dark:border-zinc-800/80 cursor-not-allowed"
+                  : "bg-[#111111] hover:bg-black dark:bg-[#FBFBFA] dark:hover:bg-white text-white dark:text-[#111111] active:scale-[0.98] shadow-sm cursor-pointer",
+              )}
             >
-              {loading ? "Joining..." : "Join"}
+              {loading ? (
+                "Sumasalo sa Tahanan..."
+              ) : (
+                <>
+                  <span>Sumalo sa Tahanan</span>
+                  <ArrowRight className="w-4 h-4" />
+                </>
+              )}
             </button>
 
+            {/* Back Button */}
             <button
               type="button"
               onClick={() => setStep("choose")}
-              className="w-full h-14 bg-transparent text-zinc-500 font-bold rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors"
+              className="w-full h-11 bg-transparent text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 font-medium text-xs rounded-xl transition-colors flex items-center justify-center gap-1.5"
             >
-              Back
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Bumalik sa Pagpipilian</span>
             </button>
           </form>
         )}
 
-        {/* STEP 3: SHOW GENERATED CODE */}
+        {/* STEP 3: SHOW GENERATED CODE & MESSENGER SHARE */}
         {step === "showCode" && (
-          <div className="space-y-6 text-center">
-            <div className="p-6 bg-zinc-50 dark:bg-[#111] border border-zinc-200 dark:border-zinc-800 rounded-2xl">
-              <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500 mb-3">
-                Send this code to your partner
+          <div className="space-y-5 text-center animate-in fade-in duration-300">
+            <div className="p-6 bg-[#FBFBFA] dark:bg-[#121212] border border-zinc-200/80 dark:border-zinc-800/80 rounded-2xl relative overflow-hidden text-left shadow-xs">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/[0.08] dark:bg-emerald-500/[0.12] text-emerald-600 dark:text-emerald-400 text-xs font-bold uppercase tracking-wider mb-3 border border-emerald-500/20">
+                <MessageCircle className="w-3.5 h-3.5" />
+                <span>Family Invite Link</span>
+              </div>
+              <h2 className="text-base font-bold text-zinc-900 dark:text-zinc-100 mb-1">
+                Ipadala kay Misis o Kapamilya
+              </h2>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-4 leading-relaxed">
+                I-share ito sa Messenger, WhatsApp, o Viber. Walang password na kailangan para makasalo sa inyong tahanan.
               </p>
-              <p className="text-2xl font-mono font-black tracking-widest break-all select-all text-amber-600 dark:text-amber-400">
-                {generatedCode}
-              </p>
+
+              {/* Link Box */}
+              <div className="flex items-center justify-between gap-2 p-2.5 bg-white dark:bg-[#1A1A1A] border border-zinc-200 dark:border-zinc-800 rounded-xl">
+                <span className="text-xs font-mono text-zinc-600 dark:text-zinc-400 truncate select-all px-1">
+                  {inviteUrl}
+                </span>
+                <button
+                  type="button"
+                  onClick={handleCopyLink}
+                  aria-label="Copy invite link"
+                  className="shrink-0 p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-500 transition-colors"
+                >
+                  {copied ? (
+                    <Check className="w-4 h-4 text-emerald-600" />
+                  ) : (
+                    <Copy className="w-4 h-4" />
+                  )}
+                </button>
+              </div>
             </div>
 
+            {/* Primary Share Button */}
             <button
-              onClick={copyToClipboard}
-              className="w-full h-14 bg-white dark:bg-[#0a0a0a] border-2 border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 font-bold text-lg rounded-xl transition-colors shadow-sm flex items-center justify-center gap-2"
+              onClick={handleShare}
+              className="w-full h-14 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl transition-all shadow-sm active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer"
             >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"
-                ></path>
-              </svg>
-              Copy Code
+              <Share2 className="w-4.5 h-4.5" />
+              <span>I-share sa Messenger / WhatsApp</span>
             </button>
 
+            {/* Secondary Copy Button */}
+            <button
+              onClick={handleCopyLink}
+              className="w-full h-12 bg-white dark:bg-[#121212] border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 font-semibold text-xs rounded-xl transition-colors shadow-2xs flex items-center justify-center gap-2 text-zinc-700 dark:text-zinc-300 active:scale-[0.99] cursor-pointer"
+            >
+              {copied ? (
+                <>
+                  <Check className="w-4 h-4 text-emerald-600" />
+                  <span className="text-emerald-600 font-bold">Na-kopyang Link!</span>
+                </>
+              ) : (
+                <>
+                  <Copy className="w-4 h-4" />
+                  <span>Kopyahin ang Link</span>
+                </>
+              )}
+            </button>
+
+            {/* Proceed to Feed */}
             <button
               onClick={() => router.push("/")}
-              className="w-full h-14 bg-amber-500 hover:bg-amber-600 text-white font-bold text-lg rounded-xl transition-colors shadow-sm active:scale-[0.98]"
+              className="w-full h-11 bg-transparent text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 font-medium text-xs rounded-xl transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
             >
-              Go to Feed
+              <span>Dumiretso sa Hapag-kainan</span>
+              <ArrowRight className="w-3.5 h-3.5" />
             </button>
 
-            <p className="text-xs text-zinc-500">
-              Code expires in 48 hours. Only one person can join.
+            <p className="text-[11px] text-zinc-400">
+              May bisa ang link sa loob ng 48 oras. Isa lang ang maaaring sumalo bawat code.
             </p>
           </div>
         )}
@@ -248,7 +434,7 @@ export default function PairingPage() {
         {/* Absolute Logout button for emergencies/resetting state */}
         <button
           onClick={() => signOut()}
-          className="absolute bottom-6 left-0 right-0 mx-auto text-xs text-zinc-400 hover:text-red-500 transition-colors w-fit"
+          className="absolute bottom-6 left-0 right-0 mx-auto text-xs text-zinc-400 hover:text-red-500 transition-colors w-fit cursor-pointer"
         >
           Sign out
         </button>

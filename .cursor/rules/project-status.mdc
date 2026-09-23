@@ -1,0 +1,40 @@
+---
+description: Auto-generated dev-library rule for project-status
+globs: *.*
+---
+﻿---
+name: project-status
+description: >-
+  Generates a human-readable and AI-readable snapshot of the project's current state, recent changes, and pending tasks. ALWAYS writes this to PROJECT_STATUS.md to prevent AI hallucinations.
+  Use when the user asks for "/project-status", "/status", or wants a clear summary of what has been done and what needs to be done.
+trigger: "/project-status"
+---
+
+# Project Status Reporter
+
+When the user invokes /project-status, your job is to read the current state of the workspace (including ACTIVITY_LOG.md, 	ask.md, and recent git commits if available) and generate a clean, highly readable Markdown report.
+
+## MANDATORY DIRECTIVE: FILE GENERATION
+You MUST ALWAYS generate or update a file named \PROJECT_STATUS.md\ in the root directory (or \docs/PROJECT_STATUS.md\ if a docs folder exists). 
+This is non-negotiable. The user demands that a physical \.md\ file is created every time this command is run so that any other AI joining the project can read it and avoid hallucinations.
+
+## The Output Format
+The \PROJECT_STATUS.md\ file must follow this exact structure:
+
+### 📊 Project Status Snapshot
+
+**1. ✅ NAGAWA (Completed)**
+*   List all major features, components, or systems that have been fully implemented and tested.
+
+**2. 🔄 NABAGO (Recent Changes & Refactors)**
+*   List what files or architectures were recently modified.
+*   Explain *why* they were changed.
+
+**3. 📝 GAGAWIN (Pending Tasks / Next Steps)**
+*   List the immediate next tasks that need to be accomplished.
+*   Identify any blockers or bugs that need fixing.
+
+**4. 🏛️ ARCHITECTURE & TECH STACK**
+*   Briefly list the frameworks, libraries, and design rules (e.g., Ethereal Glass, Tailwind) being used.
+
+*After creating the file, output a short summary in the chat confirming that \PROJECT_STATUS.md\ has been updated for other AIs to read.*

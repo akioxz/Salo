@@ -1,0 +1,38 @@
+---
+description: Auto-generated dev-library rule for liquid-glass
+globs: *.ts, *.tsx, *.js, *.jsx
+---
+﻿---
+name: liquid-glass
+description: >-
+  Generates Apple-grade Liquid Glass UI components based on the official WWDC Developer Documentation. Enforces fluid optical properties, backdrop saturation infusion, edge-to-edge content scrolling underneath, and sub-pixel optical edge highlights using Tailwind CSS.
+trigger: "/liquid-glass"
+---
+
+# Apple Liquid Glass UI Standard
+
+When the user invokes /liquid-glass, you must apply Apple's official dynamic material design principles to the requested UI components. Liquid Glass combines the optical properties of physical glass with a sense of fluidity.
+
+## 1. The Core Philosophy: "Infusion" over Tinting
+Liquid Glass does not rely on heavy background colors. Instead, it "infuses" the color of the content scrolling underneath it. 
+- **DO NOT** use heavy background colors on the glass (e.g., avoid \g-white/40\ or \g-blue/20\).
+- **DO** let the content underneath shine through using high saturation and blur.
+
+## 2. Strict CSS / Tailwind Implementation
+To achieve the exact optical properties of Liquid Glass in web development, use the following combination of utility classes:
+
+### The Glass Base
+- **Blur & Saturation:** \ackdrop-blur-2xl backdrop-saturate-[180%]\ (or \saturate-[200%]\ for darker themes).
+- **Background Alpha:** Keep it extremely low. Use \g-white/[0.04]\ for dark mode or \g-white/40\ max for light mode.
+- **Optical Edge Highlight (Crucial):** Physical glass has a refractive edge. You MUST add a sub-pixel inner shadow.
+  - Dark mode: \shadow-[inset_0_1px_0_rgba(255,255,255,0.15),0_4px_30px_rgba(0,0,0,0.3)]\
+  - Light mode: \shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_4px_30px_rgba(0,0,0,0.1)]\
+
+### 3. Structural & Layout Rules
+- **Edge-to-Edge Experience:** Liquid Glass toolbars, sidebars, and navigation docks MUST be \ixed\ or \sticky\ with a high \z-index\.
+- **Content Scrolling:** The main content (images, gradients, text) MUST scroll fully *underneath* the glass elements. Do not add solid background wrappers that block the scroll view behind the glass.
+- **Dimensional App Icons / Floating Modals:** If applying to a central hero card or modal, ensure there is a colorful, animated, or mesh-gradient background behind it to activate the refraction effect.
+
+## 4. Strict Prohibitions (What NOT to do)
+- **NO Colored Glass:** Do not artificially color the glass itself. Be judicious with color. Let the background content provide the color.
+- **NO Dense Data Overlays:** Do not use Liquid Glass behind dense data tables, heavy forms, or long reading text, as it destroys legibility and cognitive ease. Reserve it for navigation, toolbars, hero cards, and OS-level modals.

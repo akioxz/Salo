@@ -21,6 +21,11 @@ Follow these steps exactly to execute the audit.
 3. If Impeccable flags any deterministic slop (e.g., side-tab borders, dark glows, small touch targets, or hardcoded hex colors violating `design.json`), refactor the code to fix them immediately. 
 4. The code MUST pass Impeccable before proceeding.
 
+### Step 1.5: The Contextual Web Hunt (Inspiration Phase)
+Before refactoring the existing code, look at what the component is trying to be (e.g., a "shopping cart", a "social feed", a "fintech dashboard"). If requested by the user, or if the current design is too generic, use your web search tools to hunt for modern execution of this exact component on **Dribbble**, **Awwwards**, or **Mobbin**. 
+- Search query example: `site:dribbble.com modern mobile social feed UI 2026`
+- Analyze the layout, spacing, and typography of the top results. Use these real-world premium patterns as the baseline for the refactor.
+
 ### Step 2: The TasteSkill + Design Spells Doctrine (Anti-Slop Constraints)
 Apply Leon Lin's strict "Taste" rules combined with "Design Spells", "Motionsite", and "Google Flow" principles. You are STRICTLY FORBIDDEN from generating "cheap AI sci-fi" aesthetics.
 - **The TasteSkill Framework (by Leon Lin):** BANNED AI TROPES: No "em-dashes everywhere." No generic warm-beige color palettes. No repetitive three-card feature rows. No neon cyan/purple glows. No bloated 2018 dark mode templates. No excessively rounded, meaningless borders.

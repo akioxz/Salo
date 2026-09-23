@@ -1,8 +1,24 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import { createPortal } from "react-dom";
-import { Heart, MessageCircle, X, Banknote, CheckCircle2, Play, Pause, Mic, ArrowDown } from "lucide-react";
+import {
+  Heart,
+  MessageCircle,
+  X,
+  Banknote,
+  CheckCircle2,
+  Play,
+  Pause,
+  Mic,
+  ArrowDown,
+  ArrowUpRight,
+  ArrowDownLeft,
+  Users,
+  Filter,
+  RotateCcw,
+  Plus,
+} from "lucide-react";
 import { cn } from "@/lib/cn";
 import {
   formatTimeAgo,
@@ -15,6 +31,8 @@ import type {
   HouseholdComment,
   HouseholdMember,
   HouseholdPost,
+  HouseholdRole,
+  PostType,
 } from "@/types/household";
 import { CommentsThread } from "./CommentsThread";
 
@@ -22,8 +40,10 @@ interface HouseholdActivityFeedProps {
   posts?: HouseholdPost[];
   /** The signed-in person. Pass the real value from your auth/session. */
   currentUser?: HouseholdMember;
+  members?: Array<{ userId: string; role: string; name: string }>;
+  inviteCode?: string;
   onReact?: (postId: string) => void;
-  /** Fires when a post's comment section is opened Ã¢â‚¬â€ a good place to lazy-load real comments. */
+  /** Fires when a post's comment section is opened — a good place to lazy-load real comments. */
   onComment?: (postId: string) => void;
   onAddComment?: (postId: string, content: string) => void;
 }
@@ -249,22 +269,29 @@ function PostCard({
 
       {/* Floating Remittance Pill if padala */}
       {post.type === "padala" && typeof post.amount === "number" && (
-        <div className="absolute left-1/2 -bottom-6 w-[95%] -translate-x-1/2 rounded-[16px] bg-[#FBFBFA] dark:bg-[#111111] p-3 shadow-[0_8px_30px_rgb(0,0,0,0.08)] dark:shadow-none border border-[#EAEAEA] dark:border-[#333333] flex items-center justify-between z-10 transition-colors duration-300">
+        <div className="absolute left-1/2 -bottom-6 w-[95%] -translate-x-1/2 rounded-[18px] bg-[#FBFBFA] dark:bg-[#111111] p-3.5 shadow-[0_4px_20px_rgb(0,0,0,0.06),0_1px_3px_rgb(0,0,0,0.04)] dark:shadow-none border border-[#E8E8E8] dark:border-white/10 flex items-center justify-between z-10 transition-colors duration-300">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#F1F7F1] dark:bg-[#1A2E1F] text-[#346538] dark:text-[#4ADE80]">
-              <ArrowDown className="h-5 w-5" />
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-500/[0.08] dark:bg-emerald-500/[0.12] text-emerald-600 dark:text-emerald-400 border border-emerald-500/10">
+              <ArrowDown className="h-4 w-4" />
             </div>
-            <div className="flex flex-col">
-              <span className="text-sm text-[#111111] dark:text-[#FBFBFA]">From: <span className="font-bold">{post.author.name}</span></span>
-              <span className="text-sm text-[#111111] dark:text-[#FBFBFA]">To: <span className="font-bold">Household</span></span>
+            <div className="flex flex-col text-xs sm:text-[13px] leading-tight gap-0.5">
+              <span className="text-[#787774] dark:text-[#A1A1AA]">
+                From: <span className="font-semibold text-[#111111] dark:text-[#FBFBFA]">{post.author.name}</span>
+              </span>
+              <span className="text-[#787774] dark:text-[#A1A1AA]">
+                To: <span className="font-semibold text-[#111111] dark:text-[#FBFBFA]">Household</span>
+              </span>
             </div>
           </div>
           <div className="flex flex-col items-end">
             <div className="flex items-center gap-1.5">
-               <span className="text-[13px] text-[#111111] dark:text-[#FBFBFA]">Sent: <span className="font-mono font-bold text-sm tracking-tight">{formatPHP(post.amount)}</span></span>
-               <CheckCircle2 className="h-4 w-4 text-[#346538] dark:text-[#4ADE80]" />
+              <span className="text-xs text-[#787774] dark:text-[#A1A1AA] font-medium">Sent:</span>
+              <span className="font-bold text-[15px] sm:text-base tracking-tight tabular-nums text-[#111111] dark:text-[#FBFBFA]">
+                {formatPHP(post.amount)}
+              </span>
+              <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
             </div>
-            <span className="text-xs text-[#787774] dark:text-[#A1A1AA] mt-0.5">{formatTimeAgo(post.createdAt)}</span>
+            <span className="text-[11px] text-[#8E8E93] dark:text-[#71717A] mt-0.5">{formatTimeAgo(post.createdAt)}</span>
           </div>
         </div>
       )}
@@ -300,39 +327,67 @@ function PostCard({
         </div>
       )}
 
-      {/* Expense/Need Receipt Card */}
+      {/* Full-Bleed Split Receipt Band (Zero Nested Card) */}
       {(post.type === "expense" || post.type === "need") && typeof post.amount === "number" && (
-        <div className="mt-5 rounded-[24px] bg-white dark:bg-[#0A0A0A] p-6 border border-[#EAEAEA] dark:border-[#333333] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none flex flex-col items-center relative overflow-hidden transition-colors duration-300">
-          {/* Subtle gradient background accent */}
-          <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-[#F8F9FA] dark:from-[#111111] to-transparent pointer-events-none" />
-          
-          {/* Category Badge */}
-          <div className="flex items-center gap-1.5 bg-[#F4F4F5] dark:bg-[#222222] px-3 py-1 rounded-full z-10 mb-3 border border-black/5 dark:border-white/5">
-            <Banknote className="h-3 w-3 text-[#52525B] dark:text-[#A1A1AA]" />
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[#52525B] dark:text-[#A1A1AA]">
-              {post.category || "GENERAL"}
-            </span>
-          </div>
-          
-          {/* Amount */}
-          <div className="text-4xl sm:text-5xl font-extrabold tracking-tight text-[#111111] dark:text-[#FBFBFA] z-10 mb-4 tabular-nums">
-            {formatPHP(post.amount)}
+        <div className="-mx-6 mt-5 border-y border-dashed border-[#E5E5E5] dark:border-[#262626] bg-[#FBFBFA] dark:bg-[#121212] px-6 py-5 transition-colors duration-300">
+          <div className="flex items-center justify-between gap-4">
+            {/* Left: Category Badge & Micro-label */}
+            <div className="flex flex-col items-start gap-1.5 min-w-0">
+              <div className="flex items-center gap-1.5 rounded-full bg-white dark:bg-[#1C1C1E] px-2.5 py-1 border border-black/[0.04] dark:border-white/[0.06] shadow-sm">
+                {(() => {
+                  const Icon = getCategoryIcon(post.category);
+                  return <Icon className="h-3.5 w-3.5 text-[#71717A] dark:text-[#A1A1AA]" />;
+                })()}
+                <span className="truncate text-[10px] font-bold uppercase tracking-[0.08em] text-[#71717A] dark:text-[#A1A1AA]">
+                  {post.category || "GENERAL"}
+                </span>
+              </div>
+              <span className="text-[11px] font-medium tracking-wide text-[#8E8E93] dark:text-[#71717A]">
+                {post.type === "need" ? "Hiling ng Pamilya" : "Resibo ng Gastos"}
+              </span>
+            </div>
+
+            {/* Right: Calibrated Tabular Amount */}
+            <div className="shrink-0 text-right">
+              <div className="text-2xl sm:text-[26px] font-bold tracking-tight text-[#111111] dark:text-[#FBFBFA] leading-none tabular-nums">
+                {formatPHP(post.amount)}
+              </div>
+            </div>
           </div>
 
-          {/* Cover Action / Status */}
-          <div className="w-full z-10 border-t border-[#F4F4F5] dark:border-[#333333] pt-4 mt-1">
-            {post.isCovered ? (
-              <div className="flex items-center justify-center gap-2 text-sm font-bold text-[#346538] dark:text-[#4ADE80] bg-[#F1F7F1] dark:bg-[#1A2E1F] rounded-xl p-3">
-                <CheckCircle2 className="h-4 w-4" />
-                <span>Covered na!</span>
+          {/* Status / Cover Action Row */}
+          <div className="mt-4 pt-3 border-t border-[#EAEAEA]/80 dark:border-white/[0.06]">
+            {post.type === "expense" ? (
+              /* Expense: stamped "Nabayaran na" receipt status */
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-[#A1A1AA] dark:text-[#71717A]">
+                  Katayuan
+                </span>
+                <div className="flex items-center gap-1.5 rounded-lg bg-white dark:bg-[#1A1A1C] border border-[#E5E5E5] dark:border-[#262626] px-2.5 py-1 text-[11px] font-bold text-emerald-700 dark:text-emerald-400 shadow-sm">
+                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+                  <span className="uppercase tracking-wider">Nabayaran na</span>
+                </div>
               </div>
-            ) : currentUser?.role !== "child" ? (
-              <button className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#111111] dark:bg-[#FBFBFA] p-3 text-sm font-bold text-white dark:text-[#111111] transition-all hover:bg-black/80 dark:hover:bg-white/90 active:scale-[0.98] shadow-sm">
-                <CheckCircle2 className="h-4 w-4 opacity-80" />
+            ) : post.isCovered ? (
+              /* Need: covered celebration badge */
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-[#A1A1AA] dark:text-[#71717A]">
+                  Katayuan
+                </span>
+                <div className="flex items-center gap-1.5 rounded-lg bg-emerald-500/[0.08] dark:bg-emerald-500/[0.12] border border-emerald-500/20 px-2.5 py-1 text-[11px] font-bold text-emerald-700 dark:text-emerald-400">
+                  <CheckCircle2 className="h-3.5 w-3.5" />
+                  <span>Covered na!</span>
+                </div>
+              </div>
+            ) : (currentUser?.role as string) !== "child" ? (
+              /* Need: uncovered action button */
+              <button className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#111111] dark:bg-[#FBFBFA] p-3 text-[13px] font-bold text-white dark:text-[#111111] transition-all duration-300 hover:bg-[#222222] dark:hover:bg-white/90 active:scale-[0.98] shadow-sm">
+                <CheckCircle2 className="h-4 w-4 opacity-75" />
                 Mark as Covered
               </button>
             ) : (
-              <div className="text-center text-xs font-medium text-zinc-400">
+              /* Need: child waiting notice */
+              <div className="text-center text-xs font-medium text-[#8E8E93] dark:text-[#71717A] py-1">
                 Pending coverage
               </div>
             )}
@@ -520,8 +575,8 @@ function CustomAudioPlayer({ src }: { src: string }) {
       </div>
       
       <div className="flex items-center gap-3 relative z-10">
-        <span className="font-mono text-[11px] font-medium tracking-wide text-[#787774] dark:text-[#A1A1AA] shrink-0 whitespace-nowrap">
-          <span className="font-bold text-[#111111] dark:text-[#FBFBFA]">{formatTime(currentTime)}</span> / {formatTime(duration)}
+        <span className="font-mono text-xs font-medium tracking-wide text-zinc-500 dark:text-zinc-400 shrink-0 whitespace-nowrap">
+          <span className="font-bold text-zinc-950 dark:text-white">{formatTime(currentTime)}</span> / {formatTime(duration)}
         </span>
         
         <div className="relative h-1.5 flex-1 overflow-visible rounded-full bg-[#EAEAEA] dark:bg-[#333333] cursor-pointer"
@@ -567,23 +622,283 @@ function CustomAudioPlayer({ src }: { src: string }) {
 export default function HouseholdActivityFeed({
   posts = MOCK_POSTS,
   currentUser = { name: "You", role: "family" },
+  members,
+  inviteCode,
   onReact,
   onComment,
   onAddComment,
 }: HouseholdActivityFeedProps) {
+  const [selectedType, setSelectedType] = useState<"all" | PostType>("all");
+  const [selectedMember, setSelectedMember] = useState<string | null>(null);
+
+  // Consolidate family members from props and distinct authors in posts
+  const familyMembers = useMemo(() => {
+    const map = new Map<string, HouseholdMember>();
+
+    // 1. Known members from household
+    if (members && members.length > 0) {
+      members.forEach((m) => {
+        map.set(m.name, { name: m.name, role: (m.role as HouseholdRole) || "family" });
+      });
+    }
+
+    // 2. Authors from posts
+    posts.forEach((p) => {
+      if (p.author?.name && !map.has(p.author.name)) {
+        map.set(p.author.name, p.author);
+      }
+    });
+
+    return Array.from(map.values());
+  }, [members, posts]);
+
+  // Filter posts based on active type and active member
+  const filteredPosts = useMemo(() => {
+    return posts.filter((post) => {
+      const matchesType = selectedType === "all" || post.type === selectedType;
+      const matchesMember =
+        selectedMember === null ||
+        post.author.name.toLowerCase() === selectedMember.toLowerCase();
+      return matchesType && matchesMember;
+    });
+  }, [posts, selectedType, selectedMember]);
+
+  const resetFilters = () => {
+    setSelectedType("all");
+    setSelectedMember(null);
+  };
+
+  const isFiltered = selectedType !== "all" || selectedMember !== null;
+
   return (
     <div className="flex flex-col gap-6 pb-24">
-      {posts.map((post, index) => (
-        <PostCard
-          key={post.id}
-          post={post}
-          index={index}
-          currentUser={currentUser}
-          onReact={onReact}
-          onComment={onComment}
-          onAddComment={onAddComment}
-        />
-      ))}
+      {/* 1. FAMILY PULSE BAR (Bespoke Story Circles) */}
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center justify-between px-0.5">
+          <div className="flex items-center gap-2">
+            <h3 className="text-xs font-black uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+              Sambahayan
+            </h3>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 tabular-nums">
+              {familyMembers.length} {familyMembers.length === 1 ? "miyembro" : "miyembro"}
+            </span>
+          </div>
+
+          {selectedMember && (
+            <button
+              onClick={() => setSelectedMember(null)}
+              className="text-[11px] font-bold text-zinc-500 hover:text-zinc-950 dark:hover:text-white flex items-center gap-1 cursor-pointer transition-colors"
+            >
+              <span>Ipakita lahat</span>
+              <X className="w-3 h-3" />
+            </button>
+          )}
+        </div>
+
+        {/* Scrollable Story Avatar Row */}
+        <div className="flex items-center gap-3.5 overflow-x-auto no-scrollbar py-1 px-1">
+          {/* All Members Circle */}
+          <button
+            onClick={() => setSelectedMember(null)}
+            className="flex flex-col items-center gap-2 shrink-0 group cursor-pointer active:scale-95 transition-transform"
+          >
+            <div
+              className={cn(
+                "w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300",
+                selectedMember === null
+                  ? "bg-[#111111] text-white dark:bg-white dark:text-[#111111] ring-2 ring-[#111111] dark:ring-white ring-offset-2 ring-offset-[#FBFBFA] dark:ring-offset-[#0A0A0A] shadow-xs"
+                  : "bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 ring-1.5 ring-zinc-200 dark:ring-white/10 ring-offset-2 ring-offset-[#FBFBFA] dark:ring-offset-[#0A0A0A] group-hover:ring-zinc-400"
+              )}
+            >
+              <Users className="w-5 h-5" />
+            </div>
+            <div className="flex flex-col items-center w-16">
+              <span
+                className={cn(
+                  "text-xs font-bold tracking-tight truncate w-full text-center leading-tight",
+                  selectedMember === null
+                    ? "text-zinc-950 dark:text-white font-black"
+                    : "text-zinc-600 dark:text-zinc-400"
+                )}
+              >
+                Lahat
+              </span>
+              <span className="text-[10px] font-medium text-zinc-400 dark:text-zinc-500 truncate w-full text-center tabular-nums leading-tight mt-0.5">
+                {posts.length} {posts.length === 1 ? "post" : "posts"}
+              </span>
+            </div>
+          </button>
+
+          {/* Individual Member Circles */}
+          {familyMembers.map((member) => {
+            const isSelected = selectedMember?.toLowerCase() === member.name.toLowerCase();
+            const memberPostsCount = posts.filter(
+              (p) => p.author.name.toLowerCase() === member.name.toLowerCase()
+            ).length;
+            const isOfw = member.role === "ofw";
+
+            return (
+              <button
+                key={member.name}
+                onClick={() =>
+                  setSelectedMember(isSelected ? null : member.name)
+                }
+                className="flex flex-col items-center gap-2 shrink-0 group cursor-pointer active:scale-95 transition-transform"
+              >
+                <div className="relative">
+                  <div
+                    className={cn(
+                      "w-14 h-14 rounded-full flex items-center justify-center font-black text-sm tracking-tight transition-all duration-300",
+                      isSelected
+                        ? "ring-2 ring-[#111111] dark:ring-white ring-offset-2 ring-offset-[#FBFBFA] dark:ring-offset-[#0A0A0A] shadow-xs"
+                        : "ring-1.5 ring-zinc-200 dark:ring-white/10 ring-offset-2 ring-offset-[#FBFBFA] dark:ring-offset-[#0A0A0A] group-hover:ring-zinc-400",
+                      isOfw
+                        ? "bg-sky-50 dark:bg-sky-950/40 text-sky-800 dark:text-sky-300"
+                        : "bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300"
+                    )}
+                  >
+                    {getInitials(member.name)}
+                  </div>
+
+                  {/* Clean Minimalist Role Status Pip */}
+                  <span
+                    className={cn(
+                      "absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full ring-2 ring-white dark:ring-[#0A0A0A]",
+                      isOfw ? "bg-sky-500" : "bg-amber-500"
+                    )}
+                    title={isOfw ? "OFW (Abroad)" : "Pamilya (Bahay)"}
+                  />
+                </div>
+
+                <div className="flex flex-col items-center w-16">
+                  <span
+                    className={cn(
+                      "text-xs font-bold tracking-tight truncate w-full text-center leading-tight",
+                      isSelected
+                        ? "text-zinc-950 dark:text-white font-black"
+                        : "text-zinc-800 dark:text-zinc-200"
+                    )}
+                  >
+                    {member.name}
+                  </span>
+                  <span className="text-[10px] font-medium text-zinc-400 dark:text-zinc-500 truncate w-full text-center capitalize tabular-nums leading-tight mt-0.5">
+                    {isOfw ? "OFW" : "Bahay"} · {memberPostsCount}
+                  </span>
+                </div>
+              </button>
+            );
+          })}
+
+          {/* Add / Invite Member Circle */}
+          {inviteCode && (
+            <button
+              onClick={() => {
+                navigator.clipboard?.writeText(inviteCode);
+                alert(`Nakopya ang Invite Code: ${inviteCode}\nI-send ito sa kapamilya para makasali sila sa Salo!`);
+              }}
+              title="I-tap para kopyahin ang Invite Code ng Sambahayan"
+              className="flex flex-col items-center gap-2 shrink-0 group cursor-pointer active:scale-95 transition-transform"
+            >
+              <div className="w-14 h-14 rounded-full border border-dashed border-zinc-300 dark:border-zinc-700 hover:border-zinc-500 dark:hover:border-zinc-400 flex items-center justify-center text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors bg-zinc-50/50 dark:bg-zinc-900/30">
+                <Plus className="w-4 h-4" />
+              </div>
+              <div className="flex flex-col items-center w-16">
+                <span className="text-xs font-bold text-zinc-500 group-hover:text-zinc-900 dark:group-hover:text-white truncate w-full text-center transition-colors leading-tight">
+                  Imbita
+                </span>
+                <span className="text-[10px] font-medium text-zinc-400 dark:text-zinc-500 truncate w-full text-center leading-tight mt-0.5">
+                  + Sambahayan
+                </span>
+              </div>
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* 2. FEED SECTION HEADER & SMART FILTER PILLS */}
+      <div className="flex flex-col gap-3 pt-2 border-t border-zinc-200/60 dark:border-white/5">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <h2 className="text-base font-black tracking-tight text-zinc-950 dark:text-white">
+              Kaganapan sa Bahay
+            </h2>
+            <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 tabular-nums">
+              {filteredPosts.length}
+            </span>
+          </div>
+
+          {isFiltered && (
+            <button
+              onClick={resetFilters}
+              className="text-xs font-semibold text-zinc-500 hover:text-zinc-900 dark:hover:text-white flex items-center gap-1 cursor-pointer transition-colors"
+            >
+              <RotateCcw className="w-3 h-3" />
+              <span>I-reset</span>
+            </button>
+          )}
+        </div>
+
+        {/* Smart Filter Pills */}
+        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
+          {[
+            { id: "all", label: "Lahat", icon: null },
+            { id: "expense", label: "Gastos", icon: ArrowUpRight },
+            { id: "need", label: "Hiling", icon: Heart },
+            { id: "padala", label: "Padala", icon: ArrowDownLeft },
+          ].map((tab) => {
+            const isTabSelected = selectedType === tab.id;
+            const Icon = tab.icon;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setSelectedType(tab.id as any)}
+                className={cn(
+                  "px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all duration-200 active:scale-95 cursor-pointer shrink-0",
+                  isTabSelected
+                    ? "bg-[#111111] text-white dark:bg-white dark:text-[#111111] shadow-xs"
+                    : "bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800/80 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-400"
+                )}
+              >
+                {Icon && <Icon className="w-3 h-3" />}
+                <span>{tab.label}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* 3. POSTS LIST OR ZERO-STATE */}
+      {filteredPosts.length > 0 ? (
+        filteredPosts.map((post, index) => (
+          <PostCard
+            key={post.id}
+            post={post}
+            index={index}
+            currentUser={currentUser}
+            onReact={onReact}
+            onComment={onComment}
+            onAddComment={onAddComment}
+          />
+        ))
+      ) : (
+        <div className="p-8 rounded-[24px] bg-zinc-50 dark:bg-[#0A0A0A] border border-zinc-200/80 dark:border-white/10 flex flex-col items-center text-center">
+          <div className="w-12 h-12 rounded-full bg-zinc-200/70 dark:bg-zinc-800 flex items-center justify-center text-zinc-400 mb-3">
+            <Filter className="w-5 h-5" />
+          </div>
+          <h3 className="text-sm font-bold text-zinc-950 dark:text-white">
+            Walang nahanap na post
+          </h3>
+          <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 max-w-xs leading-relaxed">
+            Walang tumutugma sa kasalukuyang filter. Subukang pumili ng ibang kategorya o miyembro.
+          </p>
+          <button
+            onClick={resetFilters}
+            className="mt-4 px-4 py-2 rounded-xl bg-[#111111] dark:bg-white text-white dark:text-[#111111] text-xs font-bold active:scale-95 transition-all cursor-pointer"
+          >
+            Ipakita ang Lahat ng Posts
+          </button>
+        </div>
+      )}
     </div>
   );
 }

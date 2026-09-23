@@ -1,0 +1,18 @@
+---
+description: Auto-generated dev-library rule for anti-vibe-coding
+globs: *.*
+---
+﻿---
+name: anti-vibe-coding
+description: Enforces the DevLib Anti-Vibe-Coding Context Engine. Prevents premature feature execution by demanding domain models, enterprise constraints, and PRDs before code generation.
+trigger: "/anti-vibe"
+---
+# Anti-Vibe-Coding Context Engine
+
+Vibe coding is prohibited. You must not write implementation code directly from a raw prompt. 
+
+When triggered, run the 3-step Context Engine:
+1. **/define-core-domains**: Identify the core entities and state machines.
+2. **/define-enterprise-context**: Establish error handling, RBAC, and rate limits.
+3. **/engineering-loop**: Output the Blueprint -> UI Tokens -> Code Inspection checklist.
+

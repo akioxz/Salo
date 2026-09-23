@@ -3,6 +3,30 @@
 // Ref: docs/archive/schema.sql sections 6-7
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
+import { getAuthUserId } from "@convex-dev/auth/server";
+
+/** Helper to reliably get the authenticated user doc across Convex Auth providers */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function getSessionUser(ctx: any) {
+  const authUserId = await getAuthUserId(ctx);
+  if (authUserId) {
+    const user = await ctx.db.get(authUserId);
+    if (user) return user;
+  }
+  const identity = await ctx.auth.getUserIdentity();
+  if (identity) {
+    const user = await ctx.db
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .query("users")
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .withIndex("by_token", (q: any) =>
+        q.eq("tokenIdentifier", identity.tokenIdentifier),
+      )
+      .unique();
+    if (user) return user;
+  }
+  return null;
+}
 
 /** Create a new household. The caller becomes the first member. */
 export const create = mutation({
@@ -10,24 +34,10 @@ export const create = mutation({
     role: v.union(v.literal("family"), v.literal("ofw")),
   },
   handler: async (ctx, args) => {
-    // For now, use a simple identity check.
-    // Auth integration will replace this in Slice 3.
-    const identity = await ctx.auth.getUserIdentity();
+    const user = await getSessionUser(ctx);
 
-    // Look up user by identity, or create one for development
-    let user;
-    if (identity) {
-      user = await ctx.db
-        .query("users")
-        .withIndex("by_token", (q) =>
-          q.eq("tokenIdentifier", identity.tokenIdentifier),
-        )
-        .unique();
-    }
-
-    // Dev-only: if no auth, use a placeholder user for testing
     if (!user) {
-      throw new Error("Not authenticated. Auth will be configured in Slice 3.");
+      throw new Error("Not authenticated.");
     }
 
     // Check: user must not already belong to a household
@@ -59,26 +69,60 @@ export const create = mutation({
   },
 });
 
-/** Join an existing household using an invite code. */
-export const join = mutation({
+/** Look up household preview info by invite code for the /join page */
+export const getByInviteCode = query({
   args: {
     inviteCode: v.string(),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
+    if (!args.inviteCode) return null;
+
+    const household = await ctx.db
+      .query("households")
+      .withIndex("by_invite_code", (q) => q.eq("inviteCode", args.inviteCode))
+      .unique();
+
+    if (!household || !household.inviteExpiresAt || household.inviteExpiresAt < Date.now()) {
+      return null;
+    }
+
+    const members = await ctx.db
+      .query("householdMembers")
+      .withIndex("by_household", (q) => q.eq("householdId", household._id))
+      .collect();
+
+    let inviterName = "Kapamilya";
+    let inviterRole: "ofw" | "family" = "ofw";
+
+    if (members[0]) {
+      const inviterUser = await ctx.db.get(members[0].userId);
+      inviterName = inviterUser?.name || "Kapamilya";
+      inviterRole = members[0].role;
+    }
+
+    return {
+      householdId: household._id,
+      inviterName,
+      inviterRole,
+      isFull: members.length >= 2,
+    };
+  },
+});
+
+/** Join an existing household using an invite code. */
+export const join = mutation({
+  args: {
+    inviteCode: v.string(),
+    name: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const user = await getSessionUser(ctx);
+    if (!user) {
       throw new Error("Not authenticated");
     }
 
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_token", (q) =>
-        q.eq("tokenIdentifier", identity.tokenIdentifier),
-      )
-      .unique();
-
-    if (!user) {
-      throw new Error("User not found");
+    if (args.name && args.name.trim() && !user.name) {
+      await ctx.db.patch(user._id, { name: args.name.trim() });
     }
 
     // Check: user must not already belong to a household
@@ -139,16 +183,7 @@ export const join = mutation({
 export const getMine = query({
   args: {},
   handler: async (ctx) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) return null;
-
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_token", (q) =>
-        q.eq("tokenIdentifier", identity.tokenIdentifier),
-      )
-      .unique();
-
+    const user = await getSessionUser(ctx);
     if (!user) return null;
 
     const membership = await ctx.db

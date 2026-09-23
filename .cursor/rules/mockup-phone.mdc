@@ -1,0 +1,42 @@
+---
+description: Auto-generated dev-library rule for mockup-phone
+globs: *.*
+---
+﻿---
+name: mockup-phone
+description: >-
+  Wraps mobile UI code inside a highly realistic, purely CSS-driven iPhone Pro Max hardware mockup. Includes physical bezels, Dynamic Island, hardware buttons, and glass glare. No external images.
+trigger: "/mockup-phone"
+---
+
+# Phone Mockup Generator
+
+When the user invokes /mockup-phone or asks to wrap their design in a phone, you must place their mobile UI inside a highly realistic, purely CSS/Tailwind-driven hardware wrapper.
+
+Do NOT use standard flat containers. Do NOT use external device images. You must build the physical phone frame around their code using the exact constraints below.
+
+## Strict Mockup Requirements
+
+1. **Outer Chassis (The Phone Frame):** 
+   - Must be a fixed w-[393px] h-[852px] wrapper with ounded-[56px].
+   - Use a metallic gradient background to simulate a premium chassis (e.g., Deep Burgundy Titanium #4D1821 or Desert Titanium).
+   - Use 3D multi-layered ox-shadow (inset highlights and outer drop shadows) to simulate physical device bezels, depth, and the feeling of resting on a desk.
+
+2. **Screen Surface:**
+   - Inner container MUST have g-black, ounded-[44px], and overflow-y-auto.
+   - You MUST hide the scrollbars completely using CSS (e.g., .no-scrollbar).
+
+3. **Dynamic Island:**
+   - bsolute positioned at the top center.
+   - Must include absolute-positioned inner circles with subtle radial-gradients to simulate the camera lens and a green/blue sensor reflection.
+
+4. **Physical Hardware Buttons:**
+   - bsolute positioned metallic pills on the outer left (volume up, volume down, action button) and right (power button) edges of the chassis. 
+   - Add inset shadows to the buttons to make them look 3D.
+
+5. **Glass Glare / Reflection:**
+   - A subtle diagonal linear-gradient overlay across the screen.
+   - Must have pointer-events-none and high z-index to simulate real glass reflection without blocking clicks.
+
+6. **Home Indicator:**
+   - A thin w-32 pill fixed at the bottom center of the screen (bsolute bottom-2 left-1/2 -translate-x-1/2).

@@ -7,9 +7,9 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import CreatePostModal from "../components/CreatePostModal";
 import { CountdownBanner } from "../components/feed/CountdownBanner";
-import { WeeklyKwentoRecap } from "../components/feed/WeeklyKwentoRecap";
 import { HeroDashboard } from "../components/feed/HeroDashboard";
 import { BoxStatusMini } from "../components/feed/BoxStatusMini";
+import { OfwCompassCard } from "../components/feed/OfwCompassCard";
 import { ThemeToggle } from "../components/ui/ThemeToggle";
 import { AnalyticsDashboard } from "../components/analytics/AnalyticsDashboard";
 import HouseholdActivityFeed from "../components/feed/HouseholdActivityFeed";
@@ -87,9 +87,9 @@ export default function Home() {
             <button 
               onClick={() => setIsCreateModalOpen(true)}
               aria-label="Create Post"
-              className="bg-[#FBFBFA]  text-white  rounded-full h-8 w-8 flex items-center justify-center shadow-sm transition-transform hover:scale-95 active:scale-90 cursor-pointer"
+              className="bg-[#111111] hover:bg-black text-white dark:bg-white dark:hover:bg-zinc-200 dark:text-[#111111] rounded-full h-8 w-8 flex items-center justify-center shadow-xs transition-transform hover:scale-95 active:scale-90 cursor-pointer"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="12" y1="5" x2="12" y2="19"></line>
                 <line x1="5" y1="12" x2="19" y2="12"></line>
               </svg>
@@ -129,11 +129,11 @@ export default function Home() {
             </div>
           ) : (
             <div className="p-6">
-              <div className="grid grid-cols-2 gap-4 mb-8">
+              <div className="grid grid-cols-2 gap-4 mb-6">
                 <HeroDashboard />
-                <CountdownBanner />
                 <BoxStatusMini onClick={() => setActiveTab("box")} />
-                <WeeklyKwentoRecap />
+                <OfwCompassCard />
+                <CountdownBanner />
               </div>
               <HouseholdActivityFeed
                 currentUser={
@@ -146,6 +146,8 @@ export default function Home() {
                       }
                     : undefined
                 }
+                members={myHousehold?.members}
+                inviteCode={myHousehold?.household?.inviteCode}
                 onReact={handleReact}
                 onAddComment={handleAddComment}
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -191,38 +193,38 @@ export default function Home() {
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
             </svg>
-            <span className="text-[10px] font-bold tracking-tight">Home</span>
+            <span className="text-xs font-bold tracking-tight">Home</span>
           </div>
           <div 
             onClick={() => setActiveTab("box")}
             className={cn(
               "flex flex-col items-center gap-1 cursor-pointer transition-all",
-              activeTab === "box" ? "text-[#111111] dark:text-[#FBFBFA] scale-110" : "text-[#A1A1AA] hover:text-[#111111] dark:hover:text-[#FBFBFA]"
+              activeTab === "box" ? "text-zinc-950 dark:text-white scale-110" : "text-zinc-400 hover:text-zinc-950 dark:hover:text-white"
             )}
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
             </svg>
-            <span className="text-[10px] font-bold tracking-tight">Box</span>
+            <span className="text-xs font-bold tracking-tight">Box</span>
           </div>
           <div 
             onClick={() => setActiveTab("analytics")}
             className={cn(
               "flex flex-col items-center gap-1 cursor-pointer transition-all",
-              activeTab === "analytics" ? "text-[#111111] dark:text-[#FBFBFA] scale-110" : "text-[#A1A1AA] hover:text-[#111111] dark:hover:text-[#FBFBFA]"
+              activeTab === "analytics" ? "text-zinc-950 dark:text-white scale-110" : "text-zinc-400 hover:text-zinc-950 dark:hover:text-white"
             )}
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
             </svg>
-            <span className="text-[10px] font-bold tracking-tight">Analytics</span>
+            <span className="text-xs font-bold tracking-tight">Analytics</span>
           </div>
           <div
             onClick={() => {
               signOut();
               router.push("/auth");
             }}
-            className="flex flex-col items-center gap-1 text-[#A1A1AA] hover:text-[#E03E3E] dark:hover:text-[#F87171] transition-all cursor-pointer"
+            className="flex flex-col items-center gap-1 text-zinc-400 hover:text-rose-500 transition-all cursor-pointer"
           >
             <svg
               className="w-6 h-6"
@@ -237,7 +239,7 @@ export default function Home() {
                 d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
               ></path>
             </svg>
-            <span className="text-[10px] font-bold tracking-tight">Log out</span>
+            <span className="text-xs font-bold tracking-tight">Log out</span>
           </div>
         </div>
 

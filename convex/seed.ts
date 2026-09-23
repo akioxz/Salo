@@ -46,7 +46,7 @@ export const clearAndSeed = mutation({
       type: "padala",
       amount: 3000,
       category: "REMITTANCE",
-      caption: "Sent some extra for Kuya's bday 🎉",
+      caption: "Sent some extra for Kuya's bday",
     });
     
     await ctx.db.insert("posts", {
@@ -55,8 +55,26 @@ export const clearAndSeed = mutation({
       type: "need",
       amount: 1200,
       category: "UTILITIES",
-      caption: "Electric bill is due next week ⚡",
+      caption: "Electric bill is due next week",
     });
 
   }
+});
+
+export const sanitizeExistingPosts = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const posts = await ctx.db.query("posts").collect();
+    let updated = 0;
+    for (const post of posts) {
+      if (post.caption) {
+        const cleaned = post.caption.replace(/\p{Extended_Pictographic}/gu, "").trim();
+        if (cleaned !== post.caption) {
+          await ctx.db.patch(post._id, { caption: cleaned });
+          updated++;
+        }
+      }
+    }
+    return { updated };
+  },
 });

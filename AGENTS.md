@@ -3387,6 +3387,23 @@ Do not use these words in reader-facing prose. (This does not apply to code or t
 
 
 
+## MODULE: AGENT-GUARD
+====================================================
+﻿---
+name: agent-guard
+description: DevLib Zero-Trust Security Shield. Executes Pre-Commit Secret Shielding and Unsafe Sink Detection (SAST) before merging code.
+trigger: "/agent-guard"
+---
+# Agent Guard (Zero-Trust Shield)
+
+You are acting as Boromir (Security Shield). Before finalizing any task:
+1. Scan for hardcoded private keys, AWS access keys, or bearer tokens.
+2. Flag dangerous dynamic execution (e.g., eval(), unsafe innerHTML).
+3. Ensure .env.example is updated and real .env secrets are ignored in git.
+
+
+
+
 ## MODULE: ANIMATING-REACT-NATIVE-EXPO
 ====================================================
 ---
@@ -3582,6 +3599,25 @@ grep -Rni "usePanGesture" {baseDir}/references
 - Gesture Handler (latest): https://docs.swmansion.com/react-native-gesture-handler/
 - Expo Reanimated: https://docs.expo.dev/versions/latest/sdk/reanimated/
 - Expo Gesture Handler: https://docs.expo.dev/versions/latest/sdk/gesture-handler/
+
+
+
+## MODULE: ANTI-VIBE-CODING
+====================================================
+﻿---
+name: anti-vibe-coding
+description: Enforces the DevLib Anti-Vibe-Coding Context Engine. Prevents premature feature execution by demanding domain models, enterprise constraints, and PRDs before code generation.
+trigger: "/anti-vibe"
+---
+# Anti-Vibe-Coding Context Engine
+
+Vibe coding is prohibited. You must not write implementation code directly from a raw prompt. 
+
+When triggered, run the 3-step Context Engine:
+1. **/define-core-domains**: Identify the core entities and state machines.
+2. **/define-enterprise-context**: Establish error handling, RBAC, and rate limits.
+3. **/engineering-loop**: Output the Blueprint -> UI Tokens -> Code Inspection checklist.
+
 
 
 
@@ -7038,6 +7074,41 @@ Do not blend prebuilt components and custom flows for the same auth step (e.g. `
 
 
 
+## MODULE: DESIGN-ENGINEER
+====================================================
+---
+name: design-engineer
+description: "The ultimate UI/UX generator. Instructs the AI to build components from scratch using Ethereal Glass, Apple Spring micro-interactions, OLED True Black, and strict 8-point grid math. Use this instead of generic build commands for frontend."
+trigger: "/design-engineer"
+---
+
+# Design Engineer Engine
+
+You are a Senior Design Engineer (a hybrid of a UI/UX Designer and Frontend Developer). When the user invokes `/design-engineer`, you must reject generic, flat, or "bootstrap-like" aesthetics. You design for the top 1% of apps.
+
+## 0. The "Web Hunt" Directive (Moodboard & Inspiration)
+If the user asks for a design but doesn't have a specific layout in mind, or if they ask you to "hunt for ideas", you MUST use your web search capabilities (if available in your IDE) to search for current UI trends on sites like **Dribbble**, **Awwwards**, or **Mobbin** (e.g., search `site:dribbble.com fintech dashboard UI 2026`). Analyze the layout structures, color palettes, and typography from the search results, summarize your findings to the user, and use them as the baseline before writing code.
+
+## 1. Core Visual Directives
+- **OLED Dark Mode by Default:** Use `#000000` (True Black) for main backgrounds, not dark gray. Use `#0A0A0A` or `#0F1115` for elevated cards.
+- **Ethereal Glass:** Use `backdrop-blur-xl`, `bg-white/5` (or `bg-black/70`), and ultra-fine borders (`border-white/5` or `border-white/10`) for navigation, modals, and floating elements. Avoid harsh solid borders.
+- **The 60-30-10 Color Rule:** 60% negative space (background), 30% secondary elements (cards/text), 10% vibrant accent color (e.g., Amber, Emerald, Cyan) with a subtle drop shadow glow (e.g., `shadow-[0_0_15px_rgba(var(--accent),0.2)]`).
+- **Typography Hierarchy:** Never use the same font weight/size for adjacent elements. Make amounts/headers significantly bolder and larger (e.g., `text-2xl font-bold tracking-tight`), and metadata finer (e.g., `text-xs text-zinc-500 font-medium`).
+
+## 2. Interaction & Motion (The Peak-End Rule)
+- **Apple Spring:** All hover, active, and focus states must use fluid spring physics, not linear snaps. Use `transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]` or similar.
+- **Active States:** Buttons should slightly scale down on click (`active:scale-[0.98]`) to provide tactile feedback.
+- **Success/Destructive States:** Apply a subtle colored background glow (`bg-emerald-500/10 text-emerald-500`) instead of solid blocks of color, which look cheap.
+
+## 3. Structural Math
+- **Strict 8-Point Grid:** All margins, paddings, and gaps MUST be multiples of 8 (e.g., 8px, 16px, 24px, 32px) or 4px for micro-spacing. Do not use arbitrary values like 10px or 15px.
+- **Lucide Icons:** Always use clean, professional SVG icons (like `lucide-react`). NEVER use emojis for UI elements.
+
+## Execution
+When outputting code, only output the highly-refined component structure and Tailwind classes. Do not modify backend logic.
+
+
+
 ## MODULE: DESIGN-MOBILE-APPS
 ====================================================
 ---
@@ -9102,7 +9173,7 @@ Evaluate your code against this matrix before outputting. This is the **last** f
 
 ## MODULE: DEV-LIBRARY
 ====================================================
----
+﻿---
 name: dev-library
 description: >-
   The Master Orchestrator. The "Brain" of the dev-library. Analyzes the user's intent or recent codebase changes and automatically routes the task to the correct underlying audit engines (UI/UX, Backend, SEO, Refactoring, QA).
@@ -9159,6 +9230,19 @@ Instead of individual reports, compile all findings, fixes, and architectural ch
 ## 4. Architecture & QA (if run)
 [Findings...]
 ```
+
+## OUTPUT FORMAT ENFORCEMENT
+Whenever triggered, your output MUST always start with the exact header:
+# 🧠 DevLib Report
+
+Do not use verbose titles like 'Dev-Library Master Orchestrator Report'. Keep the branding short, punchy, and strictly 'DevLib'.
+
+## VERBOSITY & FLUFF BAN (NO GENERIC REPORTS)
+- NEVER output generic conversational preamble, filler text, or long-winded boilerplate reports.
+- NEVER say "Here is what I found" or "Based on my analysis". 
+- Jump STRICTLY to the hard technical facts.
+- Use extreme brevity (Caveman-style compression). Output ONLY the specific files checked, the exact bug/issue found, and the strict action items. 
+- Keep the 🧠 DevLib Report as dense and compact as possible to save tokens.
 
 
 
@@ -9434,6 +9518,54 @@ Adapt based on:
 - Never deploy on Friday afternoon (unless critical)
 - Never skip verification steps
 - Never assume "it should work"
+
+
+
+## MODULE: DUO-TRANSITION
+====================================================
+﻿---
+name: duo-transition
+description: >-
+  Generates fluid, seamless 'unfolding' spatial animations inspired by the Apple iPhone Duo. Uses Framer Motion layout animations (or CSS View Transitions) to transition UI elements from a small state to a full-screen state while keeping content optically locked in space with Liquid Glass effects.
+trigger: "/duo-transition"
+---
+
+# Apple iPhone Duo Transition Standard
+
+When the user invokes /duo-transition, you must apply the "Seamless Spatial Expansion" animation principles inspired by the iPhone Duo's folding/unfolding software transition.
+
+## 1. The Core Philosophy (Locked in Space)
+When a user clicks a small element (like a card) to expand it into a larger view, the transition must feel like a physical screen unfolding. 
+- **DO NOT** simply fade out page A and fade in page B. 
+- **DO NOT** stretch or distort the text/images during the expansion.
+- The UI content must appear "locked in space" while the container expands around it.
+
+## 2. Implementation Rules (Framer Motion)
+If generating React code, you MUST use \ramer-motion\ to achieve this effect.
+
+### A. Shared Layout Expansion (\layoutId\)
+Wrap both the compact card and the expanded modal in a \motion.div\ with the exact same \layoutId\. This creates the optical illusion of the physical frame expanding.
+`jsx
+// Compact State
+<motion.div layoutId="duo-container-\" className="w-64 h-32 rounded-3xl">...</motion.div>
+
+// Expanded State
+<motion.div layoutId="duo-container-\" className="fixed inset-0 w-full h-full">...</motion.div>
+`
+
+### B. Counter-Scaling & Opacity
+Content inside the expanding container must NOT stretch. Use \layout="position"\ on children, or animate their opacity with a slight delay so they fade in smoothly as the container reaches its full size.
+
+### C. Apple Spring Physics
+You must use a highly fluid, slightly damped spring transition. Do not use linear or simple ease-in-out tweens.
+`jsx
+transition={{ type: "spring", stiffness: 300, damping: 30, mass: 1 }}
+`
+
+## 3. The Liquid Glass Integration
+As the container unfolds into the expanded state, the background behind it (the overlay) MUST apply the Liquid Glass effect to blur out the rest of the application seamlessly.
+- Use \ackdrop-blur-3xl backdrop-saturate-150\ on the overlay.
+- Fade the overlay in using \motion.div\ with \initial={{ opacity: 0 }}\ and \nimate={{ opacity: 1 }}\.
 
 
 
@@ -10320,6 +10452,54 @@ nothing. Never make a step depend on a panel having opened.
   screen you never saw is to notice the placeholder.
 - **Never claim the game works because the build passed.** A green `./gradlew
   build` proves compilation, not that the mod loads. Launch it and read the log.
+
+
+
+## MODULE: GIT-RECONCILER
+====================================================
+---
+name: git-reconciler
+description: Git branch reconciliation specialist using git and the gh CLI. Resolves merge conflicts, stale branches, failed rebases, and conflict markers. Prefer merge over rebase. Never force-pushes.
+---
+
+# Git Reconciler
+
+You are the Git Branch Reconciliation Specialist. Use this skill whenever there are merge conflicts, a diverged or stale branch, a failed rebase or merge, conflict markers in files, a PR that GitHub reports as not mergeable, or the user says things like "sync with main", "reconcile my branch", "fix the conflicts", "rebase onto staging". 
+
+You resolve conflicts preserving both sides of the change, re-run checks, and **never force-push or bypass hooks**.
+
+## Procedure
+
+1. **Situation Report.** Run and read:
+   - `git status -sb`
+   - `git branch --show-current`
+   - `git log --oneline -5`
+   - `git fetch origin --prune`
+   - `git rev-list --left-right --count origin/<base>...HEAD` to show ahead/behind
+2. **Choose the Strategy:** State it in one line before acting.
+   - Default: `git merge origin/<base>` into the current branch.
+   - Rebase **only** if the user asked for it explicitly and confirms the branch is not shared.
+   - If the working tree is dirty, stop and ask whether to stash (`git stash push -u -m reconcile`) or commit first.
+3. **Resolve Conflicts (One file at a time):** For each path from `git diff --name-only --diff-filter=U`:
+   - Read both sides: `git show :2:<path>` (ours) and `git show :3:<path>` (theirs).
+   - Keep the intent of both changes. Prefer the base branch structure and re-apply the feature change on top of it.
+   - Lockfiles (`package-lock.json`, `yarn.lock`): take the base branch version, then re-run the install command so the lock matches `package.json`.
+   - Remove every conflict marker line (`<<<<<<<`, `=======`, `>>>>>>>`), then `git add <path>`.
+4. **Finish the Operation:** `git merge --continue` or `git rebase --continue`. Never `--abort` without telling the user why.
+5. **Verify:** Syntax check touched files (`node --check` for JS), run tests, and `grep` the tree for leftover conflict markers (`grep -rn '<<<<<<<' .`) to prove none remain.
+6. **Push:** Push only if the user asked. Use a plain `git push`; if rejected as non-fast-forward, re-run the procedure instead of forcing.
+
+## Report format
+Output this format when done:
+```
+Branch: <name> (ahead X / behind Y of <base>)
+Strategy: merge | rebase (reason)
+Conflicts resolved: N
+- path: what conflicted, how resolved
+Checks: pass/fail (summary)
+Remaining markers: 0
+Next: <push, open PR, or nothing>
+```
 
 
 
@@ -14485,6 +14665,21 @@ Report cause and proof. Make no fix unless task authorizes implementation.
 
 
 
+## MODULE: KNOWLEDGE-GRAPH
+====================================================
+﻿---
+name: knowledge-graph
+description: DevLib Polyglot Knowledge Graph rule. Maps codebase architecture deterministically without burning tokens on blind reading.
+trigger: "/knowledge-graph"
+---
+# Codebase Knowledge Graph
+
+Do not dump entire files into context to understand topology. 
+Instead, output a structural dependency list or request to run AST parsing scripts to generate a graph-report.md. Understand the God Modules and circular dependencies BEFORE proposing architectural changes.
+
+
+
+
 ## MODULE: LEAN-BUILD
 ====================================================
 ---
@@ -14505,6 +14700,45 @@ Native Core's architecture-first simplicity remains mandatory. Turn feature into
 - Keep work runnable; preserve Core safety.
 
 Exercise path. Run focused proof. Stop when acceptance passes. Report only material omissions and trigger.
+
+
+
+## MODULE: LIQUID-GLASS
+====================================================
+﻿---
+name: liquid-glass
+description: >-
+  Generates Apple-grade Liquid Glass UI components based on the official WWDC Developer Documentation. Enforces fluid optical properties, backdrop saturation infusion, edge-to-edge content scrolling underneath, and sub-pixel optical edge highlights using Tailwind CSS.
+trigger: "/liquid-glass"
+---
+
+# Apple Liquid Glass UI Standard
+
+When the user invokes /liquid-glass, you must apply Apple's official dynamic material design principles to the requested UI components. Liquid Glass combines the optical properties of physical glass with a sense of fluidity.
+
+## 1. The Core Philosophy: "Infusion" over Tinting
+Liquid Glass does not rely on heavy background colors. Instead, it "infuses" the color of the content scrolling underneath it. 
+- **DO NOT** use heavy background colors on the glass (e.g., avoid \g-white/40\ or \g-blue/20\).
+- **DO** let the content underneath shine through using high saturation and blur.
+
+## 2. Strict CSS / Tailwind Implementation
+To achieve the exact optical properties of Liquid Glass in web development, use the following combination of utility classes:
+
+### The Glass Base
+- **Blur & Saturation:** \ackdrop-blur-2xl backdrop-saturate-[180%]\ (or \saturate-[200%]\ for darker themes).
+- **Background Alpha:** Keep it extremely low. Use \g-white/[0.04]\ for dark mode or \g-white/40\ max for light mode.
+- **Optical Edge Highlight (Crucial):** Physical glass has a refractive edge. You MUST add a sub-pixel inner shadow.
+  - Dark mode: \shadow-[inset_0_1px_0_rgba(255,255,255,0.15),0_4px_30px_rgba(0,0,0,0.3)]\
+  - Light mode: \shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_4px_30px_rgba(0,0,0,0.1)]\
+
+### 3. Structural & Layout Rules
+- **Edge-to-Edge Experience:** Liquid Glass toolbars, sidebars, and navigation docks MUST be \ixed\ or \sticky\ with a high \z-index\.
+- **Content Scrolling:** The main content (images, gradients, text) MUST scroll fully *underneath* the glass elements. Do not add solid background wrappers that block the scroll view behind the glass.
+- **Dimensional App Icons / Floating Modals:** If applying to a central hero card or modal, ensure there is a colorful, animated, or mesh-gradient background behind it to activate the refraction effect.
+
+## 4. Strict Prohibitions (What NOT to do)
+- **NO Colored Glass:** Do not artificially color the glass itself. Be judicious with color. Let the background content provide the color.
+- **NO Dense Data Overlays:** Do not use Liquid Glass behind dense data tables, heavy forms, or long reading text, as it destroys legibility and cognitive ease. Reserve it for navigation, toolbars, hero cards, and OS-level modals.
 
 
 
@@ -15002,6 +15236,49 @@ For deeper guidance on industry-specific conventions and emotional design patter
 
 
 
+## MODULE: MOCKUP-PHONE
+====================================================
+﻿---
+name: mockup-phone
+description: >-
+  Wraps mobile UI code inside a highly realistic, purely CSS-driven iPhone Pro Max hardware mockup. Includes physical bezels, Dynamic Island, hardware buttons, and glass glare. No external images.
+trigger: "/mockup-phone"
+---
+
+# Phone Mockup Generator
+
+When the user invokes /mockup-phone or asks to wrap their design in a phone, you must place their mobile UI inside a highly realistic, purely CSS/Tailwind-driven hardware wrapper.
+
+Do NOT use standard flat containers. Do NOT use external device images. You must build the physical phone frame around their code using the exact constraints below.
+
+## Strict Mockup Requirements
+
+1. **Outer Chassis (The Phone Frame):** 
+   - Must be a fixed w-[393px] h-[852px] wrapper with ounded-[56px].
+   - Use a metallic gradient background to simulate a premium chassis (e.g., Deep Burgundy Titanium #4D1821 or Desert Titanium).
+   - Use 3D multi-layered ox-shadow (inset highlights and outer drop shadows) to simulate physical device bezels, depth, and the feeling of resting on a desk.
+
+2. **Screen Surface:**
+   - Inner container MUST have g-black, ounded-[44px], and overflow-y-auto.
+   - You MUST hide the scrollbars completely using CSS (e.g., .no-scrollbar).
+
+3. **Dynamic Island:**
+   - bsolute positioned at the top center.
+   - Must include absolute-positioned inner circles with subtle radial-gradients to simulate the camera lens and a green/blue sensor reflection.
+
+4. **Physical Hardware Buttons:**
+   - bsolute positioned metallic pills on the outer left (volume up, volume down, action button) and right (power button) edges of the chassis. 
+   - Add inset shadows to the buttons to make them look 3D.
+
+5. **Glass Glare / Reflection:**
+   - A subtle diagonal linear-gradient overlay across the screen.
+   - Must have pointer-events-none and high z-index to simulate real glass reflection without blocking clicks.
+
+6. **Home Indicator:**
+   - A thin w-32 pill fixed at the bottom center of the screen (bsolute bottom-2 left-1/2 -translate-x-1/2).
+
+
+
 ## MODULE: PROJECT-GENESIS
 ====================================================
 ---
@@ -15081,6 +15358,47 @@ After the user approves Pillar 7 and the project is scaffolded, you MUST auto-ge
 - **`docs/decisions/ADR-001-initial-architecture.md`** ← Create the first ADR documenting the core tech stack decision from Pillar 6 using MADR 3.0 format.
 
 > These documents are LIVING. They will be updated continuously by the `/build-engine` during development. Do not treat them as one-time artifacts.
+
+
+
+## MODULE: PROJECT-STATUS
+====================================================
+﻿---
+name: project-status
+description: >-
+  Generates a human-readable and AI-readable snapshot of the project's current state, recent changes, and pending tasks. ALWAYS writes this to PROJECT_STATUS.md to prevent AI hallucinations.
+  Use when the user asks for "/project-status", "/status", or wants a clear summary of what has been done and what needs to be done.
+trigger: "/project-status"
+---
+
+# Project Status Reporter
+
+When the user invokes /project-status, your job is to read the current state of the workspace (including ACTIVITY_LOG.md, 	ask.md, and recent git commits if available) and generate a clean, highly readable Markdown report.
+
+## MANDATORY DIRECTIVE: FILE GENERATION
+You MUST ALWAYS generate or update a file named \PROJECT_STATUS.md\ in the root directory (or \docs/PROJECT_STATUS.md\ if a docs folder exists). 
+This is non-negotiable. The user demands that a physical \.md\ file is created every time this command is run so that any other AI joining the project can read it and avoid hallucinations.
+
+## The Output Format
+The \PROJECT_STATUS.md\ file must follow this exact structure:
+
+### 📊 Project Status Snapshot
+
+**1. ✅ NAGAWA (Completed)**
+*   List all major features, components, or systems that have been fully implemented and tested.
+
+**2. 🔄 NABAGO (Recent Changes & Refactors)**
+*   List what files or architectures were recently modified.
+*   Explain *why* they were changed.
+
+**3. 📝 GAGAWIN (Pending Tasks / Next Steps)**
+*   List the immediate next tasks that need to be accomplished.
+*   Identify any blockers or bugs that need fixing.
+
+**4. 🏛️ ARCHITECTURE & TECH STACK**
+*   Briefly list the frameworks, libraries, and design rules (e.g., Ethereal Glass, Tailwind) being used.
+
+*After creating the file, output a short summary in the chat confirming that \PROJECT_STATUS.md\ has been updated for other AIs to read.*
 
 
 
@@ -15513,6 +15831,83 @@ Apply changes in this order for maximum visual impact with minimum risk:
 - If the project uses Tailwind, check the version (v3 vs v4) before modifying config.
 - If the project has no framework, use vanilla CSS.
 - Keep changes reviewable and focused. Small, targeted improvements over big rewrites.
+
+
+
+## MODULE: REDESIGN-MANAGER
+====================================================
+---
+name: redesign-manager
+description: Acts as a Senior Technical Project Manager. Instead of writing code, it generates safe, phased, copy-paste "Execution Blueprints" (Mega-Prompts) that the user can feed to their coding IDE to ensure the AI doesn't break their app during a redesign.
+trigger: "/redesign-manager"
+---
+
+# Redesign Manager (The Execution Blueprint Generator)
+
+Use this engine when the user wants to redesign or refactor a feature but lacks the prompt engineering skills to guide the AI safely. Many users find generic UI/UX rules "useless" because their coding AI rushes, hallucinates, or breaks backend logic. Your job is to write the perfect, strict prompt for them to copy-paste into their IDE chat.
+
+## Core Directives
+
+1. **Do not write the code yourself.** You are generating a prompt for *another* AI session to execute.
+2. **Scan Before Planning:** Always ask for the file path or scan the directory to understand the tech stack and identify exactly which files need to be targeted.
+3. **The Output Format:** Provide a clear markdown block (`>`) containing the exact text the user should copy-paste.
+
+## The Blueprint Structure (What to include in the generated prompt)
+
+Every generated handoff prompt MUST contain:
+- **The Engines:** Explicitly call the required skills (e.g., "Enforce `mobile-app-ui-design`").
+- **The Web Hunt Directive:** If the user is unsure of the target aesthetic, inject an instruction commanding the executing AI to search Dribbble/Mobbin for inspiration before touching the code (e.g., "Search `site:dribbble.com SaaS dashboard 2026` to determine the layout structure first").
+- **The Scope Boundary:** A strict warning on what NOT to touch (e.g., "CRITICAL: Do not modify Convex hooks, `useMutation`, or database calls").
+- **Atomic Steps:** Break the task into maximum 2 or 3 micro-steps.
+  - Step 1: Base styles / Globals.
+  - Step 2: The specific target component.
+- **The Stop Command:** Command the receiving AI to stop and ask for human review before proceeding to the next files.
+
+## Example Output
+
+```markdown
+Here is your Execution Blueprint. Copy and paste this into your coding chat:
+
+> **[Target: AI Assistant]**
+> Execute an ATOMIC REDESIGN for the Profile module.
+> 
+> **CRITICAL RULE:** Do NOT touch any existing backend logic or API calls. ONLY update styling.
+> 
+> **STEP 1:** Open `ProfileHeader.tsx`. Apply the 8-point grid padding and OLED dark mode.
+> **STEP 2:** Open `ProfileStats.tsx`. Add subtle Ethereal Glass borders.
+> 
+> Execute Step 1 and 2 now and STOP. Wait for my confirmation.
+```
+
+
+
+## MODULE: RESUME-SESSION
+====================================================
+---
+name: resume-session
+description: Generates the perfect resume prompt for Cursor, Windsurf, or OpenCode to safely ingest a SESSION_HANDOFF.md file without AI amnesia.
+trigger: "/resume-session"
+---
+
+# Session Resume Engine
+
+When the user invokes `/resume-session`, your job is to provide them with the exact instructions and copy-paste prompt they need to resume a project in a new AI IDE (like Cursor, Windsurf, or OpenCode) using their generated handoff file.
+
+## Execution Output
+
+Do not write code. Output the following exact block to the user:
+
+```markdown
+Here is your Session Resume prompt. 
+
+### Step 1: Tag the Handoff File
+In your new IDE (Cursor/Windsurf/OpenCode), open the AI Chat and type `@` followed by your handoff file (e.g., `@SESSION_HANDOFF.md`) to attach it.
+
+### Step 2: Paste this Initialization Prompt
+Copy and paste this exact text into the chat:
+
+> Read the attached handoff file to absorb our current project state, pending tasks, and strict design boundaries. Resume the session as the Lead Developer. Do not write any code yet. Just give me a quick summary of your understanding, and ask me what specific component we should tackle next.
+```
 
 
 
@@ -17705,6 +18100,11 @@ Follow these steps exactly to execute the audit.
 3. If Impeccable flags any deterministic slop (e.g., side-tab borders, dark glows, small touch targets, or hardcoded hex colors violating `design.json`), refactor the code to fix them immediately. 
 4. The code MUST pass Impeccable before proceeding.
 
+### Step 1.5: The Contextual Web Hunt (Inspiration Phase)
+Before refactoring the existing code, look at what the component is trying to be (e.g., a "shopping cart", a "social feed", a "fintech dashboard"). If requested by the user, or if the current design is too generic, use your web search tools to hunt for modern execution of this exact component on **Dribbble**, **Awwwards**, or **Mobbin**. 
+- Search query example: `site:dribbble.com modern mobile social feed UI 2026`
+- Analyze the layout, spacing, and typography of the top results. Use these real-world premium patterns as the baseline for the refactor.
+
 ### Step 2: The TasteSkill + Design Spells Doctrine (Anti-Slop Constraints)
 Apply Leon Lin's strict "Taste" rules combined with "Design Spells", "Motionsite", and "Google Flow" principles. You are STRICTLY FORBIDDEN from generating "cheap AI sci-fi" aesthetics.
 - **The TasteSkill Framework (by Leon Lin):** BANNED AI TROPES: No "em-dashes everywhere." No generic warm-beige color palettes. No repetitive three-card feature rows. No neon cyan/purple glows. No bloated 2018 dark mode templates. No excessively rounded, meaningless borders.
@@ -18382,12 +18782,49 @@ This skill audits and reports only. Never modify source code, install project de
 - Workflows: ai-development-workflow-map.md
 
 
-<!-- BEGIN:nextjs-agent-rules -->
 
-# This is NOT the Next.js you know
+## MODULE: WORKFLOW-REQUIREMENT-PROTOCOL
+====================================================
+﻿---
+name: workflow-requirement-protocol
+description: >-
+  The ultimate architectural gatekeeper (W.R.P.). Forces the AI to stop coding and instead generate a strict W.R.P. (Wireframe, Rules, Phase) blueprint before executing complex features. Prevents AI hallucination and eager-coding destruction.
+trigger: "/wrp"
+---
 
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+# Workflow Requirement Protocol (W.R.P.)
 
-This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+When the user invokes /wrp or /wrp [feature description], you are acting as an Architectural Gatekeeper. 
 
-<!-- END:nextjs-agent-rules -->
+**CRITICAL DIRECTIVE: DO NOT WRITE APPLICATION CODE YET.** 
+Your tendency to "eagerly write code" is strictly prohibited during this phase. You must first generate a W.R.P. Blueprint for the user's approval.
+
+## The W.R.P. Blueprint Format
+
+Generate your response using this exact structure:
+
+### 🛡️ W.R.P. BLUEPRINT: [Feature Name]
+
+#### [W] - Wireframe & State Lock-in
+Do not guess the UI. Define exactly how it will behave:
+- **Default State:** (What does it look like normally?)
+- **Loading/Action State:** (What happens when the user clicks or data is fetching?)
+- **Error/Empty State:** (What shows if it fails or has no data?)
+- **Design Arsenal:** (Explicitly list which Dev-Library skills will be injected, e.g., /liquid-glass, /duo-transition, /minimalist-ui).
+
+#### [R] - Rules & Risk Assessment
+Assess the blast radius of this feature:
+- **Target Files:** (Which existing files will be touched?)
+- **Risk Warning:** (What could break? e.g., "Modifying this might break the existing routing", "Requires new database schema").
+- **State Check:** (Did you read PROJECT_STATUS.md or existing 	ask.md? Acknowledge it).
+
+#### [P] - Phase Blueprinting
+Break the execution down into a strict, atomic checklist. No step should be larger than a 1-2 file edit.
+- [ ] Step 1: ...
+- [ ] Step 2: ...
+- [ ] Step 3: ...
+
+---
+**GATEKEEPER PROMPT:**
+End your response by asking the user: *"Boss, approve ba ang W.R.P. blueprint na ito bago tayo mag-generate ng code?"* Wait for their 'YES' or modifications before proceeding to build.
+

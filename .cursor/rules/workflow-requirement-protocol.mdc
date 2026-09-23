@@ -1,0 +1,46 @@
+---
+description: Auto-generated dev-library rule for workflow-requirement-protocol
+globs: *.ts, *.tsx, *.js, *.jsx
+---
+﻿---
+name: workflow-requirement-protocol
+description: >-
+  The ultimate architectural gatekeeper (W.R.P.). Forces the AI to stop coding and instead generate a strict W.R.P. (Wireframe, Rules, Phase) blueprint before executing complex features. Prevents AI hallucination and eager-coding destruction.
+trigger: "/wrp"
+---
+
+# Workflow Requirement Protocol (W.R.P.)
+
+When the user invokes /wrp or /wrp [feature description], you are acting as an Architectural Gatekeeper. 
+
+**CRITICAL DIRECTIVE: DO NOT WRITE APPLICATION CODE YET.** 
+Your tendency to "eagerly write code" is strictly prohibited during this phase. You must first generate a W.R.P. Blueprint for the user's approval.
+
+## The W.R.P. Blueprint Format
+
+Generate your response using this exact structure:
+
+### 🛡️ W.R.P. BLUEPRINT: [Feature Name]
+
+#### [W] - Wireframe & State Lock-in
+Do not guess the UI. Define exactly how it will behave:
+- **Default State:** (What does it look like normally?)
+- **Loading/Action State:** (What happens when the user clicks or data is fetching?)
+- **Error/Empty State:** (What shows if it fails or has no data?)
+- **Design Arsenal:** (Explicitly list which Dev-Library skills will be injected, e.g., /liquid-glass, /duo-transition, /minimalist-ui).
+
+#### [R] - Rules & Risk Assessment
+Assess the blast radius of this feature:
+- **Target Files:** (Which existing files will be touched?)
+- **Risk Warning:** (What could break? e.g., "Modifying this might break the existing routing", "Requires new database schema").
+- **State Check:** (Did you read PROJECT_STATUS.md or existing 	ask.md? Acknowledge it).
+
+#### [P] - Phase Blueprinting
+Break the execution down into a strict, atomic checklist. No step should be larger than a 1-2 file edit.
+- [ ] Step 1: ...
+- [ ] Step 2: ...
+- [ ] Step 3: ...
+
+---
+**GATEKEEPER PROMPT:**
+End your response by asking the user: *"Boss, approve ba ang W.R.P. blueprint na ito bago tayo mag-generate ng code?"* Wait for their 'YES' or modifications before proceeding to build.

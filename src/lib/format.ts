@@ -75,3 +75,9 @@ export function formatBytes(bytes: number): string {
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
+
+export function stripEmojis(str?: string): string {
+  if (!str) return "";
+  return str.replace(/\p{Extended_Pictographic}/gu, "").trim();
+}
+

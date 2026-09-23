@@ -15,6 +15,7 @@ export default defineSchema({
     email: v.optional(v.string()),
     name: v.optional(v.string()),
     tokenIdentifier: v.optional(v.string()), // Convex Auth identity reference
+    isAnonymous: v.optional(v.boolean()),
   })
     .index("by_token", ["tokenIdentifier"])
     .index("by_email", ["email"]),

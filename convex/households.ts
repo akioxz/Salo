@@ -9,14 +9,11 @@ import { getAuthUserId } from "@convex-dev/auth/server";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function getSessionUser(ctx: any) {
   const authUserId = await getAuthUserId(ctx);
-  console.log("authUserId:", authUserId);
   if (authUserId) {
     const user = await ctx.db.get(authUserId);
-    console.log("user from authUserId:", user);
     if (user) return user;
   }
   const identity = await ctx.auth.getUserIdentity();
-  console.log("identity:", identity);
   if (identity) {
     const user = await ctx.db
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -26,7 +23,6 @@ async function getSessionUser(ctx: any) {
         q.eq("tokenIdentifier", identity.tokenIdentifier),
       )
       .unique();
-    console.log("user from identity:", user);
     if (user) return user;
   }
   return null;
@@ -227,18 +223,25 @@ export const getMine = query({
   },
 });
 
-import { verifyMembership } from "./auth_dev_helper";
+import { requireMembership } from "./auth_helpers";
 
 export const setVisitDate = mutation({
   args: {
     nextVisitDate: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    const { membership } = await verifyMembership(ctx);
+    const { membership } = await requireMembership(ctx);
 
     // Only OFW can set the date
     if (membership.role !== "ofw") {
       throw new Error("Only the OFW can set the visit date");
+    }
+
+    // Validate date if provided
+    if (args.nextVisitDate !== undefined) {
+      if (!Number.isFinite(args.nextVisitDate) || args.nextVisitDate < 0) {
+        throw new Error("Invalid date value.");
+      }
     }
 
     await ctx.db.patch(membership.householdId, {
@@ -246,4 +249,3 @@ export const setVisitDate = mutation({
     });
   },
 });
-

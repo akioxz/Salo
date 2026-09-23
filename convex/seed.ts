@@ -1,20 +1,25 @@
-import { mutation } from "./_generated/server";
+// convex/seed.ts
+// INTERNAL ONLY — these mutations cannot be called from the client.
+// Run via Convex dashboard or `npx convex run seed:clearAndSeed`
+import { internalMutation } from "./_generated/server";
 
-export const clearAndSeed = mutation({
+export const clearAndSeed = internalMutation({
   args: {},
   handler: async (ctx) => {
-    // Delete all posts
+    // Delete all posts (and their storage files)
     const posts = await ctx.db.query("posts").collect();
     for (const post of posts) {
+      if (post.photoStorageId) await ctx.storage.delete(post.photoStorageId);
+      if (post.audioStorageId) await ctx.storage.delete(post.audioStorageId);
       await ctx.db.delete(post._id);
     }
-    
+
     // Delete all comments
     const comments = await ctx.db.query("comments").collect();
     for (const comment of comments) {
       await ctx.db.delete(comment._id);
     }
-    
+
     // Delete all reactions
     const reactions = await ctx.db.query("reactions").collect();
     for (const reaction of reactions) {
@@ -24,7 +29,7 @@ export const clearAndSeed = mutation({
     // Get the first user and household to attach posts to
     const user = await ctx.db.query("users").first();
     const household = await ctx.db.query("households").first();
-    
+
     if (!user || !household) {
       console.log("No user or household found. Run the app once to create a user.");
       return;
@@ -48,7 +53,7 @@ export const clearAndSeed = mutation({
       category: "REMITTANCE",
       caption: "Sent some extra for Kuya's bday",
     });
-    
+
     await ctx.db.insert("posts", {
       householdId: household._id,
       authorId: user._id,
@@ -57,11 +62,10 @@ export const clearAndSeed = mutation({
       category: "UTILITIES",
       caption: "Electric bill is due next week",
     });
-
-  }
+  },
 });
 
-export const sanitizeExistingPosts = mutation({
+export const sanitizeExistingPosts = internalMutation({
   args: {},
   handler: async (ctx) => {
     const posts = await ctx.db.query("posts").collect();

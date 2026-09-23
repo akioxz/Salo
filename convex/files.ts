@@ -1,13 +1,13 @@
+// convex/files.ts
 import { mutation } from "./_generated/server";
-import { verifyMembership } from "./auth_dev_helper";
+import { requireMembership } from "./auth_helpers";
 
 export const generateUploadUrl = mutation({
   args: {},
   handler: async (ctx) => {
-    // Ensure the user is authenticated before giving them an upload URL
-    await verifyMembership(ctx);
-    
-    // Return an upload URL pointing to Convex Storage
+    // Ensure the user is authenticated and belongs to a household
+    await requireMembership(ctx);
+
     return await ctx.storage.generateUploadUrl();
   },
 });

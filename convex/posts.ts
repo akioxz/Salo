@@ -1,99 +1,102 @@
 // convex/posts.ts
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
-import { verifyMembership } from "./auth_dev_helper";
+import { getSessionUser, requireMembership } from "./auth_helpers";
 
 /** Get all posts for the current user's household, with reactions and comments. */
 export const list = query({
   args: {},
   handler: async (ctx) => {
-    try {
-      const { user, membership } = await verifyMembership(ctx);
+    const user = await getSessionUser(ctx);
+    if (!user) return [];
 
-      const posts = await ctx.db
-        .query("posts")
-        .withIndex("by_household", (q) =>
-          q.eq("householdId", membership.householdId),
-        )
-        .order("desc") // by _creationTime (newest first)
-        .collect();
+    const membership = await ctx.db
+      .query("householdMembers")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .unique();
 
-      // Fetch authors, reactions, and comments for each post
-      return await Promise.all(
-        posts.map(async (post) => {
-          const author = await ctx.db.get(post.authorId);
-          const authorMembership = await ctx.db
-            .query("householdMembers")
-            .withIndex("by_user", (q) => q.eq("userId", post.authorId))
-            .unique();
+    if (!membership) return [];
 
-          const reactions = await ctx.db
-            .query("reactions")
-            .withIndex("by_post", (q) => q.eq("postId", post._id))
-            .collect();
+    const posts = await ctx.db
+      .query("posts")
+      .withIndex("by_household", (q) =>
+        q.eq("householdId", membership.householdId),
+      )
+      .order("desc")
+      .collect();
 
-          const comments = await ctx.db
-            .query("comments")
-            .withIndex("by_post", (q) => q.eq("postId", post._id))
-            .collect();
+    // Fetch authors, reactions, and comments for each post
+    return await Promise.all(
+      posts.map(async (post) => {
+        const author = await ctx.db.get(post.authorId);
+        const authorMembership = await ctx.db
+          .query("householdMembers")
+          .withIndex("by_user", (q) => q.eq("userId", post.authorId))
+          .unique();
 
-          const commentsWithAuthors = await Promise.all(
-            comments.map(async (c) => {
-              const cAuthor = await ctx.db.get(c.authorId);
-              const cMembership = await ctx.db
-                .query("householdMembers")
-                .withIndex("by_user", (q) => q.eq("userId", c.authorId))
-                .unique();
-              return {
-                ...c,
-                author: {
-                  name: cAuthor?.name ?? cAuthor?.email ?? "Unknown",
-                  role: cMembership?.role ?? "family",
-                },
-              };
-            })
-          );
+        const reactions = await ctx.db
+          .query("reactions")
+          .withIndex("by_post", (q) => q.eq("postId", post._id))
+          .collect();
 
-          const photoUrl = post.photoStorageId 
-            ? await ctx.storage.getUrl(post.photoStorageId) 
-            : undefined;
+        const comments = await ctx.db
+          .query("comments")
+          .withIndex("by_post", (q) => q.eq("postId", post._id))
+          .collect();
 
-          const audioUrl = post.audioStorageId 
-            ? await ctx.storage.getUrl(post.audioStorageId) 
-            : undefined;
+        const commentsWithAuthors = await Promise.all(
+          comments.map(async (c) => {
+            const cAuthor = await ctx.db.get(c.authorId);
+            const cMembership = await ctx.db
+              .query("householdMembers")
+              .withIndex("by_user", (q) => q.eq("userId", c.authorId))
+              .unique();
+            return {
+              ...c,
+              author: {
+                name: cAuthor?.name ?? "Kapamilya",
+                role: cMembership?.role ?? "family",
+              },
+            };
+          })
+        );
 
-          const hasReacted = reactions.some(
-            (r) => r.userId === user._id && r.type === "heart"
-          );
+        const photoUrl = post.photoStorageId
+          ? await ctx.storage.getUrl(post.photoStorageId)
+          : undefined;
 
-          let isCovered = false;
-          if (post.type === "need") {
-            const coveringExpense = await ctx.db
-              .query("posts")
-              .withIndex("by_linked_need", (q) => q.eq("linkedNeedId", post._id))
-              .first();
-            isCovered = !!coveringExpense;
-          }
+        const audioUrl = post.audioStorageId
+          ? await ctx.storage.getUrl(post.audioStorageId)
+          : undefined;
 
-          return {
-            ...post,
-            photoUrl,
-            audioUrl,
-            hasReacted,
-            isCovered,
-            author: {
-              name: author?.name ?? author?.email ?? "Unknown",
-              role: authorMembership?.role,
-            },
-            reactions,
-            comments: commentsWithAuthors,
-          };
-        }),
-      );
-    } catch (_e) {
-      // Return empty array if not authenticated or no household yet
-      return [];
-    }
+        const hasReacted = reactions.some(
+          (r) => r.userId === user._id && r.type === "heart"
+        );
+
+        let isCovered = false;
+        if (post.type === "need") {
+          const coveringExpense = await ctx.db
+            .query("posts")
+            .withIndex("by_linked_need", (q) => q.eq("linkedNeedId", post._id))
+            .first();
+          isCovered = !!coveringExpense;
+        }
+
+        return {
+          ...post,
+          photoUrl,
+          audioUrl,
+          hasReacted,
+          isCovered,
+          author: {
+            name: author?.name ?? "Kapamilya",
+            role: authorMembership?.role,
+          },
+          reactions,
+          comments: commentsWithAuthors,
+        };
+      }),
+    );
   },
 });
 
@@ -109,15 +112,26 @@ export const create = mutation({
     linkedNeedId: v.optional(v.id("posts")),
   },
   handler: async (ctx, args) => {
-    const { user, membership } = await verifyMembership(ctx);
+    const { user, membership } = await requireMembership(ctx);
+
+    // Input validation
+    if (args.amount !== undefined && (args.amount < 0 || !Number.isFinite(args.amount))) {
+      throw new Error("Amount must be a non-negative number.");
+    }
+    if (!args.category.trim()) {
+      throw new Error("Category is required.");
+    }
+    if (args.caption && args.caption.length > 2000) {
+      throw new Error("Caption too long (max 2000 chars).");
+    }
 
     const postId = await ctx.db.insert("posts", {
       householdId: membership.householdId,
       authorId: user._id,
       type: args.type,
       amount: args.amount,
-      category: args.category,
-      caption: args.caption,
+      category: args.category.trim(),
+      caption: args.caption?.trim(),
       photoStorageId: args.photoStorageId,
       audioStorageId: args.audioStorageId,
       linkedNeedId: args.linkedNeedId,
@@ -133,17 +147,26 @@ export const remove = mutation({
     postId: v.id("posts"),
   },
   handler: async (ctx, args) => {
-    const { user } = await verifyMembership(ctx);
+    const { user, membership } = await requireMembership(ctx);
 
     const post = await ctx.db.get(args.postId);
     if (!post) throw new Error("Post not found");
-
+    if (post.householdId !== membership.householdId) {
+      throw new Error("Post not in your household");
+    }
     if (post.authorId !== user._id) {
       throw new Error("You can only delete your own posts");
     }
 
-    // Reactions and comments don't cascade delete automatically in Convex
-    // like they do in Postgres (ON DELETE CASCADE), so we must manually clean them up.
+    // Clean up storage files
+    if (post.photoStorageId) {
+      await ctx.storage.delete(post.photoStorageId);
+    }
+    if (post.audioStorageId) {
+      await ctx.storage.delete(post.audioStorageId);
+    }
+
+    // Clean up reactions
     const reactions = await ctx.db
       .query("reactions")
       .withIndex("by_post", (q) => q.eq("postId", args.postId))
@@ -152,6 +175,7 @@ export const remove = mutation({
       await ctx.db.delete(reaction._id);
     }
 
+    // Clean up comments
     const comments = await ctx.db
       .query("comments")
       .withIndex("by_post", (q) => q.eq("postId", args.postId))

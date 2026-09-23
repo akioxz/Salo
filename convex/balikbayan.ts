@@ -1,33 +1,38 @@
+// convex/balikbayan.ts
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
-import { verifyMembership } from "./auth_dev_helper";
+import { getSessionUser, requireMembership } from "./auth_helpers";
 
 export const list = query({
   args: {},
   handler: async (ctx) => {
-    try {
-      const { membership } = await verifyMembership(ctx);
-      
-      const items = await ctx.db
-        .query("balikbayanBox")
-        .withIndex("by_household", (q) => q.eq("householdId", membership.householdId))
-        .order("asc")
-        .collect();
+    const user = await getSessionUser(ctx);
+    if (!user) return [];
 
-      const itemsWithAuthor = await Promise.all(
-        items.map(async (item) => {
-          const author = await ctx.db.get(item.authorId);
-          return {
-            ...item,
-            authorName: author?.name || "Family Member",
-          };
-        })
-      );
+    const membership = await ctx.db
+      .query("householdMembers")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .unique();
 
-      return itemsWithAuthor;
-    } catch (_e) {
-      return [];
-    }
+    if (!membership) return [];
+
+    const items = await ctx.db
+      .query("balikbayanBox")
+      .withIndex("by_household", (q) => q.eq("householdId", membership.householdId))
+      .order("asc")
+      .collect();
+
+    const itemsWithAuthor = await Promise.all(
+      items.map(async (item) => {
+        const author = await ctx.db.get(item.authorId);
+        return {
+          ...item,
+          authorName: author?.name || "Kapamilya",
+        };
+      })
+    );
+
+    return itemsWithAuthor;
   },
 });
 
@@ -37,12 +42,21 @@ export const add = mutation({
     price: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    const { user, membership } = await verifyMembership(ctx);
+    const { user, membership } = await requireMembership(ctx);
+
+    // Input validation
+    const title = args.title.trim();
+    if (!title || title.length > 200) {
+      throw new Error("Title must be 1-200 characters.");
+    }
+    if (args.price !== undefined && (args.price < 0 || !Number.isFinite(args.price))) {
+      throw new Error("Price must be a non-negative number.");
+    }
 
     const itemId = await ctx.db.insert("balikbayanBox", {
       householdId: membership.householdId,
       authorId: user._id,
-      title: args.title,
+      title,
       price: args.price,
       status: "open",
     });
@@ -57,7 +71,7 @@ export const updateStatus = mutation({
     status: v.union(v.literal("open"), v.literal("bought"), v.literal("packed")),
   },
   handler: async (ctx, args) => {
-    const { membership } = await verifyMembership(ctx);
+    const { membership } = await requireMembership(ctx);
 
     const item = await ctx.db.get(args.itemId);
     if (!item) throw new Error("Item not found");

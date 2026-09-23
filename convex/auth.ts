@@ -6,10 +6,13 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
   providers: [
     Password({
       profile(params) {
-        return {
-          email: params.email as string,
-          name: (params.name as string) || (params.email as string).split("@")[0],
-        };
+        const email = typeof params.email === "string"
+          ? params.email.trim().toLowerCase()
+          : "";
+        const name = typeof params.name === "string" && params.name.trim()
+          ? params.name.trim()
+          : email.split("@")[0] || "User";
+        return { email, name };
       },
     }),
     Anonymous({

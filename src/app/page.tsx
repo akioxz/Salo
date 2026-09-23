@@ -21,6 +21,9 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState<"home" | "box" | "analytics">("home");
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   
+  const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false);
+  const [isLeaving, setIsLeaving] = useState(false);
+  
   const { isAuthenticated, isLoading: isAuthLoading } = useConvexAuth();
   const { signOut } = useAuthActions();
   const router = useRouter();
@@ -29,6 +32,7 @@ export default function Home() {
   const posts = useQuery(api.posts.list);
   const toggleReaction = useMutation(api.reactions.toggle);
   const addComment = useMutation(api.comments.add);
+  const leaveHousehold = useMutation(api.households.leaveHousehold);
 
   const handleReact = (postId: string) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -38,6 +42,18 @@ export default function Home() {
   const handleAddComment = (postId: string, content: string) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     addComment({ postId: postId as any, content });
+  };
+
+  const handleLeave = async () => {
+    setIsLeaving(true);
+    try {
+      await leaveHousehold();
+      await signOut();
+      router.push("/welcome");
+    } catch (e) {
+      console.error(e);
+      setIsLeaving(false);
+    }
   };
 
   // Redirect if not logged in
@@ -215,10 +231,7 @@ export default function Home() {
             <span className="text-xs font-bold tracking-tight">Analytics</span>
           </div>
           <div
-            onClick={() => {
-              signOut();
-              router.push("/welcome");
-            }}
+            onClick={() => setIsLeaveModalOpen(true)}
             className="flex flex-col items-center gap-1 text-zinc-400 hover:text-rose-500 transition-all cursor-pointer"
           >
             <svg
@@ -234,7 +247,7 @@ export default function Home() {
                 d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
               ></path>
             </svg>
-            <span className="text-xs font-bold tracking-tight">Log out</span>
+            <span className="text-xs font-bold tracking-tight">Umalis</span>
           </div>
         </div>
 
@@ -243,6 +256,48 @@ export default function Home() {
           isOpen={isCreateModalOpen} 
           onClose={() => setIsCreateModalOpen(false)} 
         />
+
+        {/* Leave Household Confirmation Modal */}
+        {isLeaveModalOpen && (
+          <div className="absolute inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity">
+            <div className="bg-white dark:bg-[#111111] w-full max-w-sm rounded-[24px] p-6 shadow-2xl border border-zinc-200 dark:border-zinc-800 flex flex-col text-center">
+              <div className="w-12 h-12 rounded-full bg-rose-100 dark:bg-rose-900/30 text-rose-500 mx-auto flex items-center justify-center mb-4">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100 mb-2">Aalis sa Tahanan?</h3>
+              <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-6">
+                Sigurado ka ba? Mawawala ang access mo at kakailanganin mo ng bagong invite link para makabalik.
+              </p>
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsLeaveModalOpen(false)}
+                  disabled={isLeaving}
+                  className="flex-1 py-3 px-4 rounded-xl font-semibold text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors disabled:opacity-50"
+                >
+                  Kanselahin
+                </button>
+                <button
+                  type="button"
+                  onClick={handleLeave}
+                  disabled={isLeaving}
+                  className="flex-1 py-3 px-4 rounded-xl font-semibold text-white bg-rose-500 hover:bg-rose-600 transition-colors shadow-sm disabled:opacity-50 flex items-center justify-center"
+                >
+                  {isLeaving ? (
+                    <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                  ) : (
+                    "Umalis"
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
     </div>
   );
 }

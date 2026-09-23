@@ -249,3 +249,13 @@ export const setVisitDate = mutation({
     });
   },
 });
+
+export const leaveHousehold = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const { membership } = await requireMembership(ctx);
+
+    // Delete the membership record so the household has a free slot again.
+    await ctx.db.delete(membership._id);
+  },
+});

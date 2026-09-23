@@ -9,11 +9,14 @@ import { getAuthUserId } from "@convex-dev/auth/server";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function getSessionUser(ctx: any) {
   const authUserId = await getAuthUserId(ctx);
+  console.log("authUserId:", authUserId);
   if (authUserId) {
     const user = await ctx.db.get(authUserId);
+    console.log("user from authUserId:", user);
     if (user) return user;
   }
   const identity = await ctx.auth.getUserIdentity();
+  console.log("identity:", identity);
   if (identity) {
     const user = await ctx.db
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -23,6 +26,7 @@ async function getSessionUser(ctx: any) {
         q.eq("tokenIdentifier", identity.tokenIdentifier),
       )
       .unique();
+    console.log("user from identity:", user);
     if (user) return user;
   }
   return null;

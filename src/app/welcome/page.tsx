@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { useRouter } from "next/navigation";
-import { useAuthActions } from "@convex-dev/auth/react";
+import { useAuthActions, useConvexAuth } from "@convex-dev/auth/react";
 import {
   Share2,
   Copy,
@@ -26,6 +26,7 @@ type FlowState = "choose" | "create" | "join" | "showCode";
 export default function WelcomePage() {
   const router = useRouter();
   const { signIn, signOut } = useAuthActions();
+  const { isAuthenticated } = useConvexAuth();
 
   const createHousehold = useMutation(api.households.create);
   const joinHousehold = useMutation(api.households.join);
@@ -39,6 +40,36 @@ export default function WelcomePage() {
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  
+  const [pendingAction, setPendingAction] = useState<"create" | "join" | null>(null);
+
+  useEffect(() => {
+    if (isAuthenticated && pendingAction === "create") {
+      setPendingAction(null);
+      createHousehold({ role })
+        .then((result) => {
+          setGeneratedCode(result.inviteCode);
+          setStep("showCode");
+          setLoading(false);
+        })
+        .catch((err) => {
+          console.error(err);
+          setError(err.message || "Hindi makagawa ng tahanan.");
+          setLoading(false);
+        });
+    } else if (isAuthenticated && pendingAction === "join") {
+      setPendingAction(null);
+      joinHousehold({ inviteCode: inviteCode.trim() })
+        .then(() => {
+          router.push("/");
+        })
+        .catch((err) => {
+          console.error(err);
+          setError(err.message || "Hindi wasto ang invite code.");
+          setLoading(false);
+        });
+    }
+  }, [isAuthenticated, pendingAction, createHousehold, joinHousehold, role, inviteCode, router]);
 
   const handleCreate = async () => {
     if (!name.trim()) {
@@ -49,20 +80,18 @@ export default function WelcomePage() {
     setError("");
     setLoading(true);
     try {
-      // 1. Sign in anonymously first
-      await signIn("anonymous", { name: name.trim() });
-      
-      // 2. Create the household
-      const result = await createHousehold({ role });
-      setGeneratedCode(result.inviteCode);
-      setStep("showCode");
+      if (!isAuthenticated) {
+        setPendingAction("create");
+        await signIn("anonymous", { name: name.trim() });
+      } else {
+        const result = await createHousehold({ role });
+        setGeneratedCode(result.inviteCode);
+        setStep("showCode");
+        setLoading(false);
+      }
     } catch (err: unknown) {
       console.error(err);
-      setError(
-        (err as Error).message ||
-          "Hindi makagawa ng tahanan. Maaaring may kasalukuyang tahanan ka na.",
-      );
-    } finally {
+      setError((err as Error).message || "Hindi makagawa ng tahanan.");
       setLoading(false);
     }
   };
@@ -77,16 +106,16 @@ export default function WelcomePage() {
     setError("");
     setLoading(true);
     try {
-      // 1. Sign in anonymously first
-      await signIn("anonymous", { name: name.trim() });
-      
-      // 2. Join the household
-      await joinHousehold({ inviteCode: inviteCode.trim() });
-      router.push("/");
+      if (!isAuthenticated) {
+        setPendingAction("join");
+        await signIn("anonymous", { name: name.trim() });
+      } else {
+        await joinHousehold({ inviteCode: inviteCode.trim() });
+        router.push("/");
+      }
     } catch (err: unknown) {
       console.error(err);
-      setError((err as Error).message || "Hindi wasto o nag-expire na ang invite code.");
-    } finally {
+      setError((err as Error).message || "Hindi wasto ang invite code.");
       setLoading(false);
     }
   };

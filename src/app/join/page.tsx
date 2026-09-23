@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { useState, Suspense, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useQuery, useMutation } from "convex/react";
 import { useAuthActions, useConvexAuth } from "@convex-dev/auth/react";
@@ -23,6 +23,26 @@ function JoinHouseholdContent() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [pendingJoin, setPendingJoin] = useState(false);
+
+  useEffect(() => {
+    if (isAuthenticated && pendingJoin) {
+      setPendingJoin(false);
+      joinHousehold({
+        inviteCode,
+        name: name.trim() || undefined,
+      }).then(() => {
+        setSuccess(true);
+        setTimeout(() => {
+          router.push("/");
+        }, 1000);
+      }).catch((err: unknown) => {
+        console.error(err);
+        setError((err as Error).message || "Hindi makasali sa tahanan. Maaaring paso na ang link.");
+        setLoading(false);
+      });
+    }
+  }, [isAuthenticated, pendingJoin, joinHousehold, inviteCode, name, router]);
 
   const handleJoin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,20 +57,19 @@ function JoinHouseholdContent() {
     setLoading(true);
 
     try {
-      // If not authenticated yet (e.g. Nanay opening via Messenger), create seamless session
       if (!isAuthenticated) {
+        setPendingJoin(true);
         await signIn("anonymous", { name: trimmedName });
+      } else {
+        await joinHousehold({
+          inviteCode,
+          name: trimmedName || undefined,
+        });
+        setSuccess(true);
+        setTimeout(() => {
+          router.push("/");
+        }, 1000);
       }
-
-      await joinHousehold({
-        inviteCode,
-        name: trimmedName || undefined,
-      });
-
-      setSuccess(true);
-      setTimeout(() => {
-        router.push("/");
-      }, 1000);
     } catch (err: unknown) {
       console.error(err);
       setError((err as Error).message || "Hindi makasali sa tahanan. Maaaring paso na ang link.");
@@ -82,10 +101,10 @@ function JoinHouseholdContent() {
           Maaaring nagamit na ang link o lumipas na ang 48 oras. Humingi ng bagong invite link sa iyong kapamilya sa Messenger.
         </p>
         <button
-          onClick={() => router.push("/auth")}
+          onClick={() => router.push("/welcome")}
           className="px-6 py-3 rounded-xl bg-[#111111] dark:bg-[#FBFBFA] text-white dark:text-[#111111] text-sm font-bold shadow-sm"
         >
-          Pumunta sa Login
+          Pumunta sa Simula
         </button>
       </div>
     );
@@ -102,7 +121,7 @@ function JoinHouseholdContent() {
           Puno na ang Tahanang Ito
         </h1>
         <p className="text-sm text-zinc-500 max-w-sm mb-6 leading-relaxed">
-          Kumpleto na ang 2 miyembro sa tahanang ito. Kung nais gumawa ng sariling tahanan, pumunta sa login.
+          Kumpleto na ang 2 miyembro sa tahanang ito. Kung nais gumawa ng sariling tahanan, pumunta sa simula.
         </p>
         <button
           onClick={() => router.push("/")}

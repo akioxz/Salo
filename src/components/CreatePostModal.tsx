@@ -62,6 +62,7 @@ export default function CreatePostModal({
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
 
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -81,12 +82,22 @@ export default function CreatePostModal({
     setAmount("");
     setCategory("Groceries");
     setCustomCategory("");
+    setErrorMsg("");
     if (photoPreview) URL.revokeObjectURL(photoPreview);
     if (audioUrl) URL.revokeObjectURL(audioUrl);
     setPhotoFile(null);
     setPhotoPreview(null);
     setAudioBlob(null);
     setAudioUrl(null);
+    
+    // Stop recording and mic stream if active
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
+      mediaRecorderRef.current.stop();
+    }
+    if (mediaRecorderRef.current?.stream) {
+      mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
+    }
+    
     setIsRecording(false);
     setRecordingSeconds(0);
     setLinkedNeedId("");
@@ -94,6 +105,29 @@ export default function CreatePostModal({
     if (timerRef.current) clearInterval(timerRef.current);
     onClose();
   };
+
+  // Escape key to close
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isOpen) {
+        resetForm();
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen]);
+
+  // Clean up media stream on unmount
+  useEffect(() => {
+    return () => {
+      if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
+        mediaRecorderRef.current.stop();
+      }
+      if (mediaRecorderRef.current?.stream) {
+        mediaRecorderRef.current.stream.getTracks().forEach(t => t.stop());
+      }
+    };
+  }, []);
 
   // Recording timer
   useEffect(() => {
@@ -152,7 +186,7 @@ export default function CreatePostModal({
       setIsRecording(true);
     } catch (err) {
       console.error("Mic access error:", err);
-      alert("Kailangan ng pahintulot sa mikropono upang makapagtala ng voice note.");
+      setErrorMsg("Kailangan ng pahintulot sa mikropono upang makapagtala ng voice note.");
     }
   };
 
@@ -249,7 +283,7 @@ export default function CreatePostModal({
       resetForm();
     } catch (err) {
       console.error("Failed to post:", err);
-      alert("May naganap na problema sa pag-post. Subukan muli.");
+      setErrorMsg("May naganap na problema sa pag-post. Subukan muli.");
     } finally {
       setLoading(false);
     }
@@ -296,6 +330,8 @@ export default function CreatePostModal({
         >
           {/* Main Modal Surface */}
           <motion.div
+            role="dialog"
+            aria-modal="true"
             initial={{ y: "100%", opacity: 0.5 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: "100%", opacity: 0 }}
@@ -305,6 +341,12 @@ export default function CreatePostModal({
           >
             {/* Mobile Sheet Pull Bar Indicator */}
             <div className="w-10 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700 mx-auto mb-4 sm:hidden" />
+
+            {errorMsg && (
+              <div className="mb-4 p-3 rounded-xl bg-rose-50 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400 text-sm font-medium">
+                {errorMsg}
+              </div>
+            )}
 
             {/* Modal Header */}
             <div className="flex items-start justify-between mb-5">

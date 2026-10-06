@@ -1,0 +1,35 @@
+---
+name: naming-conventions
+description: "DevLib component."
+---
+# Rule: Naming Conventions
+
+> **Purpose:** Universal naming specification for every identifier across all languages and layers. Attach this rule when generating or reviewing code to ensure predictable, searchable names.
+
+## 1. Universal Casing Standards (Language-Agnostic)
+- **Files and Folders:** `kebab-case` for all source files, directories, and assets (e.g., `theme-provider.tsx`, `auth-wizard/`).
+- **Variables and Functions:** Use language-idiomatic casing (`camelCase` in JS/TS; `snake_case` in Python/Rust/SQL).
+- **Global Constants:** `UPPER_SNAKE_CASE` across all languages for immutable module-level constants (e.g., `MAX_POSTS_PER_PAGE`).
+- **Boolean Variables:** Prefix with `is`, `has`, `can`, or `should` (e.g., `isLoading`, `hasError`, `canSubmit`).
+
+## 2. Frontend and UI Layer
+- **Components:** `PascalCase` for component declarations and JSX tags (e.g., `ThemeProvider`, `ProjectCard`).
+- **Custom Hooks / Composables:** Prefix with `use` plus a capital letter (e.g., `useTheme`, `useMediaQuery`).
+- **Event Handlers:** Prefix with `handle` for internal handlers (`handleClick`), and `on` for component event props (`onClick`).
+- **CSS Classes:** `kebab-case` or BEM methodology (`.btn-primary`, `.card__header--active`).
+
+## 3. Backend and Systems Layer
+- **TypeScript / JavaScript:** `PascalCase` for types, interfaces, classes, enums; `camelCase` for functions and methods.
+- **Python (PEP 8):** `PascalCase` for classes; `snake_case` for functions, methods, parameters, and files.
+- **Database:** `snake_case` plural for SQL tables (`user_accounts`), singular `snake_case` for columns (`created_at`).
+- **Environment Variables:** `UPPER_SNAKE_CASE` with mandatory framework prefixes (e.g., `NEXT_PUBLIC_API_URL`).
+
+## 4. Naming Clarity Principles
+- **Reveal Intent:** A name must answer why it exists and what it does. If a comment fulfills this role, rename the symbol instead.
+- **Avoid Disinformation:** Never call a `Map` a "list." Never let two names differ only through visually ambiguous characters.
+- **Make Meaningful Distinctions:** Different names must imply different responsibilities. Avoid noise suffixes like `Manager`, `Handler`, or `Data`.
+- **Pronounceable and Searchable:** Broadly scoped identifiers must read aloud cleanly and grep cleanly. Single letters only for short-scoped loop locals.
+- **Skip Type Encodings:** Do not prefix names with type identifiers (`strName`, `iCount`). The type system surfaces types.
+- **Pick One Word per Concept:** Use one canonical verb for identical operations across the codebase (e.g., `fetch` for async reads, `get` for sync).
+- **Prefer Positive Booleans:** Use positive states (`isEnabled`, `isVisible`) to prevent double-negatives (`!isDisabled`).
+- **Scale Name Length to Scope Size:** Single-letter identifiers are permitted only in 1-3 line local scopes; module-scoped symbols must be explicit.

@@ -1,0 +1,26 @@
+---
+name: prisma-strict
+description: "Strict Prisma ORM guidelines. Enforces schema single-source-of-truth, edge runtime compatibility, correct migration flows, and performance querying."
+trigger: model_decision
+---
+
+# Prisma ORM Strict Standards
+
+This rule applies automatically whenever you are working on a project that uses Prisma (`prisma/schema.prisma`).
+
+## 1. Schema Design
+- **Single Source of Truth:** Treat `schema.prisma` as the absolute source of truth for the database. Do not manually edit the database schema outside of Prisma migrations unless using a strict separate migration tool (like Supabase migrations).
+- **Naming:** Use `PascalCase` for model names (e.g., `User`, `BlogPost`) and `camelCase` for field names.
+- **Relations:** Always define explicit relation fields and scalar fields. Use `@relation` attributes clearly.
+
+## 2. Query Performance
+- **N+1 Prevention:** Use `include` to eagerly load relations in a single query rather than looping over results and firing multiple queries.
+- **Select Specificity:** Use `select` to return only the fields you actually need, especially when sending data to the client, to avoid leaking sensitive fields (like password hashes).
+
+## 3. Client Instantiation
+- **Global Instance (Next.js):** Always instantiate the Prisma Client in a separate `lib/prisma.ts` file and attach it to the `global` object in development. This prevents exhausting database connections during hot-reloads.
+- **Edge Runtime:** If deploying to edge environments (like Vercel Edge Functions or Cloudflare Workers), remember that standard Prisma Client cannot run directly. You must use Prisma Accelerate (Data Proxy) or the driver adapters feature.
+
+## 4. Migrations
+- **Safe Changes:** When altering tables (especially dropping columns or changing types), always review the generated SQL in the `prisma/migrations/` folder before applying it to production.
+- **Push vs. Migrate:** Use `npx prisma db push` only for rapid prototyping in development. Always use `npx prisma migrate dev` to generate proper migration files for production.

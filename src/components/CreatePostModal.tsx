@@ -100,6 +100,11 @@ export default function CreatePostModal({
       streamRef.current = null;
     }
     
+    if (audioElementRef.current) {
+      audioElementRef.current.pause();
+      audioElementRef.current = null;
+    }
+    
     setIsRecording(false);
     setRecordingSeconds(0);
     setLinkedNeedId("");

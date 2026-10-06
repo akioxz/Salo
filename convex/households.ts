@@ -103,7 +103,7 @@ export const getByInviteCode = query({
       householdId: household._id,
       inviterName,
       inviterRole,
-      isFull: members.length >= 2,
+      isFull: false,
     };
   },
 });
@@ -200,7 +200,7 @@ export const getMine = query({
         return {
           userId: m.userId,
           role: m.role,
-          name: memberUser?.name ?? memberUser?.email ?? "Unknown",
+          name: memberUser?.name ?? "Kapamilya",
           image: memberUser?.image,
         };
       }),

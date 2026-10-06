@@ -50,3 +50,8 @@ node_modules/
 /playwright/.auth/
 
 .vercel
+
+# DevLib
+.env
+.env.*
+.devlib.bak/

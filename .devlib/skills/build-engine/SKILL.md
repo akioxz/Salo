@@ -1,0 +1,56 @@
+---
+name: build-engine
+description: >-
+  The execution engine. Enforces Source-Driven Development (anti-hallucination) and Incremental Implementation (atomic slices) when writing code. 
+  Use when the user says "/build", "implement this", or when executing a task list from the Genesis phase.
+trigger: explicit
+---
+
+# The Incremental Build Engine
+
+When instructed to write code or execute a task, you must NEVER dump large amounts of code across multiple files in a single pass. You must act as a disciplined, senior software engineer and follow this strict execution pipeline.
+
+## Phase 1: Source-Driven Verification
+AI training data goes stale. Do not guess framework-specific APIs.
+1. **Detect Stack:** Read `package.json` to identify the exact versions of the frameworks in use (e.g., React 19, Three.js).
+2. **Fetch Docs (If Uncertain):** If implementing a complex or new API, use your tools to fetch the *official documentation* (e.g., react.dev, threejs.org). Never rely on StackOverflow or outdated blogs.
+3. **Cite Sources:** Add a brief comment citing the official URL used for the implementation.
+
+## Phase 2: Vertical Slicing
+Break the requested feature into thin, verifiable "Vertical Slices".
+Example of slicing a feature:
+- *Slice 1:* Database Schema + API Route (Backend only)
+- *Slice 2:* Data Fetching + State Management (Logic only)
+- *Slice 3:* UI Component integration (Frontend only)
+
+## Phase 3: The Implement-Verify-Commit Loop
+For **every single slice**, you must complete this exact loop before moving to the next slice:
+1. **Implement:** Write the code for this specific slice. Ask yourself, "What is the simplest thing that could work?" Avoid premature abstractions.
+2. **Verify:** Check that the code builds or tests pass. Ensure no existing code was broken.
+3. **Atomic Commit:** Commit this specific slice to git using Conventional Commits (e.g., `feat: implement user task API route`).
+4. **Pause/Continue:** Move to the next slice.
+
+## Important Constraints
+- **Scope Discipline:** Touch ONLY what the current slice requires. Do not refactor unrelated imports or "clean up" adjacent code while you are there.
+- **Rollback-Friendly:** Every commit should be independent so the user can easily revert one slice without breaking the others.
+- **Stop on Failure:** If a slice fails to work, STOP. Do not proceed to the next slice. Drop into debugging mode and fix the failure before moving forward.
+
+## Phase 4: Document-As-You-Go (Living Docs Updates)
+After EVERY successful atomic commit in Phase 3, you MUST update the project's living documents:
+
+1. **`docs/ACTIVITY_LOG.md` (MANDATORY after every commit):**
+   Append a new row with: timestamp, commit message, files changed, and a 1-liner explaining WHY.
+   ```
+   | HH:MM | `feat: add post creation form` | `PostForm.tsx`, `api/posts/route.ts` | Users need to create posts in the feed |
+   ```
+
+2. **`docs/LEARNINGS.md` (When something new is discovered):**
+   If during implementation you discover a gotcha, a workaround, a surprising API behavior, or a debugging breakthrough, append it immediately. Do not wait until the end of the session.
+
+3. **`docs/TECH_STACK.md` (When the stack changes):**
+   If you install a new package (`npm install X`), add a new service, or change infrastructure, update the relevant table in `TECH_STACK.md` with the package name, version, and purpose.
+
+4. **`docs/DESIGN_NOTES.md` (When a new pattern is introduced):**
+   If you introduce a new code pattern (e.g., a new custom hook, a new data fetching strategy, a new component structure), document it with a brief code snippet.
+
+> **IMPORTANT:** These updates are NOT optional. They are part of the commit loop. A slice is NOT complete until the living docs are updated.

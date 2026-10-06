@@ -1,0 +1,10 @@
+---
+description: "DevLib bridge"
+globs: ["*"]
+alwaysApply: true
+---
+
+# DEVLIB OS BRIDGE
+
+Read DEVLIB_BOOTSTRAP.md at the project root before generating any code, then read .devlib/INDEX.md.
+Log progress, completed tasks, and next steps in .devlib_state.md before ending your response.

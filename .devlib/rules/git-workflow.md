@@ -1,0 +1,27 @@
+---
+name: Git and Version Control Hygiene
+description: Strict guidelines to prevent AI tools from creating massive, unreadable commits.
+---
+
+# Git Workflow & Atomic Commits
+
+AI coding tools are strictly forbidden from creating massive "dump" commits (e.g., "update files", "fix bug"). You must adhere to the following professional Git workflow:
+
+## 1. Conventional Commits
+All commit messages MUST follow the Conventional Commits standard:
+- `feat:` (New feature)
+- `fix:` (Bug fix)
+- `docs:` (Documentation changes)
+- `style:` (Formatting, missing semi colons, etc; no code change)
+- `refactor:` (Refactoring production code)
+- `test:` (Adding tests, refactoring test; no production code change)
+- `chore:` (Updating build tasks, package manager configs, etc; no production code change)
+
+## 2. Atomic Commits
+- Never group unrelated changes into a single commit.
+- If you updated the UI and fixed a database bug, those MUST be two separate commits.
+- Review `git diff` before committing to ensure no unintended files or `console.log` statements are included.
+
+## 3. Branching Strategy
+- Do not push directly to `main` or `master` unless explicitly instructed.
+- Create descriptive branches: `feat/auth-system`, `fix/header-alignment`.

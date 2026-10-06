@@ -63,6 +63,21 @@ export default function WelcomePage() {
     }
   };
 
+  const handleDryRun = async () => {
+    setError("");
+    setLoading(true);
+    try {
+      await signIn("anonymous");
+      await updateProfile({ name: "Demo User", familyTitle: "Visitor" });
+      await createHousehold({ role: "family" });
+      router.push("/");
+    } catch (err) {
+      console.error(err);
+      setError("Nabigo ang Dry Run setup.");
+      setLoading(false);
+    }
+  };
+
   const handleCreate = async () => {
     if (!name.trim() || !familyTitle.trim()) {
       setError("Kumpletuhin ang Pangalan at Role sa pamilya.");
@@ -188,10 +203,13 @@ export default function WelcomePage() {
             </button>
 
             <button
-              onClick={() => signIn("anonymous")}
-              className="w-full p-4.5 rounded-2xl bg-[#111111] dark:bg-[#FBFBFA] text-white dark:text-[#111111] border border-transparent hover:bg-black/90 dark:hover:bg-white/90 shadow-[0_2px_12px_rgba(0,0,0,0.03)] dark:shadow-none transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] flex items-center justify-center gap-2 active:scale-[0.98] h-14"
+              onClick={handleDryRun}
+              disabled={loading}
+              className="w-full p-4.5 rounded-2xl bg-[#111111] dark:bg-[#FBFBFA] text-white dark:text-[#111111] border border-transparent hover:bg-black/90 dark:hover:bg-white/90 shadow-[0_2px_12px_rgba(0,0,0,0.03)] dark:shadow-none transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] flex items-center justify-center gap-2 active:scale-[0.98] h-14 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <span className="font-bold text-sm">Subukan bilang Guest (Dry Run)</span>
+              <span className="font-bold text-sm">
+                {loading ? "Gumagawa ng Demo Account..." : "Subukan bilang Guest (Dry Run)"}
+              </span>
             </button>
 
             <p className="text-center text-xs text-zinc-500 dark:text-zinc-400">

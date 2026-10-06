@@ -12,6 +12,11 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Custom ignores
+    ".kilo/**",
+    "check_db.js",
+    "fix-hero2.js",
+    "convex/_generated/**",
   ]),
 ]);
 

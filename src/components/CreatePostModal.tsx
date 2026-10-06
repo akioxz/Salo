@@ -66,6 +66,7 @@ export default function CreatePostModal({
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const audioElementRef = useRef<HTMLAudioElement | null>(null);
@@ -94,8 +95,9 @@ export default function CreatePostModal({
     if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
       mediaRecorderRef.current.stop();
     }
-    if (mediaRecorderRef.current?.stream) {
-      mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
     }
     
     setIsRecording(false);
@@ -115,6 +117,7 @@ export default function CreatePostModal({
     };
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
   // Clean up media stream on unmount
@@ -123,22 +126,22 @@ export default function CreatePostModal({
       if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
         mediaRecorderRef.current.stop();
       }
-      if (mediaRecorderRef.current?.stream) {
-        mediaRecorderRef.current.stream.getTracks().forEach(t => t.stop());
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+        streamRef.current = null;
       }
     };
   }, []);
 
   // Recording timer
   useEffect(() => {
-    if (isRecording) {
-      setRecordingSeconds(0);
-      timerRef.current = setInterval(() => {
-        setRecordingSeconds((prev) => prev + 1);
-      }, 1000);
-    } else {
+    if (!isRecording) {
       if (timerRef.current) clearInterval(timerRef.current);
+      return;
     }
+    timerRef.current = setInterval(() => {
+      setRecordingSeconds((prev) => prev + 1);
+    }, 1000);
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
@@ -167,6 +170,7 @@ export default function CreatePostModal({
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      streamRef.current = stream; // Save to our reliable ref!
       mediaRecorderRef.current = new MediaRecorder(stream);
       audioChunksRef.current = [];
 
@@ -179,9 +183,13 @@ export default function CreatePostModal({
         const url = URL.createObjectURL(blob);
         setAudioBlob(blob);
         setAudioUrl(url);
-        stream.getTracks().forEach((track) => track.stop());
+        if (streamRef.current) {
+          streamRef.current.getTracks().forEach((track) => track.stop());
+          streamRef.current = null;
+        }
       };
 
+      setRecordingSeconds(0);
       mediaRecorderRef.current.start();
       setIsRecording(true);
     } catch (err) {
@@ -676,7 +684,7 @@ export default function CreatePostModal({
                     <button
                       type="button"
                       onClick={handleRemovePhoto}
-                      className="p-1.5 rounded-lg text-zinc-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors cursor-pointer"
+                      className="p-1.5 rounded-lg text-zinc-400 hover:text-rose-500 hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer"
                       aria-label="Remove photo"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -711,7 +719,7 @@ export default function CreatePostModal({
                     <button
                       type="button"
                       onClick={handleRemoveAudio}
-                      className="p-1.5 rounded-lg text-zinc-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors cursor-pointer"
+                      className="p-1.5 rounded-lg text-zinc-400 hover:text-rose-500 hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer"
                       aria-label="Remove audio"
                     >
                       <Trash2 className="w-4 h-4" />

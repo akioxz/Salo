@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+Allow: /welcome
+
+User-agent: OAI-SearchBot
+Allow: /
+Allow: /welcome
+
+User-agent: ClaudeBot
+Allow: /
+Allow: /welcome
+
+User-agent: PerplexityBot
+Allow: /
+Allow: /welcome
+
+Sitemap: https://salo.app/sitemap.xml

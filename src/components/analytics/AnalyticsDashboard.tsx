@@ -1,31 +1,42 @@
 "use client";
 
 import { HouseholdPost, Household } from "@/types/household";
-import { formatPHP, getCategoryIcon, formatTimeAgo } from "@/lib/format";
-import { useTheme } from "@/components/ThemeProvider";
+import { formatPHP, formatTimeAgo } from "@/lib/format";
 import { useState, useMemo } from "react";
 import { 
   ArrowDownLeft, 
   ArrowUpRight, 
   Receipt,
-  Calendar,
-  Sparkles,
-  ShoppingBag,
-  Info
+  Utensils,
+  Home,
+  GraduationCap,
+  Bus,
+  HeartPulse,
+  MonitorPlay,
+  ShoppingCart
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/cn";
 
+function getCategoryIcon(category?: string) {
+  if (!category) return Receipt;
+  const c = category.toLowerCase();
+  if (c.includes("pagkain") || c.includes("food") || c.includes("grocery")) return Utensils;
+  if (c.includes("bahay") || c.includes("rent") || c.includes("kuryente")) return Home;
+  if (c.includes("eskwela") || c.includes("tuition") || c.includes("allowance")) return GraduationCap;
+  if (c.includes("pamasahe") || c.includes("gas") || c.includes("transport")) return Bus;
+  if (c.includes("gamot") || c.includes("health") || c.includes("hospital")) return HeartPulse;
+  if (c.includes("luho") || c.includes("shopping")) return ShoppingCart;
+  if (c.includes("entertainment")) return MonitorPlay;
+  return Receipt;
+}
+
 export function AnalyticsDashboard({
   posts,
-  myHousehold,
 }: {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  posts: (HouseholdPost | any)[];
-  myHousehold: Household | null | undefined;
+  posts: HouseholdPost[];
+  myHousehold?: Household | null;
 }) {
-  const { theme } = useTheme();
-  const isDark = theme === "dark";
   const [selectedDayIndex, setSelectedDayIndex] = useState<number | null>(null);
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
 
@@ -53,7 +64,6 @@ export function AnalyticsDashboard({
   const expenseCount = posts.filter((p) => p.type === "expense").length;
 
   const netBalance = totalInflow - totalExpense;
-  const isPositive = netBalance >= 0;
   const retentionPercentage = totalInflow > 0 
     ? Math.max(0, Math.min(100, Math.round(((totalInflow - totalExpense) / totalInflow) * 100)))
     : 0;
@@ -62,7 +72,6 @@ export function AnalyticsDashboard({
   // Replaces the awkward broken Recharts single-dot graph with an authentic Apple-style weekly barometer
   const weeklyRhythm = useMemo(() => {
     const today = new Date();
-    const currentDay = today.getDay(); // 0 = Sun, 1 = Mon...
     // Start from Monday (or 6 days ago up to today)
     const days = [];
     const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -76,7 +85,6 @@ export function AnalyticsDashboard({
 
       // Find transactions on this day
       const dayPosts = financialPosts.filter((p) => {
-        // @ts-ignore
         const rawTime = p._creationTime || (p.createdAt ? new Date(p.createdAt).getTime() : 0);
         return rawTime >= d.getTime() && rawTime < nextD.getTime();
       });
@@ -127,9 +135,7 @@ export function AnalyticsDashboard({
   // Recent Transactions sorted by timestamp descending
   const recentTransactions = useMemo(() => {
     return [...financialPosts].sort((a, b) => {
-      // @ts-ignore
       const timeA = a._creationTime || (a.createdAt ? new Date(a.createdAt).getTime() : 0);
-      // @ts-ignore
       const timeB = b._creationTime || (b.createdAt ? new Date(b.createdAt).getTime() : 0);
       return timeB - timeA;
     });
@@ -397,10 +403,8 @@ export function AnalyticsDashboard({
           <div className="flex flex-col divide-y divide-zinc-200/80 dark:divide-white/10 bg-zinc-50 dark:bg-zinc-900/80 rounded-[20px] border border-zinc-200/80 dark:border-white/10 overflow-hidden">
             {recentTransactions.map((tx, idx) => {
               const isPadala = tx.type === "padala";
-              // @ts-ignore
-              const rawTime = tx._creationTime || (tx.createdAt ? new Date(tx.createdAt).getTime() : Date.now());
-              const uniqueKey = `${(tx as any)._id || tx.id || "tx"}-${idx}-${rawTime}`;
-              const Icon = getCategoryIcon(tx.category);
+              const rawTime = tx._creationTime || (tx.createdAt ? new Date(tx.createdAt).getTime() : 0);
+              const uniqueKey = `${tx._id || tx.id || "tx"}-${idx}-${rawTime}`;
 
               return (
                 <div

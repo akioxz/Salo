@@ -1,0 +1,43 @@
+---
+globs: *.*
+name: awwwards-motion-engineer
+description: >
+  Elite animation engineering skill for "Awwwards-level" upscale websites. Replaces standard Apple/safe spring physics with advanced GSAP timelines, CustomEase, Lenis smooth scrolling, text masking, and cinematic transitions.
+trigger: "/upscale-motion"
+---
+
+# Awwwards Motion Engineering (ANTI-STANDARD)
+
+Standard Apple-style springs (`duration: 0.5`, `bounce: 0.2`) are BANNED. We do not do "safe" or "generic" UI motion. We build upscale, cinematic, brutalist, and award-winning digital experiences using GSAP, Framer Motion, and Lenis.
+
+## 1. The Stack for Upscale Motion
+- **Scroll:** `Lenis` (or React Lenis) is mandatory for smooth scrolling. Native jittery scroll is banned for upscale sites.
+- **Orchestration:** `gsap.timeline()` for master sequences. Never trigger floating animations independently.
+- **React/Next.js:** ALWAYS use the official `@gsap/react` hook (`useGSAP()`) to prevent memory leaks and handle cleanup.
+
+## 2. Advanced Aesthetics & Techniques (The "Basement.studio" Vibe)
+
+### A. Masked Typography Reveal
+Never just fade in a whole paragraph (`opacity: 0 -> 1`).
+- **SplitText:** Break headlines into `chars` or `lines`.
+- **Masking:** Wrap elements in an invisible clipping container (`overflow: hidden`).
+- **Execution:** Animate `y: "100%"` to `y: "0%"` using an aggressive custom bezier curve (e.g., `power4.out` or `expo.inOut`). Stagger lines/chars by `0.02s` to `0.05s` for a waterfall effect.
+
+### B. Clip-Path Revealing
+- Do not use simple `scale` or `fade` for massive hero images or sections. 
+- Use the `clip-path` property. Start with `clip-path: inset(100% 0% 0% 0%)` (hidden at bottom) and animate to `inset(0% 0% 0% 0%)` for a slow, cinematic curtain wipe.
+
+### C. Scroll-Linked Velocity (Locomotive Style)
+- **Scrubbing:** Link animation progress directly to scroll position (`scrub: true` in GSAP ScrollTrigger).
+- **Skew/Scale on Scroll:** As the user scrolls faster, skew images slightly (`skewY`) or scale them down marginally to create a fluid, gelatinous effect that violently settles when scrolling stops.
+
+### D. Magnetic Custom Cursors
+- Ban the default `cursor: pointer` for hero interactions.
+- Implement a custom fixed DOM element tracking `clientX/Y`. When hovering over links, the cursor should "snap" magnetically to the button boundaries or invert the colors underneath using `mix-blend-mode: difference`.
+
+## 3. Framer Motion (The Extreme End)
+If using Framer Motion for component-level UI (instead of GSAP):
+- **Layout Animations:** Master the `layoutId` prop to seamlessly morph components across entirely different DOM states.
+- **Anti-Standard Physics:** Replace safe springs with extreme fluid dynamics:
+  - *Cinematic/Floating:* `{ type: "spring", mass: 2.5, stiffness: 40, damping: 15 }`
+  - *Brutalist Snap:* `{ type: "spring", mass: 0.1, stiffness: 400, damping: 25 }`

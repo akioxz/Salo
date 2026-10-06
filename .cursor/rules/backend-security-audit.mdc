@@ -1,5 +1,8 @@
 ---
+description: Auto-generated dev-library rule for backend-security-audit
 globs: *.*
+---
+﻿---
 name: backend-security-audit
 description: >-
   Run the ultimate backend and security audit combining automated SAST scanning, practical anti-vulnerability heuristics from The Lazy Developer, and Doubt-Driven Adversarial Reviews.
@@ -28,6 +31,18 @@ Manually review the codebase specifically looking for the exact mistakes AI tool
 - **Environment Variables:** Ensure server secrets DO NOT have `NEXT_PUBLIC_` or `VITE_` prefixes. Check that `.env.local` is in `.gitignore`.
 - **Database RLS & Privilege Escalation:** In Supabase/Prisma, ensure users cannot flip their own `is_admin` or `role` flags via the UI/API. Enforce Row Level Security (RLS) on all tables.
 - **Payments & Webhooks:** Ensure webhook signatures are actually verified. Add a database uniqueness constraint (e.g., processed_event_id) so replay attacks cannot double-grant credits.
+
+
+### Phase 2.5: The Lazy Developer 40-Point Pre-Launch Checklist
+You must strictly audit the codebase against Leon Lin's (The Lazy Developer) 40-point checklist:
+1. Hide API keys | 2. Purge Git secrets | 3. Use public DB key | 4. Enable row-level security | 5. Encrypt sensitive data
+6. Enforce server-side auth | 7. Lock record access | 8. Block field tampering | 9. Secure session cookies | 10. Hash passwords
+11. Rate limit login | 12. Add bot protection | 13. Parameterize queries | 14. Validate all input | 15. Escape user content
+16. Restrict file uploads | 17. Trim API responses | 18. Add security headers | 19. Force HTTPS | 20. Scan dependencies
+21. Add HSTS | 22. Add CSRF tokens | 23. Reset sessions on password change | 24. Expire reset links | 25. Prevent user enumeration
+26. Whitelist upload types | 27. Verify payment webhooks | 28. Set prices server-side | 29. Block prompt injection | 30. Cap AI usage
+31. Limit request size | 32. Rate limit password resets | 33. Sanitize before storing | 34. Lock down CORS | 35. Disable directory listing
+36. Remove default admin routes | 37. Lock accounts after failed logins | 38. Log security events | 39. Set secure cookie flags | 40. Restrict database permissions
 
 ### Phase 3: The Architecture & Performance Pass
 Review the database access and application architecture:
@@ -64,3 +79,5 @@ Once completed, generate or update a report at `security/BACKEND_VERDICT.md` wit
 ## Conclusion
 [Provide a final security rating and any remaining risks]
 ```
+
+

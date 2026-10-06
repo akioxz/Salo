@@ -16,7 +16,6 @@ async function getSessionUser(ctx: any) {
   const identity = await ctx.auth.getUserIdentity();
   if (identity) {
     const user = await ctx.db
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .query("users")
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .withIndex("by_token", (q: any) =>
@@ -149,19 +148,15 @@ export const join = mutation({
       throw new Error("Invite code has expired");
     }
 
-    // Check: household must have fewer than 2 members
+    // Remove 2-member limit to allow entire families
     const members = await ctx.db
       .query("householdMembers")
       .withIndex("by_household", (q) => q.eq("householdId", household._id))
       .collect();
 
-    if (members.length >= 2) {
-      throw new Error("Household is already full");
-    }
-
-    // Assign the opposite role
-    const existingRole = members[0]?.role;
-    const newRole = existingRole === "family" ? "ofw" : "family";
+    // Automatically determine role: if an OFW already exists, new members default to 'family'
+    const hasOfw = members.some((m) => m.role === "ofw");
+    const newRole = hasOfw ? "family" : "ofw";
 
     await ctx.db.insert("householdMembers", {
       householdId: household._id,
@@ -169,12 +164,7 @@ export const join = mutation({
       role: newRole,
     });
 
-    // Single-use: nullify the invite code
-    await ctx.db.patch(household._id, {
-      inviteCode: undefined,
-      inviteExpiresAt: undefined,
-    });
-
+    // We no longer nullify the invite code so multiple family members can join
     return { householdId: household._id, role: newRole };
   },
 });
@@ -211,6 +201,7 @@ export const getMine = query({
           userId: m.userId,
           role: m.role,
           name: memberUser?.name ?? memberUser?.email ?? "Unknown",
+          image: memberUser?.image,
         };
       }),
     );

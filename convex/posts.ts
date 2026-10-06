@@ -23,7 +23,7 @@ export const list = query({
         q.eq("householdId", membership.householdId),
       )
       .order("desc")
-      .collect();
+      .take(50);
 
     // Fetch authors, reactions, and comments for each post
     return await Promise.all(
@@ -55,7 +55,9 @@ export const list = query({
               ...c,
               author: {
                 name: cAuthor?.name ?? "Kapamilya",
+                familyTitle: cAuthor?.familyTitle,
                 role: cMembership?.role ?? "family",
+                image: cAuthor?.image,
               },
             };
           })
@@ -90,7 +92,9 @@ export const list = query({
           isCovered,
           author: {
             name: author?.name ?? "Kapamilya",
+            familyTitle: author?.familyTitle,
             role: authorMembership?.role,
+            image: author?.image,
           },
           reactions,
           comments: commentsWithAuthors,

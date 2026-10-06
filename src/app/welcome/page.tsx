@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { useRouter } from "next/navigation";
 import { useAuthActions, useConvexAuth } from "@convex-dev/auth/react";
@@ -28,94 +28,78 @@ export default function WelcomePage() {
   const { signIn, signOut } = useAuthActions();
   const { isAuthenticated } = useConvexAuth();
 
+  const myHousehold = useQuery(api.households.getMine);
   const createHousehold = useMutation(api.households.create);
   const joinHousehold = useMutation(api.households.join);
 
+  const updateProfile = useMutation(api.users.updateProfile);
+
   const [step, setStep] = useState<FlowState>("choose");
   const [role, setRole] = useState<"family" | "ofw">("family");
+
+  // Redirect to home if user already has a household
+  useEffect(() => {
+    if (isAuthenticated && myHousehold) {
+      router.push("/");
+    }
+  }, [isAuthenticated, myHousehold, router]);
+  
+  // Registration fields
   const [name, setName] = useState("");
+  const [familyTitle, setFamilyTitle] = useState("");
   const [inviteCode, setInviteCode] = useState("");
 
   const [generatedCode, setGeneratedCode] = useState("");
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  
-  const [pendingAction, setPendingAction] = useState<"create" | "join" | null>(null);
 
-  useEffect(() => {
-    if (isAuthenticated && pendingAction === "create") {
-      setPendingAction(null);
-      createHousehold({ role })
-        .then((result) => {
-          setGeneratedCode(result.inviteCode);
-          setStep("showCode");
-          setLoading(false);
-        })
-        .catch((err) => {
-          console.error(err);
-          setError(err.message || "Hindi makagawa ng tahanan.");
-          setLoading(false);
-        });
-    } else if (isAuthenticated && pendingAction === "join") {
-      setPendingAction(null);
-      joinHousehold({ inviteCode: inviteCode.trim() })
-        .then(() => {
-          router.push("/");
-        })
-        .catch((err) => {
-          console.error(err);
-          setError(err.message || "Hindi wasto ang invite code.");
-          setLoading(false);
-        });
+  const handleGoogleLogin = async () => {
+    try {
+      await signIn("google");
+    } catch (err) {
+      console.error(err);
+      setError("Nabigo ang pag-login sa Google. Subukan muli.");
     }
-  }, [isAuthenticated, pendingAction, createHousehold, joinHousehold, role, inviteCode, router]);
+  };
 
   const handleCreate = async () => {
-    if (!name.trim()) {
-      setError("Ilagay ang iyong pangalan o palayaw.");
+    if (!name.trim() || !familyTitle.trim()) {
+      setError("Kumpletuhin ang Pangalan at Role sa pamilya.");
       return;
     }
 
     setError("");
     setLoading(true);
     try {
-      if (!isAuthenticated) {
-        setPendingAction("create");
-        await signIn("anonymous", { name: name.trim() });
-      } else {
-        const result = await createHousehold({ role });
-        setGeneratedCode(result.inviteCode);
-        setStep("showCode");
-        setLoading(false);
-      }
+      await updateProfile({ name: name.trim(), familyTitle: familyTitle.trim() });
+      const result = await createHousehold({ role });
+      setGeneratedCode(result.inviteCode);
+      setStep("showCode");
+      setLoading(false);
     } catch (err: unknown) {
       console.error(err);
-      setError((err as Error).message || "Hindi makagawa ng tahanan.");
+      setError("May naganap na error sa paggawa ng tahanan.");
       setLoading(false);
     }
   };
 
   const handleJoin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inviteCode.trim() || !name.trim()) {
-      setError("Ilagay ang invite code at ang iyong pangalan.");
+    if (!inviteCode.trim() || !name.trim() || !familyTitle.trim()) {
+      setError("Kumpletuhin ang lahat ng impormasyon at ang invite code.");
       return;
     }
 
     setError("");
     setLoading(true);
     try {
-      if (!isAuthenticated) {
-        setPendingAction("join");
-        await signIn("anonymous", { name: name.trim() });
-      } else {
-        await joinHousehold({ inviteCode: inviteCode.trim() });
-        router.push("/");
-      }
+      await updateProfile({ name: name.trim(), familyTitle: familyTitle.trim() });
+      await joinHousehold({ inviteCode: inviteCode.trim() });
+      router.push("/");
     } catch (err: unknown) {
       console.error(err);
-      setError((err as Error).message || "Hindi wasto ang invite code.");
+      setError("Hindi wasto ang code o may error na naganap.");
       setLoading(false);
     }
   };
@@ -177,12 +161,51 @@ export default function WelcomePage() {
           </div>
         )}
 
-        {step === "choose" && (
-          <div className="space-y-3.5">
+        {!isAuthenticated ? (
+          <div className="space-y-4 animate-in fade-in zoom-in-95 duration-300">
             <button
-              onClick={() => setStep("create")}
-              className="w-full p-4.5 rounded-2xl bg-white dark:bg-[#121212] border border-zinc-200/90 dark:border-zinc-800/90 hover:border-zinc-400 dark:hover:border-zinc-600 shadow-[0_2px_12px_rgba(0,0,0,0.03)] dark:shadow-none transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] flex items-center justify-between text-left group active:scale-[0.98]"
+              onClick={handleGoogleLogin}
+              className="w-full p-4.5 rounded-2xl bg-white dark:bg-[#121212] border border-zinc-200/90 dark:border-zinc-800/90 hover:border-zinc-400 dark:hover:border-zinc-600 shadow-[0_2px_12px_rgba(0,0,0,0.03)] dark:shadow-none transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] flex items-center justify-center gap-3 active:scale-[0.98] h-14"
             >
+              <svg className="w-5 h-5" viewBox="0 0 24 24">
+                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+              </svg>
+              <span className="font-semibold text-sm text-zinc-900 dark:text-zinc-100">Mag-login gamit ang Google</span>
+            </button>
+
+            <button
+              onClick={() => signIn("apple").catch(() => setError("Apple Sign-In requires production configuration."))}
+              className="w-full p-4.5 rounded-2xl bg-black dark:bg-white text-white dark:text-black border border-transparent shadow-[0_2px_12px_rgba(0,0,0,0.03)] dark:shadow-none transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] flex items-center justify-center gap-3 active:scale-[0.98] h-14"
+            >
+              <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                <path d="M17.05 20.28c-.98.68-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.19 2.31-.88 3.5-.8 1.49.12 2.65.65 3.5 1.55-2.46 1.3-2.09 4.32.15 5.41-.61 1.77-1.45 3.25-2.23 4.01z" />
+                <path d="M12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.02 4.46-3.74 4.25z" />
+              </svg>
+              <span className="font-semibold text-sm">Mag-login gamit ang Apple</span>
+            </button>
+
+            <button
+              onClick={() => signIn("anonymous")}
+              className="w-full p-4.5 rounded-2xl bg-[#111111] dark:bg-[#FBFBFA] text-white dark:text-[#111111] border border-transparent hover:bg-black/90 dark:hover:bg-white/90 shadow-[0_2px_12px_rgba(0,0,0,0.03)] dark:shadow-none transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] flex items-center justify-center gap-2 active:scale-[0.98] h-14"
+            >
+              <span className="font-bold text-sm">Subukan bilang Guest (Dry Run)</span>
+            </button>
+
+            <p className="text-center text-xs text-zinc-500 dark:text-zinc-400">
+              Kailangan mag-login bago makagawa o makasali sa tahanan.
+            </p>
+          </div>
+        ) : (
+          <>
+            {step === "choose" && (
+              <div className="space-y-3.5">
+                <button
+                  onClick={() => setStep("create")}
+                  className="w-full p-4.5 rounded-2xl bg-white dark:bg-[#121212] border border-zinc-200/90 dark:border-zinc-800/90 hover:border-zinc-400 dark:hover:border-zinc-600 shadow-[0_2px_12px_rgba(0,0,0,0.03)] dark:shadow-none transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] flex items-center justify-between text-left group active:scale-[0.98]"
+                >
               <div className="flex items-center gap-3.5">
                 <div className="w-11 h-11 rounded-xl bg-zinc-100 dark:bg-[#1A1A1A] border border-zinc-200/60 dark:border-zinc-800/80 flex items-center justify-center text-zinc-900 dark:text-zinc-100 group-hover:scale-105 transition-transform duration-300">
                   <PlusCircle className="w-5 h-5 stroke-[1.75]" />
@@ -217,6 +240,13 @@ export default function WelcomePage() {
                 </div>
               </div>
               <ArrowRight className="w-4 h-4 text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 group-hover:translate-x-0.5 transition-all duration-300" />
+            </button>
+
+            <button
+              onClick={() => signOut()}
+              className="w-full mt-2 text-xs font-medium text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors"
+            >
+              Maling account? Mag-logout
             </button>
           </div>
         )}
@@ -304,22 +334,37 @@ export default function WelcomePage() {
                 </button>
               </div>
 
-              <div className="relative">
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full h-14 px-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#121212] text-zinc-900 dark:text-zinc-100 text-sm placeholder:text-zinc-400 focus:outline-none focus:border-zinc-900 dark:focus:border-zinc-100 focus:ring-4 focus:ring-zinc-500/10 transition-all duration-300"
-                  placeholder="Iyong Pangalan o Palayaw"
-                  required
-                />
+              <div className="space-y-3">
+                <div className="flex gap-3">
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="w-1/2 h-14 px-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#121212] text-zinc-900 dark:text-zinc-100 text-sm placeholder:text-zinc-400 focus:outline-none focus:border-zinc-900 dark:focus:border-zinc-100 focus:ring-4 focus:ring-zinc-500/10 transition-all duration-300"
+                    placeholder="Pangalan"
+                    required
+                  />
+                  <input
+                    type="text"
+                    value={familyTitle}
+                    onChange={(e) => setFamilyTitle(e.target.value)}
+                    className="w-1/2 h-14 px-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#121212] text-zinc-900 dark:text-zinc-100 text-sm placeholder:text-zinc-400 focus:outline-none focus:border-zinc-900 dark:focus:border-zinc-100 focus:ring-4 focus:ring-zinc-500/10 transition-all duration-300"
+                    placeholder="Role (Nanay, Ate)"
+                    required
+                  />
+                </div>
               </div>
             </div>
 
             <button
               onClick={handleCreate}
-              disabled={loading || !name.trim()}
-              className="w-full h-14 bg-[#111111] hover:bg-black dark:bg-[#FBFBFA] dark:hover:bg-white text-white dark:text-[#111111] font-bold text-sm rounded-xl transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed shadow-sm flex items-center justify-center gap-2 cursor-pointer"
+              disabled={loading || !name.trim() || !familyTitle.trim()}
+              className={cn(
+                "w-full h-14 font-bold text-sm rounded-xl transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] flex items-center justify-center gap-2",
+                !name.trim() || !familyTitle.trim() || loading
+                  ? "bg-zinc-100 dark:bg-zinc-900 text-zinc-400 dark:text-zinc-600 border border-zinc-200/80 dark:border-zinc-800/80 cursor-not-allowed"
+                  : "bg-[#111111] hover:bg-black dark:bg-[#FBFBFA] dark:hover:bg-white text-white dark:text-[#111111] active:scale-[0.98] shadow-sm cursor-pointer"
+              )}
             >
               {loading ? (
                 "Inihahanda ang Tahanan..."
@@ -360,29 +405,34 @@ export default function WelcomePage() {
                 required
               />
 
-              <label
-                htmlFor="join-name"
-                className="block text-[11px] font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 mb-2 text-center"
-              >
-                Pangalan
-              </label>
-              <input
-                id="join-name"
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full h-14 px-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#121212] text-zinc-900 dark:text-zinc-100 text-sm placeholder:text-zinc-400 focus:outline-none focus:border-zinc-900 dark:focus:border-zinc-100 focus:ring-4 focus:ring-zinc-500/10 transition-all duration-300"
-                placeholder="Iyong Pangalan o Palayaw"
-                required
-              />
+              <div className="space-y-3">
+                <div className="flex gap-3">
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="w-1/2 h-14 px-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#121212] text-zinc-900 dark:text-zinc-100 text-sm placeholder:text-zinc-400 focus:outline-none focus:border-zinc-900 dark:focus:border-zinc-100 focus:ring-4 focus:ring-zinc-500/10 transition-all duration-300"
+                    placeholder="Pangalan"
+                    required
+                  />
+                  <input
+                    type="text"
+                    value={familyTitle}
+                    onChange={(e) => setFamilyTitle(e.target.value)}
+                    className="w-1/2 h-14 px-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#121212] text-zinc-900 dark:text-zinc-100 text-sm placeholder:text-zinc-400 focus:outline-none focus:border-zinc-900 dark:focus:border-zinc-100 focus:ring-4 focus:ring-zinc-500/10 transition-all duration-300"
+                    placeholder="Role (Nanay, Ate)"
+                    required
+                  />
+                </div>
+              </div>
             </div>
 
             <button
               type="submit"
-              disabled={loading || !inviteCode.trim() || !name.trim()}
+              disabled={loading || !inviteCode.trim() || !name.trim() || !familyTitle.trim()}
               className={cn(
                 "w-full h-14 font-bold text-sm rounded-xl transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] flex items-center justify-center gap-2",
-                !inviteCode.trim() || !name.trim() || loading
+                !inviteCode.trim() || !name.trim() || !familyTitle.trim() || loading
                   ? "bg-zinc-100 dark:bg-zinc-900 text-zinc-400 dark:text-zinc-600 border border-zinc-200/80 dark:border-zinc-800/80 cursor-not-allowed"
                   : "bg-[#111111] hover:bg-black dark:bg-[#FBFBFA] dark:hover:bg-white text-white dark:text-[#111111] active:scale-[0.98] shadow-sm cursor-pointer",
               )}
@@ -474,6 +524,8 @@ export default function WelcomePage() {
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
+        )}
+        </>
         )}
       </div>
     </div>

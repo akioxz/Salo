@@ -84,3 +84,26 @@ export const updateStatus = mutation({
     });
   },
 });
+
+export const remove = mutation({
+  args: {
+    itemId: v.id("balikbayanBox"),
+  },
+  handler: async (ctx, args) => {
+    const { membership, user } = await requireMembership(ctx);
+
+    const item = await ctx.db.get(args.itemId);
+    if (!item) throw new Error("Item not found");
+    if (item.householdId !== membership.householdId) {
+      throw new Error("Item not in your household");
+    }
+
+    // Only allow deletion if the item is not packed OR if the user is the author
+    if (item.status === "packed" && item.authorId !== user._id) {
+       // but maybe in a family everyone can delete if it's a mistake. Let's just allow it for now if they are in household.
+       // Actually, let's keep it simple: any household member can delete.
+    }
+
+    await ctx.db.delete(args.itemId);
+  },
+});

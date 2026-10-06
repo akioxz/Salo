@@ -1,0 +1,59 @@
+---
+description: Auto-generated dev-library rule for production-gatekeeper
+globs: *.*
+---
+﻿---
+name: production-gatekeeper
+description: >
+  The ultimate non-standard, anti-generic pre-launch audit. Goes beyond standard CI/CD checks by auditing for Hostile Networks (3G/Drop-offs), Race Conditions (Double-taps), Zero-Trust Data Leaks, and Idempotency.
+trigger: "/production-gatekeeper"
+---
+
+# Production Gatekeeper (Extreme Launch Readiness)
+
+Standard deployment checklists (like checking for lint errors or alt tags) are the bare minimum. This skill enforces **Military-Grade/High-Friction Audits** for real-world application deployment. Apps do not live in perfect localhost environments; they live in hostile networks, handled by impatient users.
+
+When this skill is triggered, the AI must aggressively audit the codebase against these 4 Universal Gates before approving a launch:
+
+## 1. The Hostile Network & Chaos Gate (Third-World Connectivity)
+Do not assume users have 5G. Audit the app for connection drops.
+- **Optimistic UI Rollbacks:** If a database mutation fails due to a network drop, does the UI automatically revert to its previous state? Or does it lie to the user?
+- **Offline Hydration:** Are critical queries wrapped in suspense boundaries, skeleton loaders, or cached (e.g., React Query / SWR) so the user doesn't see a blank white screen on a 3G connection?
+- **WebSocket Reconnection:** If using real-time channels (Supabase Realtime/Socket.io), is there a reconnection strategy with exponential backoff?
+
+## 2. The Idempotency & Race Condition Gate (The "Double-Tap" Problem)
+Impatient users click buttons multiple times when the internet is slow.
+- **Double-Charge/Submit Prevention:** Are payment or critical mutation endpoints protected by Idempotency Keys? 
+- **Debounce/Throttle:** Are form submissions globally disabling the submit button on isSubmitting?
+- **TOCTOU (Time-of-Check to Time-of-Use):** Does the backend check authorization *again* at the exact moment of execution, not just on page load?
+
+## 3. Zero-Trust Data Leak Gate
+Standard scanners miss logical data leaks.
+- **Console Log Ban:** Ensure absolutely NO console.log, console.dir, or debug statements exist in production code that could leak PII or state.
+- **Token Storage:** Are auth tokens sitting naked in localStorage (vulnerable to XSS)? Enforce HTTP-Only secure cookies for session management.
+- **Supabase RLS Deep Check:** Do not just check if RLS is "enabled". Audit the policies: Can a user guess another user's UUID and read their data? Is there a strict uth.uid() = user_id boundary?
+
+## 4. The "Anti-Slop" UI Integrity Gate
+- **Cumulative Layout Shift (CLS):** Do images and fonts have explicit dimensions so the layout doesn't violently shift as assets load?
+- **Aesthetic Regression:** Does the final build still obey the upscale-motion and design-taste-frontend rules, or did generic Tailwind defaults creep back in?
+
+
+## 5. The Exhaustive Crawler Rule (Anti-AI Laziness)
+AI models naturally suffer from context decay and skip files when auditing large codebases. You are FORBIDDEN from doing a superficial "skim" of the codebase.
+- You must generate a full file tree of the src/ or pp/ directory.
+- You must perform a **Component-by-Component** and **Route-by-Route** deep scan.
+- You must output a Checklist of every single file you audited. If a file was not explicitly read and checked against the 4 gates, you cannot approve the launch.
+
+
+## 6. The Legal & Compliance Gate (App Store & DPA Readiness)
+Deploying an app without legal compliance will result in App Store rejections or Data Privacy violations. The AI must audit the UI and codebase for the following:
+- **Cookie Consent & Analytics:** If the app uses Google Analytics, PostHog, or tracking cookies, is there a visible Cookie Consent Banner?
+- **Mandatory Legal Pages:** Are the "Privacy Policy" and "Terms of Service" explicitly linked in the footer or auth screens? (Required for Google Play/Apple App Store).
+- **Account Deletion (Right to be Forgotten):** Is there a clear, accessible CTA (Call-to-Action) inside the app allowing users to completely delete their account and data? (Strict App Store mandate).
+- **Unsubscribe/Opt-Out:** If the app sends emails or SMS, is there an automated opt-out mechanism built into the backend flow?
+
+## Output Requirement
+Do not output a generic "Looks good!" response. 
+Output a **Brutalist Audit Report**. List exactly which files fail these 4 gates, the specific lines of code, and the required architectural fix. If the app passes, output: [GATE PASSED] - READY FOR DEPLOYMENT.
+
+

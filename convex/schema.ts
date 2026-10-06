@@ -14,11 +14,17 @@ export default defineSchema({
   users: defineTable({
     email: v.optional(v.string()),
     name: v.optional(v.string()),
+    familyTitle: v.optional(v.string()), // e.g. "Nanay", "Tatay", "Ate", "Bunso"
     tokenIdentifier: v.optional(v.string()), // Convex Auth identity reference
     isAnonymous: v.optional(v.boolean()),
+    // Standard auth fields required by convex auth
+    image: v.optional(v.string()),
+    emailVerificationTime: v.optional(v.number()),
+    phone: v.optional(v.string()),
+    phoneVerificationTime: v.optional(v.number()),
   })
     .index("by_token", ["tokenIdentifier"])
-    .index("by_email", ["email"]),
+    .index("email", ["email"]),
 
   // ---------------------------------------------------------------
   // Households — max 2 members, invite-code pairing

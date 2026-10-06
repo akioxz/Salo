@@ -3,7 +3,9 @@ export type PostType = "expense" | "need" | "padala";
 
 export interface HouseholdMember {
   name: string;
+  familyTitle?: string;
   role: HouseholdRole;
+  image?: string;
 }
 
 export interface HouseholdComment {
@@ -16,6 +18,8 @@ export interface HouseholdComment {
 
 export interface HouseholdPost {
   id: string;
+  _id?: string;
+  _creationTime?: number;
   type: PostType;
   author: HouseholdMember;
   /** ISO timestamp */

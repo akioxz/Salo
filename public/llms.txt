@@ -1,0 +1,11 @@
+# Salo - Tahanan ng Pamilya
+
+Salo is a private household feed and budget space for Overseas Filipino Workers (OFWs) and their families. It bridges the distance by combining a private social feed with shared financial tracking—allowing families to transparently manage expenses, request "padala" (remittances), and stay connected in one secure space.
+
+## Features
+- **Private Household Feed**: Share updates, photos, and voice notes with your family.
+- **Balikbayan Box Tracker**: Track the status of your Balikbayan boxes.
+- **Shared Financial Tracking**: Transparently manage expenses and padala requests.
+- **Invite-only Access**: Only family members with an invite code can join your household.
+
+This application is primarily a private dashboard. You must be authenticated to access the feed.

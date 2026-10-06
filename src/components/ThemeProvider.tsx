@@ -21,6 +21,8 @@ const ThemeProviderContext = React.createContext<ThemeProviderState | undefined>
   undefined
 );
 
+const emptySubscribe = () => () => {};
+
 export function ThemeProvider({
   children,
   defaultTheme = "system",
@@ -28,16 +30,23 @@ export function ThemeProvider({
   disableTransitionOnChange = false,
 }: ThemeProviderProps) {
   const [theme, setThemeState] = React.useState<Theme>(defaultTheme);
-  const [mounted, setMounted] = React.useState(false);
+  const mounted = React.useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false
+  );
 
   React.useEffect(() => {
-    setMounted(true);
-    const savedTheme = window.localStorage.getItem("theme") as Theme | null;
-    if (savedTheme) {
-      setThemeState(savedTheme);
-    } else if (enableSystem) {
-      setThemeState("system");
-    }
+    try {
+      const savedTheme = window.localStorage.getItem("theme") as Theme | null;
+      if (savedTheme) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setThemeState(savedTheme);
+      } else if (enableSystem) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setThemeState("system");
+      }
+    } catch {}
   }, [enableSystem]);
 
   React.useEffect(() => {
@@ -75,7 +84,7 @@ export function ThemeProvider({
     // Save to local storage
     try {
       window.localStorage.setItem("theme", theme);
-    } catch (e) {}
+    } catch {}
   }, [theme, mounted, enableSystem, disableTransitionOnChange]);
 
   // Listen for system theme changes

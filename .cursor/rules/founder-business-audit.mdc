@@ -1,0 +1,138 @@
+---
+globs: *.*
+name: founder-business-audit
+description: >
+  The Ultimate Virtual CTO, CPO, and General Counsel Audit. Evaluates SaaS applications for legal compliance (GDPR, CCPA, App Store, FTC Click-to-Cancel), monetization integrity (Stripe webhooks, freemium bypass, dunning), and growth engines (TTV, viral loops, telemetry).
+trigger: "/founder-business"
+---
+
+# Founder & Business Audit (Virtual CTO, CPO & Legal Counsel)
+
+Do not look at the codebase solely for syntax or linting errors. Audit the software from the perspective of an experienced **SaaS Founder, Chief Product Officer, and Chief Legal Counsel**. Every unvalidated API route is a revenue leak; every missing account deletion button is an App Store rejection or GDPR fine; every friction-heavy onboarding step is lost MRR.
+
+## Universal Audit Protocol
+
+When triggered, the AI must systematically execute 4 sequential audit passes:
+
+---
+
+### Pass 1: The Legal Armor & Regulatory Gate (Counsel Review)
+Audit the codebase against binding consumer protection and privacy laws:
+1. **In-App Account Deletion (GDPR Art. 17 & Apple Guideline 5.1.1(v)):**
+   - Search for a self-service "Delete Account" button in settings/profile.
+   - Verify backend cascading purge (cleans up DB rows, file storage, Stripe customer, and calls Apple `/auth/revoke` if Sign in with Apple is used).
+2. **Data Portability (GDPR Art. 20):**
+   - Verify existence of a machine-readable data export endpoint (`/api/user/export` returning JSON/CSV).
+3. **Prior-Consent Cookie & Script Blocking (ePrivacy / Google Consent Mode v2):**
+   - Verify that Google Analytics, Meta Pixel, PostHog, or Hotjar do NOT fire before user consent.
+   - Verify consent defaults to `'denied'` for `ad_storage` and `analytics_storage`.
+4. **Sign in with Apple Parity (Apple Guideline 4.8):**
+   - If Google or social login is present in mobile/responsive builds, verify "Sign in with Apple" is also offered.
+5. **Subscription Cancellation Parity ("Click-to-Cancel" / FTC & California ARL):**
+   - Cancellation must be self-service in <= 3 clicks via the UI or Stripe Customer Portal.
+   - Ban dark patterns requiring phone calls or "email support to cancel".
+6. **Zero PII in URLs & Telemetry:**
+   - Audit search params and logger calls for unmasked emails, tokens, or passwords.
+
+---
+
+### Pass 2: The Monetization & Revenue Protection Gate (CTO Review)
+Audit the payment infrastructure and subscription entitlement gates:
+1. **Stripe Webhook Signature Verification:**
+   - Ensure `/api/webhooks/stripe` calls `stripe.webhooks.constructEvent()` using the **raw request body**.
+   - Flag any pre-parsing of body JSON before signature verification.
+2. **Atomic Webhook Idempotency:**
+   - Ensure Stripe `event.id` is tracked in a dedicated table with a `UNIQUE` constraint before side effects are executed.
+3. **Server-Side Entitlement Enforcement (Anti-Freemium Bypass):**
+   - Audit all premium/paid API routes and Server Actions. Verify subscription tier or entitlement checks occur server-side.
+   - Ban client-only checks (`disabled={!isPro}`).
+4. **Atomic Usage Quota Deduction (TOCTOU & Double-Spend Defense):**
+   - For credit/token-based systems, ensure decrements are atomic (`UPDATE ... WHERE credits >= 1`).
+   - Flag read-then-write race conditions.
+5. **Disposable Email Blocking on Free Tiers:**
+   - Verify signups are checked against disposable email blocklists to prevent bot trial cycling.
+6. **Graceful Dunning & Failed Payment Recovery:**
+   - Verify handling of `invoice.payment_failed` and `customer.subscription.deleted`.
+   - Ensure users enter a `past_due` grace period with an in-app card update banner rather than immediate data deletion.
+7. **Stripe Customer Portal Integration:**
+   - Ensure a 1-click portal session (`stripe.billingPortal.sessions.create`) allows users to manage cards and view invoices.
+
+---
+
+### Pass 3: The Growth & Retention Engine (CPO Review)
+Audit the user acquisition and product-led growth (PLG) mechanics:
+1. **Time-to-Value (TTV) & Blank-Slate Elimination:**
+   - Count onboarding form fields (flag if > 3 non-essential fields block entry).
+   - Check empty states on the dashboard: Must provide starter templates, sample data, or a progress checklist.
+   - Flag hard email-verification blockers that prevent immediate product exploration.
+2. **Dynamic Social Previews (Open Graph Viral Loop):**
+   - Verify `og:title`, `og:description`, `og:image` (1200x630), and `twitter:card` metadata on shareable links.
+   - Audit for dynamic OG image generation on user-generated content.
+3. **Referral Attribution & Anti-Fraud:**
+   - Ensure referral attribution is preserved across signup.
+   - Verify rewards only trigger upon active milestones (not raw signups) and strictly block self-referrals.
+4. **Churn Exit Survey & Non-Coercive Retention Saves:**
+   - Check for a 1-step churn survey with an optional plan pause or discount offer before finalizing cancellation.
+
+---
+
+### Pass 4: The YC Launch & Operational Readiness Gate (Founder Review)
+Audit startup survival essentials:
+1. **Production Crash Alerting:**
+   - Verify Sentry, Highlight, or Bugsnag is initialized and integrated into global error boundaries.
+2. **Core Funnel Telemetry:**
+   - Verify analytics events track: Signup -> Onboarding -> Aha Moment -> Checkout.
+3. **Transactional Email Quality:**
+   - Verify emails are routed through a real provider (Resend, Postmark) with dynamic URLs (no `localhost:3000`).
+4. **Admin Support & Impersonation:**
+   - Verify founders have an authenticated admin interface to inspect accounts and resolve customer issues.
+
+---
+
+## Output Requirement: The Founder's Verdict
+
+Do not output generic platitudes. Output a **Brutalist Founder's Audit Report** structured exactly as follows:
+
+```markdown
+# Founder & Business Audit Report -- [Project Name]
+
+## Executive Summary
+- **Business Health Score:** [0-100%]
+- **Primary Risk Factor:** [LEGAL LIABILITY | REVENUE LEAK | CHURN RISK]
+- **Launch Readiness Verdict:** [READY TO LAUNCH | BLOCKED - CRITICAL VULNERABILITIES FOUND]
+
+---
+
+### 1. [LEGAL & COMPLIANCE RISKS]
+*(List specific files, line numbers, violations like Apple 5.1.1 account deletion, GDPR cookie blocking, FTC click-to-cancel)*
+- **Finding:** [Description]
+- **File:** `path/to/file.ts:line`
+- **Violation:** [e.g. Apple App Store Guideline 5.1.1(v)]
+- **Actionable Fix:** [Code snippet]
+
+---
+
+### 2. [REVENUE & MONETIZATION LEAKS]
+*(List unverified webhooks, freemium bypass vulnerabilities, missing dunning, atomic double-spend races)*
+- **Finding:** [Description]
+- **File:** `path/to/file.ts:line`
+- **Revenue Impact:** [e.g. Free users can trigger unmetered AI generations]
+- **Actionable Fix:** [Code snippet]
+
+---
+
+### 3. [GROWTH, RETENTION & TTV BOTTLENECKS]
+*(List onboarding friction, blank slates, missing OG preview tags, referral fraud flaws)*
+- **Finding:** [Description]
+- **File:** `path/to/file.ts:line`
+- **Friction Factor:** [e.g. Blank dashboard causes 60% activation drop]
+- **Actionable Fix:** [Code snippet]
+
+---
+
+### 4. [FOUNDER'S ACTION PLAN]
+Prioritized 3-step immediate roadmap for the founder:
+1. **P0 (Immediate Blockers):** ...
+2. **P1 (Revenue Hardening):** ...
+3. **P2 (Growth Optimizations):** ...
+```

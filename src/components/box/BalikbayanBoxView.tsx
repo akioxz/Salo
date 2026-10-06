@@ -4,7 +4,7 @@ import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { useState } from "react";
 import { cn } from "@/lib/cn";
-import { Package, Plus, Sparkles } from "lucide-react";
+import { Package, Plus, Trash2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { getWishCategory } from "@/lib/wishCategory";
 
@@ -12,6 +12,7 @@ export function BalikbayanBoxView() {
   const items = useQuery(api.balikbayan.list);
   const addItem = useMutation(api.balikbayan.add);
   const updateStatus = useMutation(api.balikbayan.updateStatus);
+  const removeItem = useMutation(api.balikbayan.remove);
 
   const [title, setTitle] = useState("");
   const [price, setPrice] = useState("");
@@ -21,6 +22,22 @@ export function BalikbayanBoxView() {
   const [isBoxOpen, setIsBoxOpen] = useState(false);
   const [showGrid, setShowGrid] = useState(false);
   const [justPackedId, setJustPackedId] = useState<string | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [deletingIds, setDeletingIds] = useState<Record<string, boolean>>({});
+
+  const handleDeleteItem = (itemId: string) => {
+    setDeletingIds((prev) => ({ ...prev, [itemId]: true }));
+    setConfirmDeleteId(null);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    removeItem({ itemId: itemId as any });
+    setTimeout(() => {
+      setDeletingIds((prev) => {
+        const next = { ...prev };
+        delete next[itemId];
+        return next;
+      });
+    }, 1000);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -126,7 +143,7 @@ export function BalikbayanBoxView() {
               className="absolute inset-x-0 top-0 h-1/2 bg-[#C2AA8C] dark:bg-[#231A12] origin-top z-20 rounded-t-[22px] overflow-hidden border-x border-t border-[#D9C4A9]/20 dark:border-white/5 shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_-2px_10px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_-2px_10px_rgba(0,0,0,0.5)]"
               initial={false}
               animate={{ rotateX: isBoxOpen ? -110 : 0 }}
-              transition={{ type: "spring", stiffness: 200, damping: 22 }}
+              transition={{ type: "spring", stiffness: 300, damping: 24, mass: 0.75 }}
             >
               {/* Cargo Print / Decal */}
               <div className="absolute top-3 left-4 flex gap-1.5 opacity-20 dark:opacity-10">
@@ -141,7 +158,7 @@ export function BalikbayanBoxView() {
               <motion.div 
                 className="absolute bottom-0 left-1/2 -translate-x-1/2 w-20 h-full bg-white/30 dark:bg-white/10 backdrop-blur-2xl border-x border-white/40 dark:border-white/20 origin-bottom shadow-[0_2px_15px_rgba(255,255,255,0.2)]"
                 animate={{ scaleY: isBoxOpen ? 0 : 1, opacity: isBoxOpen ? 0 : 1 }}
-                transition={{ duration: 0.2 }}
+                transition={{ type: "spring", stiffness: 340, damping: 26 }}
               >
                 <div className="absolute inset-0 bg-gradient-to-t from-white/20 to-transparent" />
               </motion.div>
@@ -152,7 +169,7 @@ export function BalikbayanBoxView() {
               className="absolute inset-x-0 bottom-0 h-1/2 bg-[#D9C4A9] dark:bg-[#2A2118] origin-bottom z-30 rounded-b-[22px] flex flex-col items-center justify-start overflow-hidden border-x border-b border-[#E8D5BC]/30 dark:border-white/5 shadow-[inset_0_1px_0_rgba(255,255,255,0.5),0_5px_20px_rgba(0,0,0,0.1)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_5px_20px_rgba(0,0,0,0.6)]"
               initial={false}
               animate={{ rotateX: isBoxOpen ? 100 : 0 }}
-              transition={{ type: "spring", stiffness: 200, damping: 22 }}
+              transition={{ type: "spring", stiffness: 300, damping: 24, mass: 0.75 }}
             >
               {/* Cargo Print */}
               <div className="absolute bottom-3 right-4 font-mono text-[11px] font-bold text-black/20 dark:text-black/40 tracking-widest transform -rotate-90 origin-bottom-right">
@@ -163,7 +180,7 @@ export function BalikbayanBoxView() {
               <motion.div 
                 className="absolute top-0 left-1/2 -translate-x-1/2 w-20 h-full bg-white/30 dark:bg-white/10 backdrop-blur-2xl border-x border-white/40 dark:border-white/20 origin-top shadow-[0_-2px_15px_rgba(255,255,255,0.2)]"
                 animate={{ scaleY: isBoxOpen ? 0 : 1, opacity: isBoxOpen ? 0 : 1 }}
-                transition={{ duration: 0.2 }}
+                transition={{ type: "spring", stiffness: 340, damping: 26 }}
               >
                 <div className="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent" />
               </motion.div>
@@ -208,21 +225,22 @@ export function BalikbayanBoxView() {
                       <motion.button
                         layout
                         layoutId={`packed-item-${item._id}`}
-                        initial={{ opacity: 0, scale: 0.2, y: 100, rotate: randomRotate * 4 }}
+                        initial={{ opacity: 0, scale: 0.72, y: 35, rotate: randomRotate * 2 }}
                         animate={{ opacity: 1, scale: 1, y: 0, rotate: randomRotate }}
-                        exit={{ opacity: 0, scale: 0.2, y: 100, rotate: 0 }}
+                        exit={{ opacity: 0, scale: 0.72, y: 35, rotate: 0 }}
                         transition={{ 
                           type: "spring", 
-                          stiffness: 450, 
-                          damping: 20, 
+                          stiffness: 400, 
+                          damping: 24, 
                           delay: delay 
                         }}
-                        whileHover={{ scale: 1.05, rotate: 0, zIndex: 50 }}
+                        whileHover={{ scale: 1.08, rotate: 0, zIndex: 50, transition: { type: "spring", stiffness: 450, damping: 20 } }}
+                        whileTap={{ scale: 0.94 }}
                         key={item._id}
                         onClick={() => handleStatusChange(item._id, item.status)}
                         aria-label={`Unpack ${item.title}`}
                         className={cn(
-                          "group relative w-[76px] sm:w-[82px] shrink-0 aspect-square rounded-[8px] flex items-center justify-center cursor-pointer active:scale-[0.96] overflow-hidden text-left",
+                          "group relative w-[72px] sm:w-[80px] shrink-0 aspect-square rounded-[8px] flex items-center justify-center cursor-pointer active:scale-[0.96] overflow-hidden text-left",
                           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#111111] dark:focus-visible:ring-white/20",
                           "bg-[#C2AA8C] dark:bg-[#2A2118]",
                           "border border-[#A88F6D]/50 dark:border-[#1A130D]",
@@ -266,7 +284,7 @@ export function BalikbayanBoxView() {
 
       <div className="px-4 space-y-6">
         {/* Apple-style premium form with slider */}
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4 bg-[#F4F4F5] dark:bg-[#111111] p-5 rounded-[24px] border border-[#EAEAEA] dark:border-white/5 focus-within:border-[#D4D4D8] dark:focus-within:border-white/15 transition-all focus-within:bg-white dark:focus-within:bg-[#0A0A0A] shadow-inner dark:shadow-[0_2px_10px_rgba(0,0,0,0.2)]">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4 bg-[#F4F4F5] dark:bg-[#111111] p-6 rounded-[24px] border border-[#EAEAEA] dark:border-white/5 focus-within:border-[#D4D4D8] dark:focus-within:border-white/15 transition-all focus-within:bg-white dark:focus-within:bg-[#0A0A0A] shadow-inner dark:shadow-[0_2px_10px_rgba(0,0,0,0.2)]">
           <div className="flex items-center gap-3">
             <div className="flex-1 min-w-0">
               <input
@@ -277,13 +295,15 @@ export function BalikbayanBoxView() {
                 className="w-full bg-transparent px-1 focus:outline-none text-[17px] placeholder:text-[#A1A1AA] text-[#111111] dark:text-[#FBFBFA] font-bold tracking-tight"
               />
             </div>
-            <button
+            <motion.button
               type="submit"
               disabled={isSubmitting || !title.trim()}
-              className="w-10 h-10 flex items-center justify-center bg-[#111111] dark:bg-[#FBFBFA] text-white dark:text-[#111111] rounded-full transition-all active:scale-[0.95] disabled:opacity-50 disabled:active:scale-100 shrink-0 shadow-sm"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.92 }}
+              className="w-10 h-10 flex items-center justify-center bg-[#111111] dark:bg-[#FBFBFA] text-white dark:text-[#111111] rounded-full transition-colors disabled:opacity-40 disabled:pointer-events-none shrink-0 shadow-sm cursor-pointer"
             >
               <Plus className="w-5 h-5" />
-            </button>
+            </motion.button>
           </div>
         </form>
 
@@ -295,7 +315,7 @@ export function BalikbayanBoxView() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="w-full py-12 flex flex-col items-center justify-center text-center px-6 bg-white dark:bg-[#111111] rounded-[4px] border border-dashed border-[#EAEAEA] dark:border-[#222222]"
+                className="w-full py-12 flex flex-col items-center justify-center text-center px-6 bg-white dark:bg-[#111111] rounded-[16px] border border-dashed border-[#EAEAEA] dark:border-[#222222]"
               >
                 <Package className="w-8 h-8 text-[#A1A1AA] mb-3 opacity-50" />
                 <p className="text-base font-semibold text-zinc-700 dark:text-zinc-200">
@@ -309,32 +329,56 @@ export function BalikbayanBoxView() {
                 .map((item) => {
                   const category = getWishCategory(item.title);
                   const CategoryIcon = category.icon;
+                  const isDeleting = !!deletingIds[item._id];
                   const waybillVariants = {
                     initial: { opacity: 0, y: 10 },
                     animate: { opacity: 1, y: 0 },
-                    exit: { 
-                      scale: 0.28,
-                      y: -380, // Shoots UP directly into the open Balikbayan box above
-                      backgroundColor: "#C2AA8C", // Morphs to cardboard
-                      borderColor: "#A88F6D",
-                      borderRadius: "14px",
-                      zIndex: 50,
-                      opacity: 0,
-                      transition: { 
-                        duration: 0.75,
-                        ease: [0.16, 1, 0.3, 1] as const, // Apple spring curve
-                        y: { duration: 0.75, ease: [0.32, 0, 0.67, 0] as const }, // Upward launch into box
-                        scale: { duration: 0.28, ease: "easeOut" as const },
-                        backgroundColor: { duration: 0.2 },
-                        borderColor: { duration: 0.2 },
-                        borderRadius: { duration: 0.2 },
-                        opacity: { duration: 0.15, delay: 0.6 } // STAYS 100% VISIBLE until entering the box!
-                      }
-                    }
+                    exit: isDeleting
+                      ? {
+                          // Clean Apple Spring Swipe Fling (Emil Kowalski Standard)
+                          opacity: 0,
+                          x: "-115%",
+                          rotate: -6,
+                          scale: 0.92,
+                          height: 0,
+                          minHeight: 0,
+                          paddingTop: 0,
+                          paddingBottom: 0,
+                          marginTop: 0,
+                          marginBottom: 0,
+                          transition: {
+                            duration: 0.28,
+                            ease: [0.16, 1, 0.3, 1] as const, // Apple spring curve
+                            height: { duration: 0.26, ease: [0.16, 1, 0.3, 1] as const, delay: 0.04 },
+                            minHeight: { duration: 0.26, ease: [0.16, 1, 0.3, 1] as const, delay: 0.04 },
+                            paddingTop: { duration: 0.26, delay: 0.04 },
+                            paddingBottom: { duration: 0.26, delay: 0.04 },
+                            marginBottom: { duration: 0.26, delay: 0.04 },
+                          },
+                        }
+                      : { 
+                          scale: 0.28,
+                          y: -380, // Shoots UP directly into the open Balikbayan box above
+                          backgroundColor: "#C2AA8C", // Morphs to cardboard
+                          borderColor: "#A88F6D",
+                          borderRadius: "14px",
+                          zIndex: 50,
+                          opacity: 0,
+                          transition: { 
+                            duration: 0.75,
+                            ease: [0.16, 1, 0.3, 1] as const, // Apple spring curve
+                            y: { duration: 0.75, ease: [0.32, 0, 0.67, 0] as const }, // Upward launch into box
+                            scale: { duration: 0.28, ease: "easeOut" as const },
+                            backgroundColor: { duration: 0.2 },
+                            borderColor: { duration: 0.2 },
+                            borderRadius: { duration: 0.2 },
+                            opacity: { duration: 0.15, delay: 0.6 } // STAYS 100% VISIBLE until entering the box!
+                          }
+                        }
                   };
 
                   return (
-                    <motion.button
+                    <motion.div
                       layout
                       layoutId={`feed-item-${item._id}`}
                       variants={waybillVariants}
@@ -343,19 +387,45 @@ export function BalikbayanBoxView() {
                       exit="exit"
                       key={item._id}
                       onClick={() => handleStatusChange(item._id, item.status)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          handleStatusChange(item._id, item.status);
+                        }
+                      }}
+                      role="button"
+                      tabIndex={0}
                       aria-label={`Mark ${item.title} as bought`}
+                      whileHover={{ scale: 1.008, transition: { duration: 0.2 } }}
+                      whileTap={{ scale: 0.985 }}
                       className={cn(
-                        "group relative w-full text-left p-4 rounded-[4px] flex justify-between items-stretch cursor-pointer active:scale-[0.98] min-h-[96px] overflow-hidden",
+                        "group relative w-full text-left p-4 rounded-[16px] flex justify-between items-stretch cursor-pointer active:scale-[0.98] min-h-[96px] overflow-hidden select-none",
                         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#111111] dark:focus-visible:ring-white/20",
                         // Waybill / Sticker Aesthetics
                         "bg-[#F8F9FA] dark:bg-[#EAEAEA] border border-[#E0E0E0] dark:border-[#D4D4D4] shadow-sm hover:shadow-[0_5px_15px_rgba(0,0,0,0.08)]"
                       )}
                     >
-                      {/* Normal Waybill Content (Fades out when packing) */}
                       <motion.div 
-                        className="w-full flex justify-between items-stretch absolute inset-0 p-4"
+                        className="absolute inset-0 bg-red-500 dark:bg-red-600 flex justify-end items-center pr-6"
                         exit={{ opacity: 0 }}
-                        transition={{ duration: 0.15 }}
+                        transition={{ duration: 0.08 }}
+                      >
+                        <Trash2 className="w-5 h-5 text-white" />
+                      </motion.div>
+
+                      {/* Normal Waybill Content (Fades out when packing, stays visible during swipe exit) */}
+                      <motion.div 
+                        drag="x"
+                        dragConstraints={{ left: 0, right: 0 }}
+                        dragElastic={{ left: 0.8, right: 0 }}
+                        onDragEnd={(e, info) => {
+                          if (info.offset.x < -50) {
+                            setConfirmDeleteId(item._id);
+                          }
+                        }}
+                        className="w-full flex justify-between items-stretch absolute inset-0 p-4 bg-[#F8F9FA] dark:bg-[#EAEAEA] active:cursor-grabbing"
+                        exit={{ opacity: isDeleting ? 1 : 0 }}
+                        transition={{ duration: isDeleting ? 0.28 : 0.15 }}
                       >
                         {/* Fake Vertical Barcode on the left edge */}
                         <div className="absolute left-4 top-4 bottom-4 flex gap-[2px] opacity-20 group-hover:opacity-40 transition-opacity">
@@ -371,12 +441,10 @@ export function BalikbayanBoxView() {
                         
                         <div className="pl-8 w-full flex justify-between items-center z-10 gap-4">
                           {/* Left Side: Text Details */}
-                          <div className="flex flex-col flex-1 min-w-0 py-1">
-                            {/* @ts-ignore */}
-                            {item.authorName && (
+                          <div className="flex flex-col flex-1 min-w-0 py-1 pointer-events-none">
+                            {(item as { authorName?: string }).authorName && (
                               <span className="text-[9px] uppercase tracking-[0.2em] font-extrabold text-[#111111]/40 mb-1 flex items-center gap-1.5">
-                                {/* @ts-ignore */}
-                                {item.authorName}
+                                {(item as { authorName?: string }).authorName}
                               </span>
                             )}
                             <h3 className="font-black tracking-tight text-[16px] leading-tight text-[#111111] line-clamp-2 uppercase">
@@ -385,8 +453,10 @@ export function BalikbayanBoxView() {
                           </div>
 
                           {/* Right Side: Icon & CTA Stamp */}
-                          <div className="flex flex-col items-end justify-between h-full gap-3 shrink-0 py-1">
-                            <CategoryIcon className="w-5 h-5 text-[#111111] opacity-70" strokeWidth={2.5} />
+                          <div className="flex flex-col items-end justify-between h-full gap-3 shrink-0 py-1 pointer-events-none">
+                            <div className="flex items-center gap-3">
+                              <CategoryIcon className="w-5 h-5 text-[#111111] opacity-70" strokeWidth={2.5} />
+                            </div>
                             
                             {/* Rubber Stamp Buttons */}
                             {item.status === "open" && (
@@ -407,10 +477,66 @@ export function BalikbayanBoxView() {
                         </div>
                       </motion.div>
 
+                      {/* Dimming Overlay when Confirming Delete */}
+                      <AnimatePresence>
+                        {confirmDeleteId === item._id && (
+                          <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="absolute inset-0 bg-white/30 dark:bg-black/40 backdrop-blur-md z-40 flex items-center justify-center"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setConfirmDeleteId(null);
+                            }}
+                          >
+                            <motion.div
+                              initial={{ opacity: 0, scale: 0.95, y: 4 }}
+                              animate={{ opacity: 1, scale: 1, y: 0 }}
+                              exit={{ opacity: 0, scale: 0.95, y: 4 }}
+                              transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                              className="flex items-center gap-1 bg-white/80 dark:bg-[#0A0A0A]/80 backdrop-blur-2xl border border-white/50 dark:border-white/10 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.15)] rounded-[14px] p-1.5"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <div className="pl-3 pr-2 flex items-center gap-2">
+                                <Trash2 className="w-3.5 h-3.5 text-red-500/80" />
+                                <span className="text-[11px] font-semibold text-zinc-800 dark:text-zinc-200 tracking-wide">Delete wish?</span>
+                              </div>
+                              
+                              <div className="w-[1px] h-5 bg-black/5 dark:bg-white/5 mx-1" />
+                              
+                              <motion.button
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.93 }}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setConfirmDeleteId(null);
+                                }}
+                                className="px-3 py-1.5 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 rounded-[10px] transition-colors flex items-center justify-center cursor-pointer font-medium text-[11px]"
+                              >
+                                Cancel
+                              </motion.button>
+                              <motion.button
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.93 }}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeleteItem(item._id);
+                                }}
+                                className="px-4 py-1.5 text-red-600 dark:text-red-400 bg-red-500/10 hover:bg-red-500/20 rounded-[10px] transition-colors flex items-center justify-center cursor-pointer font-bold text-[11px]"
+                              >
+                                Delete
+                              </motion.button>
+                            </motion.div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+
+
                       {/* Mini Parcel Morph Overlay (Visible when morphing into a cardboard box flying to the big box) */}
                       <motion.div
                         initial={{ opacity: 0 }}
-                        exit={{ opacity: 1 }}
+                        exit={{ opacity: isDeleting ? 0 : 1 }}
                         transition={{ duration: 0.18 }}
                         className="absolute inset-0 pointer-events-none flex items-center justify-center p-2"
                       >
@@ -437,7 +563,7 @@ export function BalikbayanBoxView() {
                           </div>
                         </div>
                       </motion.div>
-                    </motion.button>
+                    </motion.div>
                   );
                 })
             )}

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, type FormEvent, type KeyboardEvent } from "react";
 import { Send } from "lucide-react";
@@ -53,12 +53,16 @@ export function CommentsThread({
                   role="img"
                   aria-label={comment.author.name}
                   className={cn(
-                    "flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold",
-                    role.avatarBg,
-                    role.avatarText,
+                    "flex h-7 w-7 overflow-hidden shrink-0 items-center justify-center rounded-full text-[11px] font-semibold",
+                    !comment.author.image && role.avatarBg,
+                    !comment.author.image && role.avatarText,
                   )}
                 >
-                  {getInitials(comment.author.name)}
+                  {comment.author.image ? (
+                    <img src={comment.author.image} alt={comment.author.name} className="w-full h-full object-cover" />
+                  ) : (
+                    getInitials(comment.author.name)
+                  )}
                 </div>
                 <div
                   className={cn(
@@ -66,15 +70,21 @@ export function CommentsThread({
                     role.bubbleBg,
                   )}
                 >
-                  <div className="flex items-baseline gap-2">
-                    <span className="truncate text-[13px] font-medium text-zinc-900 ">
+                  <div className="flex flex-col">
+                    <span className="truncate text-[13px] font-bold text-zinc-900 dark:text-zinc-100">
                       {comment.author.name}
                     </span>
-                    <span className="shrink-0 text-[11px] text-[#787774] ">
-                      {formatTimeAgo(comment.createdAt)}
-                    </span>
+                    <div className="flex items-center gap-1.5 text-[10px] font-bold text-[#787774]">
+                      {comment.author.familyTitle && (
+                        <>
+                          <span>{comment.author.familyTitle}</span>
+                          <span>·</span>
+                        </>
+                      )}
+                      <span>{formatTimeAgo(comment.createdAt)}</span>
+                    </div>
                   </div>
-                  <p className="mt-0.5 text-sm leading-relaxed text-zinc-700 ">
+                  <p className="mt-1 text-[13px] leading-relaxed text-zinc-800 dark:text-zinc-200">
                     {comment.content}
                   </p>
                 </div>
@@ -89,16 +99,20 @@ export function CommentsThread({
           role="img"
           aria-label={currentUser?.name ?? "You"}
           className={cn(
-            "flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold mb-1",
-            currentUser
+            "flex h-8 w-8 overflow-hidden shrink-0 items-center justify-center rounded-full text-xs font-semibold mb-1",
+            currentUser && !currentUser.image
               ? ROLE_STYLES[currentUser.role].avatarBg
               : "bg-zinc-200 ",
-            currentUser
+            currentUser && !currentUser.image
               ? ROLE_STYLES[currentUser.role].avatarText
               : "text-[#787774] ",
           )}
         >
-          {currentUser ? getInitials(currentUser.name) : "?"}
+          {currentUser?.image ? (
+            <img src={currentUser.image} alt={currentUser.name} className="w-full h-full object-cover" />
+          ) : (
+            currentUser ? getInitials(currentUser.name) : "?"
+          )}
         </div>
 
         <div className="flex flex-1 items-center gap-1.5 rounded-xl border border-[#EAEAEA] bg-zinc-50/50 pl-4 pr-1 py-1 focus-within:ring-2 focus-within:ring-amber-400/50  ">

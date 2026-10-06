@@ -40,7 +40,7 @@ interface HouseholdActivityFeedProps {
   posts?: HouseholdPost[];
   /** The signed-in person. Pass the real value from your auth/session. */
   currentUser?: HouseholdMember;
-  members?: Array<{ userId: string; role: string; name: string }>;
+  members?: Array<{ userId: string; role: string; name: string; image?: string }>;
   inviteCode?: string;
   onReact?: (postId: string) => void;
   /** Fires when a post's comment section is opened — a good place to lazy-load real comments. */
@@ -212,26 +212,31 @@ function PostCard({
           role="img"
           aria-label={post.author.name}
           className={cn(
-            "flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold border dark:border-white/10",
-            role.avatarBg,
-            role.avatarText,
+            "flex h-9 w-9 overflow-hidden shrink-0 items-center justify-center rounded-full text-sm font-semibold border dark:border-white/10",
+            !post.author.image && role.avatarBg,
+            !post.author.image && role.avatarText,
           )}
         >
-          {getInitials(post.author.name)}
+          {post.author.image ? (
+            <img src={post.author.image} alt={post.author.name} className="w-full h-full object-cover" />
+          ) : (
+            getInitials(post.author.name)
+          )}
         </div>
 
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2">
-            <span className="truncate text-sm font-bold text-[#111111] dark:text-[#FBFBFA]">
-              {post.author.name}
-            </span>
-            <span className={cn("text-[11px] font-bold", role.avatarText)}>
-              {role.label}
-            </span>
-          </div>
-          <span className="text-[10px] font-bold tracking-wide text-[#787774] dark:text-[#A1A1AA]">
-            {formatTimeAgo(post.createdAt)}
+          <span className="block truncate text-sm font-bold text-[#111111] dark:text-[#FBFBFA]">
+            {post.author.name}
           </span>
+          <div className="flex items-center gap-1.5 text-[10px] font-bold tracking-wide text-[#787774] dark:text-[#A1A1AA]">
+            {post.author.familyTitle && (
+              <>
+                <span className="text-zinc-500 dark:text-zinc-400">{post.author.familyTitle}</span>
+                <span>·</span>
+              </>
+            )}
+            <span>{formatTimeAgo(post.createdAt)}</span>
+          </div>
         </div>
       </div>
 
@@ -638,7 +643,7 @@ export default function HouseholdActivityFeed({
     // 1. Known members from household
     if (members && members.length > 0) {
       members.forEach((m) => {
-        map.set(m.name, { name: m.name, role: (m.role as HouseholdRole) || "family" });
+        map.set(m.name, { name: m.name, role: (m.role as HouseholdRole) || "family", image: m.image });
       });
     }
 
@@ -757,17 +762,13 @@ export default function HouseholdActivityFeed({
                         : "bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300"
                     )}
                   >
-                    {getInitials(member.name)}
+                    {member.image ? (
+                      <img src={member.image} alt={member.name} className="w-full h-full object-cover rounded-full" />
+                    ) : (
+                      getInitials(member.name)
+                    )}
                   </div>
 
-                  {/* Clean Minimalist Role Status Pip */}
-                  <span
-                    className={cn(
-                      "absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full ring-2 ring-white dark:ring-[#0A0A0A]",
-                      isOfw ? "bg-sky-500" : "bg-amber-500"
-                    )}
-                    title={isOfw ? "OFW (Abroad)" : "Pamilya (Bahay)"}
-                  />
                 </div>
 
                 <div className="flex flex-col items-center w-16">
@@ -851,7 +852,7 @@ export default function HouseholdActivityFeed({
             return (
               <button
                 key={tab.id}
-                onClick={() => setSelectedType(tab.id as any)}
+                onClick={() => setSelectedType(tab.id as PostType | "all")}
                 className={cn(
                   "px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all duration-200 active:scale-95 cursor-pointer shrink-0",
                   isTabSelected
